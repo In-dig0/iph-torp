@@ -317,6 +317,8 @@ def insert_request():
     rec_request = rec_user | rec_pgroup | rec_req
     insdate = datetime.datetime.now().strftime("%Y-%m-%d")
     rec_request["Req_insdate"] = insdate
+    if 'submit_clicked' not in st.session_state:
+        st.session_state.submit_clicked = False
     st.button("Submit", type="primary", on_click=click_submit_button)
     if st.session_state.submit_clicked:
       if check_request_fields(rec_request):

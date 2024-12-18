@@ -49,7 +49,7 @@ def display_app_info():
     
     import streamlit as st
 
-    st.header(":blue[TORP Application]", divider=blue)
+    st.header(":blue[TORP Application]", divider="blue")
     st.subheader(
         """
         TORP - Technical Office Requests POC (Proof Of Concept), is a simple web application to manage request to IPH Technical Office.

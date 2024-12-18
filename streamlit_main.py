@@ -40,10 +40,35 @@ def check_password():
         st.error("😕 User not known or password incorrect")
     return False
 
+def display_app_info():
+    """ Show app title and description """
+    
+    import streamlit as st
+
+    st.title("🧿 :blue[TORP Application]")
+    st.write(
+        """
+        TORP - Technical Office Requests POC (Proof Of Concept), is a simple application to manage request to IPH Technical Office.
+        """
+    )
+    st.markdown("Powered with Streamlit :streamlit:")
+    st.divider()
+
+def insert_request():
+  pass
+
+def view_request():
+  pass
 
 def main():
   if not check_password():
       st.stop()
-
+  page_names_to_funcs = {
+    "—": display_app_info,
+    "Insert Request": insert_request,
+    "View Request": view_request
+}    
+  demo_name = st.sidebar.selectbox("Choose a demo", page_names_to_funcs.keys())
+  page_names_to_funcs[demo_name]()
 if __name__ == "__main__":
     main()

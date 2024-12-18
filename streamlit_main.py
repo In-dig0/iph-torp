@@ -162,15 +162,24 @@ def display_attachment_section() -> dict:
     st.divider()              
     return rec_out       
 
+def upload_pdf_file():
+    """ Widget used to upload an xml file """
+    uploaded_file = st.file_uploader("Choose a PDF file:", type=["pdf","jpg"], accept_multiple_files=False)
+    return uploaded_file
+
+
 def check_request_fields(record: dict) -> bool:
     res = all(record.values())
     return res
 
+
 def click_submit_button():
     st.session_state.submit_clicked = True
 
+
 def clear_text(t_txt):
     st.session_state[t_txt] = ""
+
 
 def save_applog_to_sqlitecloud(log_values:dict) -> None:
     """ Save applog into SQLite Cloud Database """

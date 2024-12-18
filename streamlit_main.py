@@ -182,7 +182,7 @@ def check_request_fields(record: dict) -> bool:
     for k in list(record.keys()):
         st.write(k)
         st.write(record[k])
-        if k in mandatory_fields and record[k] == "":
+        if k in mandatory_fields and record[k] == None:
             res = False
     return res
 

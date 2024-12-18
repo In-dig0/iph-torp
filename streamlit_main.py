@@ -1,12 +1,17 @@
+# Python built-in libraries
+import datetime
+import os
+import io
+
+# 3th party packages
 import streamlit as st
 import pandas as pd
 import sqlitecloud
-import datetime
 import pytz 
-import io
 import hmac
-import os
 
+
+# Global constants
 APPNAME = "TORP" #IPH Technical Office Request POC (Proof Of Concept)
 APPCODE = "TORP"
 APPVERSION = "0.1"
@@ -63,27 +68,27 @@ def display_app_info():
     st.markdown("Powered with Streamlit :streamlit:")
 
 
-def display_user_section() -> dict:
+def display_requester_section() -> dict:
     """ Show a section to declare the user informations """
     req_department = ""
-    req_user = ""
+    req_requester = ""
     with st.container():
-        st.header(":orange[User informations]")
+        st.header(":orange[Requester informations]")
         req_dept_values_00 = ["DMN-ACCOUNTING", "DTD-DESIGN TECHNICAL DEPARTMENT", "COMMERCIALE AFTER MARKET"]
         req_department = st.selectbox(":blue[Requester Department(:red[*])]", req_dept_values_00, index=None)
         if req_department == "DMN-ACCOUNTING":
-            req_user_values_01 = ["COMELLINI GIORGIO", "ROMANI CORRADO", "ROSSI PAOLA"]
-            req_user = st.selectbox(":blue[Requester User(:red[*])]", req_user_values_01, index=None)
+            req_requester_values_01 = ["COMELLINI GIORGIO", "ROMANI CORRADO", "ROSSI PAOLA"]
+            req_requester = st.selectbox(":blue[Requester User(:red[*])]", req_user_values_01, index=None)
         elif req_department == "DTD-DESIGN TECHNICAL DEPARTMENT":
-            req_user_values_02 = ["CARLINI MICHELE", "FENARA GABRIELE", "PALMA NICOLA"]
-            req_user = st.selectbox(":blue[Requester User(:red[*])]", req_user_values_02, index=None)
+            req_requester_values_02 = ["CARLINI MICHELE", "FENARA GABRIELE", "PALMA NICOLA"]
+            req_requester = st.selectbox(":blue[Requester User(:red[*])]", req_user_values_02, index=None)
         elif req_department == "COMMERCIALE AFTER MARKET":
-            req_user_values_03 = ["GIORGI IVAN", "ANGOTTI FRANCESCO", "BALDINI ROBERTO"]
-            req_user = st.selectbox(":blue[Requester User(:red[*])]", req_user_values_03, index=None)
+            req_requester_values_03 = ["GIORGI IVAN", "ANGOTTI FRANCESCO", "BALDINI ROBERTO"]
+            req_requester = st.selectbox(":blue[Requester User(:red[*])]", req_user_values_03, index=None)
     st.divider()    
     rec_out =    {
                      "Req_dept": req_department,
-                     "Req_user": req_user
+                     "Req_requester": req_requester
                  }
            
     return rec_out        
@@ -172,7 +177,11 @@ def upload_pdf_file():
 
 
 def check_request_fields(record: dict) -> bool:
-    res = all(record.values())
+    res = True
+    mandatory_fields = ["Req_dept","Req_requester", "Prd_line, "Prd_family"]
+    for k in list(record.keys()):
+        if k in mandatory_fields and record[k] = "":
+            res = False
     return res
 
 
@@ -233,6 +242,8 @@ def save_applog_to_sqlitecloud(log_values:dict) -> None:
         conn.commit()
     finally:
         cursor.close()
+    if conn:
+        conn.close()
 
 def save_request_to_sqlitecloud(row:dict, atch: dict) -> None:
     """ Save applog into SQLite Cloud Database """
@@ -247,7 +258,7 @@ def save_request_to_sqlitecloud(row:dict, atch: dict) -> None:
         db_link = os.getenv("SQLITECLOUD_DBLINK")
         db_apikey = os.getenv("SQLITECLOUD_APIKEY")
         db_name = os.getenv("SQLITECLOUD_DBNAME")
-    except st.StreamlitAPIException as errMsg:
+    except Exception as errMsg:
         try:
             #Search DB credentials using ST.SECRETS
             db_link = st.secrets["SQLITE_DBLINK"]
@@ -277,7 +288,7 @@ def save_request_to_sqlitecloud(row:dict, atch: dict) -> None:
     next_rowid = (max_rowid + 1) if max_rowid is not None else 1
      
     # Setup row values
-    values = (next_rowid, row["Req_dept"], row["Req_user"], row["Prd_line"], row["Prd_family"], row["Req_priority"], row["Req_type"], row["Req_category"], row["Req_title"], row["Req_detail"], row["Req_insdate"])
+    values = (next_rowid, row["Req_dept"], row["Req_requester"], row["Prd_line"], row["Prd_family"], row["Req_priority"], row["Req_type"], row["Req_category"], row["Req_title"], row["Req_detail"], row["Req_insdate"])
     try:
         cursor.execute(sqlcode, values)
     #    cursor.lastrowid
@@ -312,11 +323,11 @@ def save_request_to_sqlitecloud(row:dict, atch: dict) -> None:
 
 
 def insert_request():
-    rec_user = display_user_section()
+    rec_requester= display_requester_section()
     rec_pgroup = display_productgroup_section()
     rec_req = display_request_section()
     rec_attchment = display_attachment_section() 
-    rec_request = rec_user | rec_pgroup | rec_req
+    rec_request = rec_requester | rec_pgroup | rec_req
     insdate = datetime.datetime.now().strftime("%Y-%m-%d")
     rec_request["Req_insdate"] = insdate
     if 'submit_clicked' not in st.session_state:
@@ -365,5 +376,7 @@ def main():
 }    
   demo_name = st.sidebar.selectbox("Choose a function", page_names_to_funcs.keys())
   page_names_to_funcs[demo_name]()
+
+
 if __name__ == "__main__":
     main()

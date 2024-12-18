@@ -49,13 +49,13 @@ def display_app_info():
     
     import streamlit as st
 
-    st.title("🧿 :blue[TORP Application]")
-    st.write(
+    st.header(":blue[TORP Application]", divider=blue)
+    st.subheader(
         """
-        TORP - Technical Office Requests POC (Proof Of Concept), is a simple application to manage request to IPH Technical Office.
+        TORP - Technical Office Requests POC (Proof Of Concept), is a simple web application to manage request to IPH Technical Office.
         """
     )
-    st.markdown(f"Version: {APPVERSION}")
+    st.markdown(f":grey[Version: {APPVERSION}]")
     st.divider()
     st.markdown("Powered with Streamlit :streamlit:")
 

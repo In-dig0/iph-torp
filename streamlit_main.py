@@ -180,6 +180,8 @@ def check_request_fields(record: dict) -> bool:
     res = True
     mandatory_fields = ["Req_dept", "Req_requester", "Prd_line", "Prd_family", "Req_priority", "Req_type", "ReReq_category", "Req_title", "Req_detail"]
     for k in list(record.keys()):
+        st.write(k)
+        st.write(record[k])
         if k in mandatory_fields and record[k] == "":
             res = False
     return res

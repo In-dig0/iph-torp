@@ -178,7 +178,7 @@ def upload_pdf_file():
 
 def check_request_fields(record: dict) -> bool:
     res = True
-    mandatory_fields = ["Req_dept","Req_requester", "Prd_line, "Prd_family"]
+    mandatory_fields = ["Req_dept", "Req_requester", "Prd_line", "Prd_family"]
     for k in list(record.keys()):
         if k in mandatory_fields and record[k] = "":
             res = False

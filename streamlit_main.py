@@ -4,6 +4,10 @@ import pytz
 import io
 import hmac
 
+APPNAME = "TORP" #IPH Technical Office Request POC (Proof Of Concept)
+APPCODE = "TORP"
+APPVERSION = "0.1"
+
 def check_password():
     """Returns `True` if the user had a correct password."""
 
@@ -51,8 +55,10 @@ def display_app_info():
         TORP - Technical Office Requests POC (Proof Of Concept), is a simple application to manage request to IPH Technical Office.
         """
     )
-    st.markdown("Powered with Streamlit :streamlit:")
+    st.markdown(f"Version: {APPVERSION}")
     st.divider()
+    st.markdown("Powered with Streamlit :streamlit:")
+
 
 def insert_request():
   pass
@@ -64,11 +70,11 @@ def main():
   if not check_password():
       st.stop()
   page_names_to_funcs = {
-    "—": display_app_info,
-    "Insert Request": insert_request,
-    "View Request": view_request
+    "ℹ️ App Info": display_app_info,
+    "📝 Insert Request": insert_request,
+    "🔍 View Request ": view_request
 }    
-  demo_name = st.sidebar.selectbox("Choose a demo", page_names_to_funcs.keys())
+  demo_name = st.sidebar.selectbox("Choose a function", page_names_to_funcs.keys())
   page_names_to_funcs[demo_name]()
 if __name__ == "__main__":
     main()

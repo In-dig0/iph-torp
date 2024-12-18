@@ -10,7 +10,7 @@ def check_password():
     def login_form():
         """Form with widgets to collect user information"""
         with st.form("Credentials"):
-            st.title("📝 :blue[TORP APP Login]")
+            st.title("📝 :blue[TORP App Login]")
             st.divider()
             st.text_input("Username", key="username")
             st.text_input("Password", type="password", key="password")

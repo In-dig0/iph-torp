@@ -69,10 +69,16 @@ def display_app_info():
     st.markdown("Powered with Streamlit :streamlit:")
 
 
-def display_requester_section() -> dict:
+def display_getinfo_section() -> dict:
     """ Show a section to declare the user informations """
     req_department = ""
     req_requester = ""
+    product_line = ""
+    product_family = ""
+    req_type = ""
+    req_category = ""  
+    request_record = dict()
+    attachment_record = dict() 
     with st.container():
         st.header(":orange[Requester informations]")
         req_dept_values_00 = ["DMN-ACCOUNTING", "DTD-DESIGN TECHNICAL DEPARTMENT", "COMMERCIALE AFTER MARKET"]
@@ -86,21 +92,7 @@ def display_requester_section() -> dict:
         elif req_department == "COMMERCIALE AFTER MARKET":
             req_requester_values_03 = ["GIORGI IVAN", "ANGOTTI FRANCESCO", "BALDINI ROBERTO"]
             req_requester = st.selectbox(":blue[Requester User(:red[*])]", req_requester_values_03, index=None)
-    st.divider()    
-    rec_out =    {
-                     "Req_dept": req_department,
-                     "Req_requester": req_requester
-                 }
-           
-    return rec_out        
-
-
-def display_productgroup_section() -> dict:
-    """ Show a section to declare the product group informations """
-    
-    product_line = ""
-    product_family = ""
-    with st.container():
+        st.divider()
         st.header(":orange[Product group informations]")
         product_line_values_00 = ["POWER TAKE OFFs", "HYDRAULICS", "CYLINDERS", "ALL"]
         product_line = st.selectbox(":blue[Product line(:red[*])]", product_line_values_00, index=None)
@@ -113,20 +105,8 @@ def display_productgroup_section() -> dict:
         elif product_line == "CYLINDERS":
             product_line_values_03 = ["FRONT-END CYLINDERS", "UNDERBODY CYLINDERS", "DOUBLE ACTING CYLINDERS", "BRACKETS FOR CYLINDERS"]
             product_family = st.selectbox(":blue[Product family(:red[*])]", product_line_values_03, index=None)
-    st.divider()       
-    rec_out =    {
-                     "Prd_line": product_line,
-                     "Prd_family": product_family
-                 }
-    return rec_out 
-
-
-def display_request_section() -> dict:
-    """ Show a section to declare the request informations """
-    req_type = ""
-    req_category = ""
-    st.header(":orange[Add a request]")
-    with st.container():
+        st.divider()
+        st.header(":orange[Request information]")
         priority_values_00 = ["High", "Medium", "Low"]
         req_priority = st.selectbox(":blue[Priority]", priority_values_00, index=1)
         type_values_00 = ["DOCUMENTATION", "PRODUCT", "SERVICE"]
@@ -142,34 +122,35 @@ def display_request_section() -> dict:
             req_category = st.selectbox(":blue[Request category(:red[*])]", category_03, index=None)
         req_title = st.text_input(":blue[Request title(:red[*])]")
         req_detail = st.text_area(":blue[Request details(:red[*])]", key="req_det")
-    st.divider()   
-    rec_out =    {
-                    "Req_priority": req_priority, 
-                    "Req_type": req_type,
-                    "Req_category": req_category,                    
-                    "Req_title": req_title,
-                    "Req_detail": req_detail
-                }
-    return rec_out 
-
-def display_attachment_section() -> dict:
-    """ Show a section to upload attachments """
-    rec_out = dict()
-    st.header(":orange[Add an attachment (only PDF file)]")
-    with st.container():
+        insdate = datetime.datetime.now().strftime("%Y-%m-%d")
+        st.divider()
+        request_record =    {
+                "Req_insdate": insdate,
+                "Req_dept": req_department,
+                "Req_requester": req_requester,
+                "Prd_line": product_line,
+                "Prd_family": product_family,
+                "Req_priority": req_priority, 
+                "Req_type": req_type,
+                "Req_category": req_category,                    
+                "Req_title": req_title,
+                "Req_detail": req_detail,
+            } 
+        st.header(":orange[Add an attachment (only PDF file)]")
         uploaded_file = upload_pdf_file()
-    if uploaded_file is not None:
+        if uploaded_file is not None:
         # To read file as bytes:
         #bytes_data = uploaded_file.getvalue()
-        bytes_data = uploaded_file.read()
-        rec_out =    {
-                    "Atch_name": uploaded_file.name,
-                    "Atch_type": "GENERIC",
-                    "Atch_link": " ",                    
-                    "Atch_data": bytes_data,
-                }
-    st.divider()              
-    return rec_out       
+            bytes_data = uploaded_file.read()   
+            attachment_record =    {
+                        "Atch_name": uploaded_file.name,
+                        "Atch_type": "GENERIC",
+                        "Atch_link": " ",                    
+                        "Atch_data": bytes_data,
+                    }
+           
+    return request_record, attachment_record        
+   
 
 def upload_pdf_file():
     """ Widget used to upload an xml file """
@@ -331,13 +312,7 @@ def display_request_popup(rec_request: dict)-> None:
     st.rerun()
 
 def insert_request():
-    rec_requester= display_requester_section()
-    rec_pgroup = display_productgroup_section()
-    rec_req = display_request_section()
-    rec_attchment = display_attachment_section() 
-    rec_request = rec_requester | rec_pgroup | rec_req
-    insdate = datetime.datetime.now().strftime("%Y-%m-%d")
-    rec_request["Req_insdate"] = insdate
+    rec_request, rec_attchment = display_getinfo_section()
     if 'submit_clicked' not in st.session_state:
         st.session_state.submit_clicked = False
     st.button("Submit", type="primary", on_click=click_submit_button)
@@ -354,9 +329,6 @@ def insert_request():
               # Convertire di nuovo la lista in un dizionario
               rec_request = dict(items)
               display_request_popup(rec_request)
-              #st.write(f"Request {nr_req} submitted! Here are the ticket details:")
-              #df_request = pd.DataFrame([rec_request])
-              #st.dataframe(df_request, use_container_width=True, hide_index=True)
               applog["appstatus"] = "COMPLETED"
               applog["appmsg"] = " "
           else:

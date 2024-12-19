@@ -82,16 +82,16 @@ def display_getinfo_section() -> dict:
     with st.container():
         st.header(":orange[Requester informations]")
         req_dept_values_00 = ["DMN-ACCOUNTING", "DTD-DESIGN TECHNICAL DEPARTMENT", "COMMERCIALE AFTER MARKET"]
-        req_department = st.selectbox(":blue[Requester Department(:red[*])]", req_dept_values_00, index=None, key=sb_dept)
+        req_department = st.selectbox(":blue[Requester Department(:red[*])]", req_dept_values_00, index=None, key="sb_dept")
         if req_department == "DMN-ACCOUNTING":
             req_requester_values_01 = ["COMELLINI GIORGIO", "ROMANI CORRADO", "ROSSI PAOLA"]
-            req_requester = st.selectbox(":blue[Requester User(:red[*])]", req_requester_values_01, index=None)
+            req_requester = st.selectbox(":blue[Requester User(:red[*])]", req_requester_values_01, index=None, key="sb_requester")
         elif req_department == "DTD-DESIGN TECHNICAL DEPARTMENT":
             req_requester_values_02 = ["CARLINI MICHELE", "FENARA GABRIELE", "PALMA NICOLA"]
-            req_requester = st.selectbox(":blue[Requester User(:red[*])]", req_requester_values_02, index=None)
+            req_requester = st.selectbox(":blue[Requester User(:red[*])]", req_requester_values_02, index=None, key="sb_requester")
         elif req_department == "COMMERCIALE AFTER MARKET":
             req_requester_values_03 = ["GIORGI IVAN", "ANGOTTI FRANCESCO", "BALDINI ROBERTO"]
-            req_requester = st.selectbox(":blue[Requester User(:red[*])]", req_requester_values_03, index=None)
+            req_requester = st.selectbox(":blue[Requester User(:red[*])]", req_requester_values_03, index=None, key="sb_requester")
         st.divider()
         st.header(":orange[Product group informations]")
         product_line_values_00 = ["POWER TAKE OFFs", "HYDRAULICS", "CYLINDERS", "ALL"]

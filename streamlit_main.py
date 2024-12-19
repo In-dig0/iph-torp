@@ -323,6 +323,7 @@ def insert_request():
           applog = dict()
           nr_req, rc = save_request_to_sqlitecloud(rec_request, rec_attchment)
           if rc == 0:
+              st.session_state.submit_clicked = False
               # Creare una lista di tuple chiave-valore
               items = list(rec_request.items())
               # Inserire la nuova coppia chiave-valore nella prima posizione
@@ -333,6 +334,7 @@ def insert_request():
               rec_request, rec_attchment = display_getinfo_section()
               applog["appstatus"] = "COMPLETED"
               applog["appmsg"] = " "
+
           else:
               applog["appstatus"] = "ERROR"
               applog["appmsg"] = "TABLE TORP_REQUESTS: UNIQUE CONSTRAIN ON FIELD r_title"    

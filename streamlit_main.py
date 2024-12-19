@@ -323,7 +323,7 @@ def save_request_to_sqlitecloud(row:dict, atch: dict) -> None:
 
 @st.dialog("Request submitted!")
 def display_request_popup(rec_request: dict)-> None:
-    st.write(f"Request {rec_request[Req_nr]} submitted! Here are the ticket details:")
+    st.write(f"Request {rec_request["Req_nr"]} submitted! Here are the ticket details:")
     df_request = pd.DataFrame([rec_request])
     st.dataframe(df_request, use_container_width=True, hide_index=True)
 

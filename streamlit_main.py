@@ -82,7 +82,7 @@ def display_getinfo_section() -> dict:
     with st.container():
         st.header(":orange[Requester informations]")
         req_dept_values_00 = ["DMN-ACCOUNTING", "DTD-DESIGN TECHNICAL DEPARTMENT", "COMMERCIALE AFTER MARKET"]
-        req_department = st.selectbox(":blue[Requester Department(:red[*])]", req_dept_values_00, index=None)
+        req_department = st.selectbox(":blue[Requester Department(:red[*])]", req_dept_values_00, index=None, key=sb_dept)
         if req_department == "DMN-ACCOUNTING":
             req_requester_values_01 = ["COMELLINI GIORGIO", "ROMANI CORRADO", "ROSSI PAOLA"]
             req_requester = st.selectbox(":blue[Requester User(:red[*])]", req_requester_values_01, index=None)
@@ -336,7 +336,7 @@ def insert_request():
           else:
               applog["appstatus"] = "ERROR"
               applog["appmsg"] = "TABLE TORP_REQUESTS: UNIQUE CONSTRAIN ON FIELD r_title"    
-          
+          st.session_state.submit_clicked = False
           applog["appname"] = APPNAME
           applog["applink"] = __file__
           applog["appcode"] = APPCODE

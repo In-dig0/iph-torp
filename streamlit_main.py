@@ -336,8 +336,6 @@ def insert_request():
           else:
               applog["appstatus"] = "ERROR"
               applog["appmsg"] = "TABLE TORP_REQUESTS: UNIQUE CONSTRAIN ON FIELD r_title"    
-          if st.session_state.submit_clicked == True:
-            st.session_state.submit_clicked == False
           applog["appname"] = APPNAME
           applog["applink"] = __file__
           applog["appcode"] = APPCODE

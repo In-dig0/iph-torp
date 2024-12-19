@@ -138,6 +138,7 @@ def display_getinfo_section() -> dict:
             } 
         st.header(":orange[Add an attachment (only PDF file)]")
         uploaded_file = upload_pdf_file()
+        st.divider()
         if uploaded_file is not None:
         # To read file as bytes:
         #bytes_data = uploaded_file.getvalue()
@@ -329,6 +330,7 @@ def insert_request():
               # Convertire di nuovo la lista in un dizionario
               rec_request = dict(items)
               display_request_popup(rec_request)
+              rec_request, rec_attchment = display_getinfo_section()
               applog["appstatus"] = "COMPLETED"
               applog["appmsg"] = " "
           else:
@@ -346,6 +348,7 @@ def insert_request():
 
 def view_request():
   pass
+
 
 def main():
   if not check_password():

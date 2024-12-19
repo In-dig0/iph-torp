@@ -2,6 +2,7 @@
 import datetime
 import os
 import io
+import time
 
 # 3th party packages
 import streamlit as st
@@ -326,6 +327,8 @@ def display_request_popup(rec_request: dict)-> None:
     st.markdown(f"Request :green-background[**{rec_request["Req_nr"]}**] submitted! Here are the details:")
     df_request = pd.DataFrame([rec_request])
     st.dataframe(df_request, use_container_width=True, hide_index=True)
+    time.sleep(5)
+    st.rerun()
 
 def insert_request():
     rec_requester= display_requester_section()

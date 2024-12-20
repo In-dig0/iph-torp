@@ -165,6 +165,7 @@ def check_request_fields(record: dict) -> bool:
     for k in list(record.keys()):
         if k in mandatory_fields and record[k] == None:
             res = False
+            st.session_state.submit_clicked = False
     return res
 
 
@@ -331,7 +332,6 @@ def insert_request():
               # Convertire di nuovo la lista in un dizionario
               rec_request = dict(items)
               display_request_popup(rec_request)
-              rec_request, rec_attchment = display_getinfo_section()
               applog["appstatus"] = "COMPLETED"
               applog["appmsg"] = " "
 

@@ -71,6 +71,8 @@ def display_app_info():
 
 def display_getinfo_section() -> dict:
     """ Show a section to declare the user informations """
+    if 'req_department' not in st.session_state:
+        st.session_state.req_department = ""
     req_department = ""
     req_requester = ""
     product_line = ""
@@ -332,6 +334,7 @@ def insert_request():
               # Convertire di nuovo la lista in un dizionario
               rec_request = dict(items)
               display_request_popup(rec_request)
+              st.session_state.req_department = ""
               applog["appstatus"] = "COMPLETED"
               applog["appmsg"] = " "
 

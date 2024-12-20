@@ -71,8 +71,6 @@ def display_app_info():
 
 def display_getinfo_section() -> dict:
     """ Show a section to declare the user informations """
-    if 'req_department' not in st.session_state:
-        st.session_state.req_department = ""
     req_department = ""
     req_requester = ""
     product_line = ""
@@ -313,7 +311,7 @@ def display_request_popup(rec_request: dict)-> None:
     df_request = pd.DataFrame([rec_request])
     st.dataframe(df_request, use_container_width=True, hide_index=True)
     time.sleep(5)
-    st.rerun()
+#    st.rerun()
 
 def insert_request():
     rec_request, rec_attchment = display_getinfo_section()
@@ -327,6 +325,8 @@ def insert_request():
           nr_req, rc = save_request_to_sqlitecloud(rec_request, rec_attchment)
           if rc == 0:
               st.session_state.submit_clicked = False
+              if 'req_department' not in st.session_state:
+                st.session_state.req_department = ""
               # Creare una lista di tuple chiave-valore
               items = list(rec_request.items())
               # Inserire la nuova coppia chiave-valore nella prima posizione

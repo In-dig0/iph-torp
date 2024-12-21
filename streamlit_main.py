@@ -313,7 +313,7 @@ def display_request_popup(rec_request: dict)-> None:
     time.sleep(5)
     st.session_state.req_title = ""
     req_title = ""
-#    st.rerun()
+    st.rerun()
 
 def insert_request():
     rec_request, rec_attchment = display_getinfo_section()
@@ -327,8 +327,8 @@ def insert_request():
           nr_req, rc = save_request_to_sqlitecloud(rec_request, rec_attchment)
           if rc == 0:
               st.session_state.submit_clicked = False
-              if 'req_department' not in st.session_state:
-                st.session_state.req_department = ""
+              if 'req_title' not in st.session_state:
+                st.session_state.req_title = ""
               # Creare una lista di tuple chiave-valore
               items = list(rec_request.items())
               # Inserire la nuova coppia chiave-valore nella prima posizione

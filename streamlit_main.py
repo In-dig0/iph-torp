@@ -311,8 +311,8 @@ def display_request_popup(rec_request: dict)-> None:
     df_request = pd.DataFrame([rec_request])
     st.dataframe(df_request, use_container_width=True, hide_index=True)
     time.sleep(5)
-    st.session_state.req_department = ""
-    req_department = ""
+    st.session_state.req_title = ""
+    req_title = ""
 #    st.rerun()
 
 def insert_request():
@@ -336,7 +336,6 @@ def insert_request():
               # Convertire di nuovo la lista in un dizionario
               rec_request = dict(items)
               display_request_popup(rec_request)
-              st.session_state.req_department = ""
               applog["appstatus"] = "COMPLETED"
               applog["appmsg"] = " "
 

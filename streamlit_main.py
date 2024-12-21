@@ -355,14 +355,25 @@ def view_request():
 
     if 'selectbox_value' not in st.session_state:
         st.session_state.selectbox_value = None
+    if 'reset_selectbox' not in st.session_state:
+        st.session_state.reset_selectbox = False
 
     options = ['Opzione 1', 'Opzione 2', 'Opzione 3']
+
     st.write("Valore precedente:", st.session_state.selectbox_value)
-    selected_value = st.selectbox("Seleziona un'opzione:", options, index=options.index(st.session_state.selectbox_value) if st.session_state.selectbox_value in options else None)
+
+    # Logica per resettare la selectbox
+    if st.session_state.reset_selectbox:
+        selected_value = st.selectbox("Seleziona un'opzione:", options, index=None)
+        st.session_state.reset_selectbox = False # Resetta il flag immediatamente dopo l'uso
+        st.session_state.selectbox_value = None
+    else:
+        selected_value = st.selectbox("Seleziona un'opzione:", options, index=options.index(st.session_state.selectbox_value) if st.session_state.selectbox_value in options else None)
+
 
     if st.button("Submit"):
-        st.session_state.selectbox_value = None  # Resetta il valore
-        st.rerun() #Forza il rerunning dello script per aggiornare la UI
+        st.session_state.reset_selectbox = True # Imposta il flag per il reset
+        st.rerun()
 
     if selected_value:
         st.write("Hai selezionato:", selected_value)

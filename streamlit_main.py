@@ -362,7 +362,7 @@ def view_request():
 
     if st.button("Submit"):
         st.session_state.selectbox_value = None  # Resetta il valore
-        st.experimental_rerun() #Forza il rerunning dello script per aggiornare la UI
+        st.rerun() #Forza il rerunning dello script per aggiornare la UI
 
     if selected_value:
         st.write("Hai selezionato:", selected_value)

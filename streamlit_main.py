@@ -369,10 +369,6 @@ def view_request():
         st.session_state.selectbox_value = selected_value
 
 
-if __name__ == "__main__":
-    main()
-
-
 def main():
   if not check_password():
       st.stop()

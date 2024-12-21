@@ -352,7 +352,25 @@ def insert_request():
 
 
 def view_request():
-  pass
+
+    if 'selectbox_value' not in st.session_state:
+        st.session_state.selectbox_value = None
+
+    options = ['Opzione 1', 'Opzione 2', 'Opzione 3']
+    st.write("Valore precedente:", st.session_state.selectbox_value)
+    selected_value = st.selectbox("Seleziona un'opzione:", options, index=options.index(st.session_state.selectbox_value) if st.session_state.selectbox_value in options else None)
+
+    if st.button("Submit"):
+        st.session_state.selectbox_value = None  # Resetta il valore
+        st.experimental_rerun() #Forza il rerunning dello script per aggiornare la UI
+
+    if selected_value:
+        st.write("Hai selezionato:", selected_value)
+        st.session_state.selectbox_value = selected_value
+
+
+if __name__ == "__main__":
+    main()
 
 
 def main():

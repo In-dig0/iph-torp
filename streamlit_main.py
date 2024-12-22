@@ -71,7 +71,9 @@ def display_app_info():
 
 def display_getinfo_section() -> dict:
     """ Show a section to declare the user informations """
+    global req_department 
     req_department = ""
+    global req_requester 
     req_requester = ""
     product_line = ""
     product_family = ""
@@ -106,7 +108,7 @@ def display_getinfo_section() -> dict:
             product_line_values_03 = ["FRONT-END CYLINDERS", "UNDERBODY CYLINDERS", "DOUBLE ACTING CYLINDERS", "BRACKETS FOR CYLINDERS"]
             product_family = st.selectbox(":blue[Product family(:red[*])]", product_line_values_03, index=None)
         st.divider()
-        st.header(":orange[Request information]")
+        st.header(":orange[Request informations]")
         priority_values_00 = ["High", "Medium", "Low"]
         req_priority = st.selectbox(":blue[Priority]", priority_values_00, index=1)
         type_values_00 = ["DOCUMENTATION", "PRODUCT", "SERVICE"]
@@ -311,9 +313,19 @@ def display_request_popup(rec_request: dict)-> None:
     df_request = pd.DataFrame([rec_request])
     st.dataframe(df_request, use_container_width=True, hide_index=True)
     time.sleep(5)
-    st.session_state.req_title = ""
-    req_title = ""
-    st.rerun()
+
+
+def reset_user_input()-> None:
+    selectbox_key = "req_department"
+
+    if st.session_state.submit_clicked:
+        st.session_state[selectbox_key] = None  # Resetta il valore *PRIMA* della selectbox
+        st.rerun() #Forza il refresh
+
+    if selectbox_key not in st.session_state:
+        st.session_state[selectbox_key] = None
+
+
 
 def insert_request():
     rec_request, rec_attchment = display_getinfo_section()
@@ -326,9 +338,6 @@ def insert_request():
           applog = dict()
           nr_req, rc = save_request_to_sqlitecloud(rec_request, rec_attchment)
           if rc == 0:
-              st.session_state.submit_clicked = False
-              if 'req_title' not in st.session_state:
-                st.session_state.req_title = ""
               # Creare una lista di tuple chiave-valore
               items = list(rec_request.items())
               # Inserire la nuova coppia chiave-valore nella prima posizione
@@ -336,6 +345,7 @@ def insert_request():
               # Convertire di nuovo la lista in un dizionario
               rec_request = dict(items)
               display_request_popup(rec_request)
+              st.session_state.submit_clicked = False
               applog["appstatus"] = "COMPLETED"
               applog["appmsg"] = " "
 
@@ -349,6 +359,7 @@ def insert_request():
           save_applog_to_sqlitecloud(applog)           
       else:
           st.write(":red-background[**ERROR: please fill all mandatory fields (:red[*])]")
+          st.session_state.submit_clicked = False
 
 
 def view_request():
@@ -370,7 +381,8 @@ def view_request():
 
     if selected_value:
         st.write("Hai selezionato:", selected_value)
-        
+
+
 def main():
   if not check_password():
       st.stop()

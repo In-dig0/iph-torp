@@ -345,6 +345,7 @@ def insert_request():
               # Convertire di nuovo la lista in un dizionario
               rec_request = dict(items)
               display_request_popup(rec_request)
+              reset_user_input()
               st.session_state.submit_clicked = False
               applog["appstatus"] = "COMPLETED"
               applog["appmsg"] = " "

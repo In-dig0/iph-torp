@@ -360,7 +360,7 @@ def insert_request():
           save_applog_to_sqlitecloud(applog)           
       else:
           st.write(":red-background[**ERROR: please fill all mandatory fields (:red[*])]")
-          st.session_state.submit_clicked = False
+#          st.session_state.submit_clicked = False
 
 
 def view_request():

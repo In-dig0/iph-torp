@@ -353,32 +353,23 @@ def insert_request():
 
 def view_request():
 
-    if 'selectbox_value' not in st.session_state:
-        st.session_state.selectbox_value = None
-    if 'reset_selectbox' not in st.session_state:
-        st.session_state.reset_selectbox = False
+    selectbox_key = "my_selectbox"  # Chiave univoca per la selectbox
+
+    if selectbox_key not in st.session_state:
+        st.session_state[selectbox_key] = None
 
     options = ['Opzione 1', 'Opzione 2', 'Opzione 3']
 
-    st.write("Valore precedente:", st.session_state.selectbox_value)
+    st.write("Valore precedente:", st.session_state[selectbox_key])
 
-    # Logica per resettare la selectbox
-    if st.session_state.reset_selectbox:
-        selected_value = st.selectbox("Seleziona un'opzione:", options, index=None)
-        st.session_state.reset_selectbox = False # Resetta il flag immediatamente dopo l'uso
-        st.session_state.selectbox_value = None
-    else:
-        selected_value = st.selectbox("Seleziona un'opzione:", options, index=options.index(st.session_state.selectbox_value) if st.session_state.selectbox_value in options else None)
-
+    selected_value = st.selectbox("Seleziona un'opzione:", options, key=selectbox_key)
 
     if st.button("Submit"):
-        st.session_state.reset_selectbox = True # Imposta il flag per il reset
-        st.rerun()
+        st.session_state[selectbox_key] = None  # Resetta il valore nello stato
+        st.experimental_rerun() #Forza il refresh. Nelle versioni di streamlit >= 1.12 si può usare st.rerun()
 
     if selected_value:
         st.write("Hai selezionato:", selected_value)
-        st.session_state.selectbox_value = selected_value
-
 
 def main():
   if not check_password():

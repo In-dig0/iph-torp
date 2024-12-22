@@ -366,7 +366,7 @@ def view_request():
 
     if st.button("Submit"):
         st.session_state[selectbox_key] = None  # Resetta il valore nello stato
-        st.experimental_rerun() #Forza il refresh. Nelle versioni di streamlit >= 1.12 si può usare st.rerun()
+        st.rerun() #Forza il refresh. Nelle versioni di streamlit >= 1.12 si può usare st.rerun()
 
     if selected_value:
         st.write("Hai selezionato:", selected_value)

@@ -2,4 +2,4 @@ pandas
 streamlit
 sqlitecloud
 pytz
-st_aggrid
+streamlit-aggrid

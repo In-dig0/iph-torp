@@ -3,3 +3,5 @@ streamlit
 sqlitecloud
 pytz
 streamlit-aggrid
+streamlit-modal
+extra-streamlit-components

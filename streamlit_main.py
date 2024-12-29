@@ -3,6 +3,8 @@ import datetime
 import os
 import io
 import time
+import json
+import urllib.parse
 
 # 3th party packages
 import streamlit as st
@@ -10,7 +12,11 @@ import pandas as pd
 import sqlitecloud
 import pytz 
 import hmac
-from st_aggrid import AgGrid, GridOptionsBuilder, GridUpdateMode, DataReturnMode, JsCode
+from st_aggrid import AgGrid, GridOptionsBuilder, GridUpdateMode, DataReturnMode, JsCode, ColumnsAutoSizeMode
+import numpy as np
+from streamlit_modal import Modal
+import extra_streamlit_components as stx
+
 
 
 # Global constants
@@ -54,6 +60,7 @@ def check_password():
         st.error("😕 User not known or password incorrect")
     return False
 
+
 def display_app_info():
     """ Show app title and description """
     
@@ -62,7 +69,7 @@ def display_app_info():
     st.header(":blue[TORP Web Application]", divider="blue")
     st.subheader(
         """
-        TORP - Technical Office Requests POC (Proof Of Concept), is a simple web application to manage request to IPH Technical Office.
+        TORP - Technical Office Requests POC (Proof Of Concept), is a simple web application to manage requests to IPH Technical Office.
         """
     )
     st.markdown(f":grey[Version: {APPVERSION}]")
@@ -283,7 +290,7 @@ def insert_request()-> None:
         req_category = st.selectbox(":blue[Request category(:red[*])]", req_category_option_03, index=None, key="sb_category")  
     
     req_title = st.text_input(":blue[Request title(:red[*])]", key=ti_title_key)
-    req_detail = st.text_input(":blue[Request detail(:red[*])]", key=ti_detail_key)
+    req_detail = st.text_area(":blue[Request detail(:red[*])]", key=ti_detail_key)
 
     insdate = datetime.datetime.now().strftime("%Y-%m-%d")
     request_record =    {
@@ -350,7 +357,10 @@ def view_request():
     cursor = conn.cursor()
 
     df_requests = pd.read_sql_query("SELECT r_id as ROWID, r_insdate as DATE, r_dept as DEPARTMENT, r_requester as REQUESTER, r_pline as PR_LINE, r_pfamily as PR_FAMILY, r_priority as PRIORITY, r_type as TYPE, r_category as CATEGORY, r_title as TITLE, r_detail as DETAIL FROM TORP_REQUESTS", conn)
+    
     df_requests["DATE"] = pd.to_datetime(df_requests["DATE"], format="%Y-%m-%d")
+    df_requests = df_requests.sort_values(by="DATE", ascending=False)
+
 #    df_requests["ROWID"] = "R"+df_requests["ROWID"]
     df_requests["ROWID"] = 'R' + df_requests["ROWID"].astype(str).str.zfill(4)
     #####################
@@ -379,7 +389,10 @@ def view_request():
         enableRowGroup=False
     )
     # Enalble pagination
-    grid_builder.configure_pagination(enabled=True, paginationPageSize=20)
+    grid_builder.configure_pagination(paginationAutoPageSize=False, paginationPageSize=12)
+#    gb.configure_selection('single', use_checkbox=True)
+    grid_builder.configure_grid_options(domLayout='normal')
+#    grid_builder.configure_pagination(enabled=True, paginationPageSize=5, paginationAutoPageSize=True)
 #    grid_builder.configure_selection(selection_mode="multiple", use_checkbox=True)
 #    grid_builder.configure_side_bar(filters_panel=True)# defaultToolPanel='filters')    
     grid_builder.configure_column(
@@ -390,7 +403,7 @@ def view_request():
     grid_builder.configure_column("ROWID", cellStyle=cellStyle)   
     grid_builder.configure_selection(
     selection_mode='single',     # Enable multiple row selection
-    use_checkbox=True             # Show checkboxes for selection
+    use_checkbox=False             # Show checkboxes for selection
     )
     grid_options = grid_builder.build()
     # List of available themes
@@ -416,6 +429,7 @@ def view_request():
     else:
         st.session_state.grid_data = df_requests.copy() # Mostra tutti i dati se il filtro è None
 
+    st.subheader("Request list:") 
     # Creazione/Aggiornamento della griglia (UNA SOLA VOLTA per ciclo di esecuzione)
     if st.session_state.grid_response is None:
         st.session_state.grid_response = AgGrid(
@@ -442,31 +456,28 @@ def view_request():
 
     selected_row = st.session_state.grid_response['selected_rows']
 
-    # # Visualizzazione dei dati (opzionale)
-    # if not st.session_state.grid_response['data'].empty:  # Check if data exists
-    #     st.write("Dati visualizzati nella griglia:")
-    #     st.dataframe(st.session_state.grid_response['data'])
+    if selected_row is not None and len(selected_row) > 0:
+#        selected_row = selected_row[0] 
+        data_out = {
+            'Column name': ["Request Number", "Insert date", "Department", "Requester", "Product Line", "Product Family", "Priority", "Type", "Category", "Title", "Detail"],
+            'Column value': [selected_row['ROWID'][0], selected_row['DATE'][0], selected_row['DEPARTMENT'][0], selected_row['REQUESTER'][0], selected_row['PR_LINE'][0], selected_row['PR_FAMILY'][0], selected_row['PRIORITY'][0], selected_row['TYPE'][0], selected_row['CATEGORY'][0], selected_row['TITLE'][0], selected_row['DETAIL'][0]]
+        }
+        df_out = pd.DataFrame(data_out)
+        st.subheader("Request details:")         
+        st.dataframe(df_out, use_container_width=True, height=450, hide_index=True)
 
-def test_funct():
-    try:
-        #Search DB credentials using ST.SECRETS
-        db_link = st.secrets["db_credentials"]["SQLITECLOUD_DBLINK"]
-        db_apikey = st.secrets["db_credentials"]["SQLITECLOUD_APIKEY"]
-        db_name = st.secrets["db_credentials"]["SQLITECLOUD_DBNAME"]
-    except Exception as errMsg:
-        st.error(f"**ERROR: DB credentials NOT FOUND: \n{errMsg}", icon="🚨")
-    else:
-        st.write(f"DBLINK: {db_link}")
-        st.write(f"APIKEY: {db_apikey}")
-        st.write(f"DBNAME: {db_name}")
+def assign_request():
+    pass
 
 def main():
 #  if not check_password():
 #      st.stop()
+  st.set_page_config(layout="wide")
   page_names_to_funcs = {
     "ℹ️ App Info": display_app_info,
-    "📝 Insert Request": insert_request,
-    "🔍 View Request ": view_request
+    "🪄 Insert Request": insert_request,
+    "🔍 View Request ": view_request,
+    "📝 Assign Request": assign_request
 }    
   demo_name = st.sidebar.selectbox("Choose a function", page_names_to_funcs.keys())
   page_names_to_funcs[demo_name]()

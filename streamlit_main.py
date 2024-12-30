@@ -484,7 +484,7 @@ def insert_request():
     if selected_row is not None and len(selected_row) > 0:
 #        selected_row = selected_row[0] 
         data_out = {
-            'Column name': ["Request Number", "Insert date", "User", "Status, "Department", "Requester", "Priority", "Product Line", "Product Family", "Type", "Category", "Title", "Detail"],
+            'Column name': ["Request Number", "Insert date", "User", "Status", "Department", "Requester", "Priority", "Product Line", "Product Family", "Type", "Category", "Title", "Detail"],
             'Column value': [selected_row['ROWID'][0], selected_row['DATE'][0], selected_row['USER'][0], selected_row['STATUS'][0], selected_row['DEPARTMENT'][0], selected_row['REQUESTER'][0], selected_row['PRIORITY'][0], selected_row['PR_LINE'][0], selected_row['PR_FAMILY'][0], selected_row['TYPE'][0], selected_row['CATEGORY'][0], selected_row['TITLE'][0], selected_row['DETAIL'][0]]
         }
         df_out = pd.DataFrame(data_out)

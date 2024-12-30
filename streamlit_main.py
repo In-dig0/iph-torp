@@ -93,7 +93,6 @@ def insert_request()-> None:
         """ Save new request into SQLite Cloud Database """
         # Inzialise variables
         rc = 0
-        max_rowid = 0
         req_nr = ""
         db_link = ""
         db_apikey = ""
@@ -149,8 +148,7 @@ def insert_request()-> None:
         return req_nr, rc
 
 
-def click_submit_button():
-    st.session_state.submitted = True
+############################################################################################    
 
     sb_dept_key = "sb_dept"
     reset_sb_dept_key = "reset_sb_dept"
@@ -295,17 +293,17 @@ def click_submit_button():
     req_detail = st.text_area(":blue[Request detail(:red[*])]", key=ti_detail_key)
 
     req_insdate = datetime.datetime.now().strftime("%Y-%m-%d")
-    req_status = "NEW"
     req_user = "RB"
+    req_status = "NEW"
     request_record =    {
             "Req_insdate": req_insdate,
             "Req_user": req_user,
+            "Req_status": req_status,
             "Req_dept": req_department,
             "Req_requester": req_requester,
-            "Req_status": req_status,
+            "Req_priority": req_priority,
             "Req_pline": req_pline,
             "Req_pfamily": req_pfamily,
-            "Req_priority": req_priority,
             "Req_type": req_type,
             "Req_category": req_category,
             "Req_title": req_title,
@@ -422,37 +420,14 @@ def view_request():
     ct_requester = df_requests['REQUESTER'].drop_duplicates()
     df_ct_requester = pd.DataFrame({"REQUESTER": ct_requester}).sort_values(by="REQUESTER")
 
-@st.dialog("Request submitted!", width="large")
-def display_request_popup(rec_request: dict)-> None:
-    st.success(f"Request :green-background[**{rec_request["Req_nr"]}**] submitted! Here are the details:")
-    df_request = pd.DataFrame([rec_request])
-    st.dataframe(df_request, use_container_width=True, hide_index=True)
-    time.sleep(5)
-    st.rerun()
+    # Get an optional value requester filter
+    requester_filter = st.sidebar.selectbox("Select a Requester:", df_ct_requester, index=None)
 
-def insert_request():
-    rec_request, rec_attchment = display_getinfo_section()
-    if 'submit_clicked' not in st.session_state:
-        st.session_state.submitted = False
-    st.button("Submit", type="primary", on_click=click_submit_button)
-    if st.session_state.submit_clicked:
-      if check_request_fields(rec_request):
-          nr_req = ""
-          applog = dict()
-          nr_req, rc = save_request_to_sqlitecloud(rec_request, rec_attchment)
-          if rc == 0:
-              st.session_state.submit_clicked = False
-              # Creare una lista di tuple chiave-valore
-              items = list(rec_request.items())
-              # Inserire la nuova coppia chiave-valore nella prima posizione
-              items.insert(0, ("Req_nr", nr_req))
-              # Convertire di nuovo la lista in un dizionario
-              rec_request = dict(items)
-              display_request_popup(rec_request)
-              st.session_state.submitted = False
-              st.session_state.sb_requester = None
-              applog["appstatus"] = "COMPLETED"
-              applog["appmsg"] = " "
+    # Filtro e AGGIORNAMENTO DEI DATI (utilizzando la sessione)
+    if requester_filter:
+        st.session_state.grid_data = df_requests.loc[df_requests["REQUESTER"] == requester_filter].copy()
+    else:
+        st.session_state.grid_data = df_requests.copy() # Mostra tutti i dati se il filtro è None
 
     st.subheader("Request list:") 
     # Creazione/Aggiornamento della griglia (UNA SOLA VOLTA per ciclo di esecuzione)
@@ -489,7 +464,7 @@ def insert_request():
         }
         df_out = pd.DataFrame(data_out)
         st.subheader("Request details:")         
-        st.dataframe(df_out, use_container_width=True, height=450, hide_index=True)
+        st.dataframe(df_out, use_container_width=True, height=500, hide_index=True)
 
 def assign_request():
     pass

@@ -124,12 +124,12 @@ def insert_request()-> None:
         next_rownr = (max_rowid + 1) if max_rowid is not None else 1
 
         # Setup sqlcode for inserting applog as a new row
-        sqlcode = """INSERT INTO TORP_REQUESTS (r_id, r_dept, r_requester, r_pline, r_pfamily, r_priority, r_type, r_category, r_title, r_detail, r_insdate) 
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
+        sqlcode = """INSERT INTO TORP_REQUESTS (r_id, r_user, r_status, r_dept, r_requester, r_priority, r_pline, r_pfamily, r_type, r_category, r_title, r_detail, r_insdate) 
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
                 """    
         
         # Setup row values
-        values = (next_rownr, row["Req_dept"], row["Req_requester"], row["Req_pline"], row["Req_pfamily"], row["Req_priority"], row["Req_type"], row["Req_category"], row["Req_title"], row["Req_detail"], row["Req_insdate"])
+        values = (next_rownr, row["Req_user"], row["Req_status"], row["Req_dept"], row["Req_requester"], row["Req_priority"], row["Req_pline"], row["Req_pfamily"], row["Req_type"], row["Req_category"], row["Req_title"], row["Req_detail"], row["Req_insdate"])
         try:
             cursor.execute(sqlcode, values)
         #    cursor.lastrowid
@@ -293,11 +293,15 @@ def click_submit_button():
     req_title = st.text_input(":blue[Request title(:red[*])]", key=ti_title_key)
     req_detail = st.text_area(":blue[Request detail(:red[*])]", key=ti_detail_key)
 
-    insdate = datetime.datetime.now().strftime("%Y-%m-%d")
+    req_insdate = datetime.datetime.now().strftime("%Y-%m-%d")
+    req_status = "NEW"
+    req_user = "RB"
     request_record =    {
-            "Req_insdate": insdate,
+            "Req_insdate": req_insdate,
+            "Req_user": req_user,
             "Req_dept": req_department,
             "Req_requester": req_requester,
+            "Req_status": req_status,
             "Req_pline": req_pline,
             "Req_pfamily": req_pfamily,
             "Req_priority": req_priority,
@@ -323,11 +327,7 @@ def click_submit_button():
             st.rerun()
     else:
         st.button("Submit", type="primary", disabled=True)
-            # display_request_popup(request_record)
-            # st.session_state[reset_sb_dept_key] = True
-            # st.session_state[reset_sb_requester_key] = True
-            # st.session_state[reset_ti_title_key] = True
-            # st.rerun()
+
 
 def view_request():
     # Inzialise variables
@@ -357,7 +357,7 @@ def view_request():
     conn.execute(f"USE DATABASE {db_name}")
     cursor = conn.cursor()
 
-    df_requests = pd.read_sql_query("SELECT r_id as ROWID, r_insdate as DATE, r_dept as DEPARTMENT, r_requester as REQUESTER, r_pline as PR_LINE, r_pfamily as PR_FAMILY, r_priority as PRIORITY, r_type as TYPE, r_category as CATEGORY, r_title as TITLE, r_detail as DETAIL FROM TORP_REQUESTS", conn)
+    df_requests = pd.read_sql_query("SELECT r_id as ROWID, r_user as USER, r_status as STATUS, r_insdate as DATE, r_dept as DEPARTMENT, r_requester as REQUESTER, r_priority as PRIORITY, r_pline as PR_LINE, r_pfamily as PR_FAMILY, r_type as TYPE, r_category as CATEGORY, r_title as TITLE, r_detail as DETAIL FROM TORP_REQUESTS", conn)
     
     df_requests["DATE"] = pd.to_datetime(df_requests["DATE"], format="%Y-%m-%d")
     df_requests = df_requests.sort_values(by="DATE", ascending=False)
@@ -483,8 +483,8 @@ def insert_request():
     if selected_row is not None and len(selected_row) > 0:
 #        selected_row = selected_row[0] 
         data_out = {
-            'Column name': ["Request Number", "Insert date", "Department", "Requester", "Product Line", "Product Family", "Priority", "Type", "Category", "Title", "Detail"],
-            'Column value': [selected_row['ROWID'][0], selected_row['DATE'][0], selected_row['DEPARTMENT'][0], selected_row['REQUESTER'][0], selected_row['PR_LINE'][0], selected_row['PR_FAMILY'][0], selected_row['PRIORITY'][0], selected_row['TYPE'][0], selected_row['CATEGORY'][0], selected_row['TITLE'][0], selected_row['DETAIL'][0]]
+            'Column name': ["Request Number", "Insert date", "User", "Status, "Department", "Requester", "Priority", "Product Line", "Product Family", "Type", "Category", "Title", "Detail"],
+            'Column value': [selected_row['ROWID'][0], selected_row['DATE'][0], selected_row['USER'][0], selected_row['STATUS'][0], selected_row['DEPARTMENT'][0], selected_row['REQUESTER'][0], selected_row['PRIORITY'][0], selected_row['PR_LINE'][0], selected_row['PR_FAMILY'][0], selected_row['TYPE'][0], selected_row['CATEGORY'][0], selected_row['TITLE'][0], selected_row['DETAIL'][0]]
         }
         df_out = pd.DataFrame(data_out)
         st.subheader("Request details:")         

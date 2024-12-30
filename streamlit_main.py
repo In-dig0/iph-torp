@@ -93,6 +93,7 @@ def insert_request()-> None:
         """ Save new request into SQLite Cloud Database """
         # Inzialise variables
         rc = 0
+        max_rowid = 0
         req_nr = ""
         db_link = ""
         db_apikey = ""

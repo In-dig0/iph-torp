@@ -14,8 +14,8 @@ import pytz
 import hmac
 from st_aggrid import AgGrid, GridOptionsBuilder, GridUpdateMode, DataReturnMode, JsCode, ColumnsAutoSizeMode
 import numpy as np
-from streamlit_modal import Modal
-import extra_streamlit_components as stx
+#from streamlit_modal import Modal
+#import extra_streamlit_components as stx
 
 
 
@@ -60,7 +60,7 @@ def check_password():
         st.error("😕 User not known or password incorrect")
     return False
 
-
+#######################################################################################################
 def display_app_info():
     """ Show app title and description """
     
@@ -76,10 +76,10 @@ def display_app_info():
     st.divider()
     st.markdown("Powered with Streamlit :streamlit:")
 
+#######################################################################################################
 def insert_request()-> None:
     """ Function to insert a new request """    
     
-############################################################################################    
     @st.dialog("Request submitted!", width="large")
     def display_request_popup(req_nr: str, request: dict)-> None:
         """ Function to get request information from user """
@@ -88,7 +88,7 @@ def insert_request()-> None:
         st.dataframe(df_request, use_container_width=True, hide_index=True)
         time.sleep(10)
 
-############################################################################################    
+#######################################################################################################
     def save_request_to_sqlitecloud(row:dict):
         """ Save new request into SQLite Cloud Database """
         # Inzialise variables
@@ -147,8 +147,6 @@ def insert_request()-> None:
 
         return req_nr, rc
 
-
-############################################################################################    
 
     sb_dept_key = "sb_dept"
     reset_sb_dept_key = "reset_sb_dept"
@@ -327,7 +325,7 @@ def insert_request()-> None:
     else:
         st.button("Submit", type="primary", disabled=True)
 
-
+#######################################################################################################
 def view_request():
     # Inzialise variables
     rc = 0
@@ -335,6 +333,11 @@ def view_request():
     db_link = ""
     db_apikey = ""
     db_name = ""
+
+    # Aggiungere all'inizio della funzione assign_request(), dopo le altre inizializzazioni
+    if "grid_refresh" not in st.session_state:
+        st.session_state.grid_refresh = False
+    
     # Get database information
     try:
         #Search DB credentials using ST.SECRETS
@@ -356,14 +359,24 @@ def view_request():
     conn.execute(f"USE DATABASE {db_name}")
     cursor = conn.cursor()
 
-    df_requests = pd.read_sql_query("SELECT r_id as ROWID, r_user as USER, r_status as STATUS, r_insdate as DATE, r_dept as DEPARTMENT, r_requester as REQUESTER, r_priority as PRIORITY, r_pline as PR_LINE, r_pfamily as PR_FAMILY, r_type as TYPE, r_category as CATEGORY, r_title as TITLE, r_detail as DETAIL FROM TORP_REQUESTS", conn)
-    
-    df_requests["DATE"] = pd.to_datetime(df_requests["DATE"], format="%Y-%m-%d")
-    df_requests = df_requests.sort_values(by="DATE", ascending=False)
+    # Modifica la query per includere anche il campo r_assignedto
+    df_requests = pd.read_sql_query("""
+        SELECT r_id as ROWID, r_user as USER, r_status as STATUS, 
+            r_insdate as DATE, r_dept as DEPARTMENT, r_requester as REQUESTER, 
+            r_priority as PRIORITY, r_pline as PR_LINE, r_pfamily as PR_FAMILY, 
+            r_type as TYPE, r_category as CATEGORY, r_title as TITLE, 
+            r_detail as DETAIL 
+        FROM TORP_REQUESTS
+        ORDER by ROWID desc
+    """, conn)
 
-#    df_requests["ROWID"] = "R"+df_requests["ROWID"]
+    # Aggiungi questo dopo il caricamento dei dati
+    if st.session_state.grid_refresh:
+        st.session_state.grid_data = df_requests.copy()
+        st.session_state.grid_refresh = False    
+        df_requests["DATE"] = pd.to_datetime(df_requests["DATE"], format="%Y-%m-%d")
+
     df_requests["ROWID"] = 'R' + df_requests["ROWID"].astype(str).str.zfill(4)
-    #####################
     # Custom cell styling based on stock levels
     cellStyle = JsCode("""
         function(params) {
@@ -377,9 +390,8 @@ def view_request():
             return null;
         }
         """)
-    #####################
+
     grid_builder = GridOptionsBuilder.from_dataframe(df_requests)
-    #gb = GridOptionsBuilder()
     # makes columns resizable, sortable and filterable by default
     grid_builder.configure_default_column(
         resizable=True,
@@ -466,9 +478,249 @@ def view_request():
         st.subheader("Request details:")         
         st.dataframe(df_out, use_container_width=True, height=500, hide_index=True)
 
+#######################################################################################################
 def assign_request():
-    pass
 
+    # Inzialize variables
+    rc = 0
+    req_nr = ""
+    db_link = ""
+    db_apikey = ""
+    db_name = ""
+    # Get database information
+    try:
+        #Search DB credentials using ST.SECRETS
+        db_link = st.secrets["db_credentials"]["SQLITECLOUD_DBLINK"]
+        db_apikey = st.secrets["db_credentials"]["SQLITECLOUD_APIKEY"]
+        db_name = st.secrets["db_credentials"]["SQLITECLOUD_DBNAME"]
+    except Exception as errMsg:
+        st.error(f"**ERROR: DB credentials NOT FOUND: \n{errMsg}", icon="🚨")
+        rc = 1
+        
+    conn_string = "".join([db_link, db_apikey])
+    # Connect to SQLite Cloud platform
+    try:
+        conn = sqlitecloud.connect(conn_string)
+    except Exception as errMsg:
+        st.error(f"**ERROR connecting to database: \n{errMsg}", icon="🚨")
+    
+    # Open SQLite database
+    conn.execute(f"USE DATABASE {db_name}")
+    cursor = conn.cursor()
+   
+    df_requests = pd.read_sql_query("""
+    SELECT r_id as ROWID, r_user as USER, r_status as STATUS, 
+        r_insdate as DATE, r_dept as DEPARTMENT, r_requester as REQUESTER, 
+        r_priority as PRIORITY, r_pline as PR_LINE, r_pfamily as PR_FAMILY, 
+        r_type as TYPE, r_category as CATEGORY, r_title as TITLE, 
+        r_detail as DETAIL 
+    FROM TORP_REQUESTS
+    ORDER by ROWID desc
+    """, conn)
+    
+    df_requests["DATE"] = pd.to_datetime(df_requests["DATE"], format="%Y-%m-%d")
+
+#    df_requests["ROWID"] = "R"+df_requests["ROWID"]
+    df_requests["ROWID"] = 'R' + df_requests["ROWID"].astype(str).str.zfill(4)
+
+    # Custom cell styling based on stock levels
+    cellStyle = JsCode("""
+        function(params) {
+            if (params.column.colId === 'ROWID') {
+                       return {
+                        'backgroundColor': '#ECEBBD',
+                        'color': '#111810',
+                        'fontWeight': 'bold'
+                    };
+            }
+            return null;
+        }
+        """)
+    grid_builder = GridOptionsBuilder.from_dataframe(df_requests)
+    #gb = GridOptionsBuilder()
+    # makes columns resizable, sortable and filterable by default
+    grid_builder.configure_default_column(
+        resizable=True,
+        filterable=True,
+        sortable=True,
+        editable=False,
+        enableRowGroup=False
+    )
+    # Enalble pagination
+    grid_builder.configure_pagination(paginationAutoPageSize=False, paginationPageSize=12)
+#    gb.configure_selection('single', use_checkbox=True)
+    grid_builder.configure_grid_options(domLayout='normal')
+#    grid_builder.configure_pagination(enabled=True, paginationPageSize=5, paginationAutoPageSize=True)
+#    grid_builder.configure_selection(selection_mode="multiple", use_checkbox=True)
+#    grid_builder.configure_side_bar(filters_panel=True)# defaultToolPanel='filters')    
+    grid_builder.configure_column(
+    field="DATE",
+    header_name="INSERT DATE",
+    valueFormatter="value != undefined ? new Date(value).toLocaleString('it-IT', {dateStyle:'short'}): ''",
+    )
+    grid_builder.configure_column("ROWID", cellStyle=cellStyle)   
+    grid_builder.configure_selection(
+    selection_mode='single',     # Enable multiple row selection
+    use_checkbox=False             # Show checkboxes for selection
+    )
+    grid_options = grid_builder.build()
+    # List of available themes
+    available_themes = ["streamlit", "alpine", "balham", "material"]
+    
+    # Inizializzazione della sessione
+    if "grid_data" not in st.session_state:
+        st.session_state.grid_data = df_requests.copy()  # Copia per evitare modifiche al DataFrame originale
+    if "grid_response" not in st.session_state:
+        st.session_state.grid_response = None
+
+    # Sidebar controls - Filters
+    st.sidebar.header("Filters")
+    ct_status = df_requests['STATUS'].drop_duplicates()
+    df_ct_status = pd.DataFrame({"STATUS": ct_status}).sort_values(by="STATUS")
+
+    # Get an optional value requester filter
+    status_filter = st.sidebar.selectbox("Select a Status value:", df_ct_status, index=None)
+
+    # Filtro e AGGIORNAMENTO DEI DATI (utilizzando la sessione)
+    if status_filter:
+        st.session_state.grid_data = df_requests.loc[df_requests["STATUS"] == status_filter].copy()
+    else:
+        st.session_state.grid_data = df_requests.copy() # Mostra tutti i dati se il filtro è None
+
+    st.subheader("Request list:") 
+    # Creazione/Aggiornamento della griglia (UNA SOLA VOLTA per ciclo di esecuzione)
+    if st.session_state.grid_response is None:
+        st.session_state.grid_response = AgGrid(
+            st.session_state.grid_data,
+            gridOptions=grid_options,
+            allow_unsafe_jscode=True,
+            theme=available_themes[2],
+            fit_columns_on_grid_load=False,
+            update_mode=GridUpdateMode.MODEL_CHANGED,
+            data_return_mode=DataReturnMode.AS_INPUT,
+            key="main_grid"
+        )
+    else:
+        st.session_state.grid_response = AgGrid( # Aggiorna la griglia esistente
+            st.session_state.grid_data,
+            gridOptions=grid_options,
+            allow_unsafe_jscode=True,
+            theme=available_themes[2],
+            fit_columns_on_grid_load=False,
+            update_mode=GridUpdateMode.MODEL_CHANGED,
+            data_return_mode=DataReturnMode.AS_INPUT,
+            key="main_grid"
+        )
+
+    selected_row = st.session_state.grid_response['selected_rows']
+    
+        
+    def show_request_dialog(selected_row):
+        popup_title = f'Request {selected_row["ROWID"][0]} detail'
+    
+        @st.dialog(popup_title, width="small")
+        def dialog_content():
+            rc = 0
+            req_status = ""
+            req_assignedto = ""
+        # Stili personalizzati per gli input
+            st.markdown(
+                """
+                <style>
+                /* Stile per text_input abilitato */
+                div[data-testid="stTextInput"] > div > div > input:not([disabled]) {
+                    color: #28a745; /* Verde scuro */
+                    border: 2px solid #28a745;
+                    -webkit-text-fill-color: #28a745 !important;
+                    font-weight: bold;
+                }
+
+                /* Stile per text_input disabilitato */
+                div[data-testid="stTextInput"] > div > div input[disabled] {
+                    color: #6c757d !important; /* Grigio più chiaro */
+                    opacity: 1 !important;
+                    -webkit-text-fill-color: #6c757d !important;
+                    background-color: #e9ecef !important; /* Grigio ancora più chiaro */
+                    border: 1px solid #ced4da !important;
+                    font-style: italic;
+                }
+
+                /* Stile per selectbox abilitato */
+                .stSelectbox > div > div > div > div {
+                    color: #007bff; /* Blu per il testo */
+                }
+                </style>
+                """,
+                unsafe_allow_html=True,
+            )
+
+            st.text_input(label="Product family", value=selected_row['PR_FAMILY'][0], disabled=True)
+            st.text_input(label="Category", value=selected_row['CATEGORY'][0], disabled=True)                
+            st.text_input(label="Title", value=selected_row['TITLE'][0], disabled=True)
+            st.text_area(label="Details", value=selected_row['DETAIL'][0], disabled=True)
+            status_option = ['NEW', 'ASSIGNED', 'WIP', 'COMPLETED', 'DELETED']
+            idx_status = status_option.index(selected_row['STATUS'][0])
+            req_status = st.selectbox("Status", status_option, disabled=False, index=idx_status)
+            assignedto_option = ["TOP_01", "TOP_02", "TOP_03", "TOP_04"]
+            if req_status == "ASSIGNED":
+                req_assignedto = st.multiselect("Assigned to:", assignedto_option)
+
+            # Aggiungi funzioni per pulsante "Save"
+            if req_status != selected_row['STATUS'][0]:
+                if st.button("Save", type="primary", disabled=False, key="save_button"):                       
+                    # Aggiorna il database
+                    try:
+                        cursor.execute("""
+                            UPDATE TORP_REQUESTS 
+                            SET r_status = ? 
+                            WHERE r_id = ?
+                        """, (req_status, selected_row["ROWID"][0][1:]))
+                        conn.commit()
+                        cursor.close()  
+                        if conn:
+                            conn.close()
+
+                        st.session_state.grid_refresh = True
+                        st.session_state.grid_response = None
+                        st.success("Aggiornamento eseguito con successo!")
+                        
+                        # Imposta una flag per indicare che dobbiamo refreshare
+                        st.session_state.need_refresh = True
+                        time.sleep(3)  # Piccola pausa per mostrare il messaggio di successo
+                        st.rerun()
+
+                    except Exception as errMsg:
+                        st.error(f"**ERROR updating request in tab TORP_REQUESTS: \n{errMsg}", icon="🚨")
+                        return False
+
+            return False             
+        return dialog_content()
+    
+    # Nel codice principale:
+    if selected_row is not None and len(selected_row) > 0:
+        if 'dialog_shown' not in st.session_state:
+            st.session_state.dialog_shown = False
+            
+        if 'need_refresh' not in st.session_state:
+            st.session_state.need_refresh = False
+            
+        if st.session_state.need_refresh:
+            st.session_state.need_refresh = False
+            st.session_state.dialog_shown = False
+        else:
+            if not st.session_state.dialog_shown:
+                if show_request_dialog(selected_row):
+                    st.session_state.dialog_shown = True
+                    st.rerun()
+   
+
+
+#######################################################################################################
+def mytest():
+    pass
+    
+
+#######################################################################################################
 def main():
 #  if not check_password():
 #      st.stop()
@@ -477,7 +729,8 @@ def main():
     "ℹ️ App Info": display_app_info,
     "🪄 Insert Request": insert_request,
     "🔍 View Request ": view_request,
-    "📝 Assign Request": assign_request
+    "📝 Assign Request": assign_request,
+    "MYTEST": mytest
 }    
   demo_name = st.sidebar.selectbox("Choose a function", page_names_to_funcs.keys())
   page_names_to_funcs[demo_name]()

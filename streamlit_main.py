@@ -5,6 +5,8 @@ import io
 import time
 import json
 import urllib.parse
+from dataclasses import dataclass
+from typing import Optional, Tuple, Dict, List
 
 # 3th party packages
 import streamlit as st
@@ -18,12 +20,56 @@ import numpy as np
 #import extra_streamlit_components as stx
 
 
-
 # Global constants
 APPNAME = "TORP" #IPH Technical Office Request POC (Proof Of Concept)
 APPCODE = "TORP"
 APPVERSION = "0.1"
 
+#######################################################################################################
+def open_sqlitecloud_db():
+    db_link = ""
+    db_apikey = ""
+    db_name = ""
+    # Get database information
+    try:
+        #Search DB credentials using ST.SECRETS
+        db_link = st.secrets["db_credentials"]["SQLITECLOUD_DBLINK"]
+        db_apikey = st.secrets["db_credentials"]["SQLITECLOUD_APIKEY"]
+        db_name = st.secrets["db_credentials"]["SQLITECLOUD_DBNAME"]
+    except Exception as errMsg:
+        st.error(f"**ERROR: DB credentials NOT FOUND: \n{errMsg}", icon="🚨")
+        rc = 1
+        
+    conn_string = "".join([db_link, db_apikey])
+    global conn
+    # Connect to SQLite Cloud platform
+    try:
+        conn = sqlitecloud.connect(conn_string)
+        # st.success(f"Connected to {db_name} database!")
+    except Exception as errMsg:
+        st.error(f"**ERROR connecting to database: \n{errMsg}", icon="🚨")
+    
+    # Open SQLite database
+    conn.execute(f"USE DATABASE {db_name}")
+    global cursor
+    cursor = conn.cursor()
+
+
+#######################################################################################################
+def close_sqlitecloud_db():
+    with st.container(border=True):
+        try:
+            if cursor:
+                cursor.close()    
+            if conn:
+                conn.close() 
+        except Exception as errMsg:
+            st.error(f"**ERROR closing database connection: \n{errMsg}", icon="🚨")
+        else:
+            st.success(f"Database closed successfully!")   
+
+
+#######################################################################################################
 def check_password():
     """Returns `True` if the user had a correct password."""
 
@@ -64,8 +110,6 @@ def check_password():
 def display_app_info():
     """ Show app title and description """
     
-    import streamlit as st
-
     st.header(":blue[TORP Web Application]", divider="blue")
     st.subheader(
         """
@@ -77,297 +121,299 @@ def display_app_info():
     st.markdown("Powered with Streamlit :streamlit:")
 
 #######################################################################################################
-def insert_request()-> None:
-    """ Function to insert a new request """    
+def insert_request() -> None:
+    """Main function to handle request insertion"""
+    @dataclass
+    class RequestData:
+        """Class to store request data with type hints"""
+        insdate: str
+        user: str
+        status: str
+        dept: str
+        requester: str
+        priority: str
+        pline: str
+        pfamily: str
+        type: str
+        category: str
+        title: str
+        detail: str
+
+    class RequestManager:
+        """Class to handle request management operations"""
     
-    @st.dialog("Request submitted!", width="large")
-    def display_request_popup(req_nr: str, request: dict)-> None:
-        """ Function to get request information from user """
-        st.markdown(f"Request :green-background[**{req_nr}**] submitted! Here are the details:")
-        df_request = pd.DataFrame([request])
-        st.dataframe(df_request, use_container_width=True, hide_index=True)
-        time.sleep(10)
-
-#######################################################################################################
-    def save_request_to_sqlitecloud(row:dict):
-        """ Save new request into SQLite Cloud Database """
-        # Inzialise variables
-        rc = 0
-        req_nr = ""
-        db_link = ""
-        db_apikey = ""
-        db_name = ""
-        # Get database information
-        try:
-            #Search DB credentials using ST.SECRETS
-            db_link = st.secrets["db_credentials"]["SQLITECLOUD_DBLINK"]
-            db_apikey = st.secrets["db_credentials"]["SQLITECLOUD_APIKEY"]
-            db_name = st.secrets["db_credentials"]["SQLITECLOUD_DBNAME"]
-        except Exception as errMsg:
-            st.error(f"**ERROR: DB credentials NOT FOUND: \n{errMsg}", icon="🚨")
-            rc = 1
-            
-        conn_string = "".join([db_link, db_apikey])
-        # Connect to SQLite Cloud platform
-        try:
-            conn = sqlitecloud.connect(conn_string)
-        except Exception as errMsg:
-            st.error(f"**ERROR connecting to database: \n{errMsg}", icon="🚨")
-        
-        # Open SQLite database
-        conn.execute(f"USE DATABASE {db_name}")
-        cursor = conn.cursor()
-
-        # Calculate the next rowid
-        cursor.execute('SELECT MAX(r_id) FROM TORP_REQUESTS')
-        max_rowid = cursor.fetchone()[0]
-        next_rownr = (max_rowid + 1) if max_rowid is not None else 1
-
-        # Setup sqlcode for inserting applog as a new row
-        sqlcode = """INSERT INTO TORP_REQUESTS (r_id, r_user, r_status, r_dept, r_requester, r_priority, r_pline, r_pfamily, r_type, r_category, r_title, r_detail, r_insdate) 
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
-                """    
-        
-        # Setup row values
-        values = (next_rownr, row["Req_user"], row["Req_status"], row["Req_dept"], row["Req_requester"], row["Req_priority"], row["Req_pline"], row["Req_pfamily"], row["Req_type"], row["Req_category"], row["Req_title"], row["Req_detail"], row["Req_insdate"])
-        try:
-            cursor.execute(sqlcode, values)
-        #    cursor.lastrowid
-        except Exception as errMsg:
-            st.error(f"**ERROR inserting request in tab TORP_REQUESTS: \n{errMsg}", icon="🚨")
-            rc = 1
-        else:
-            conn.commit()
-            req_nr = f"R-{str(next_rownr).zfill(4)}"
-            rc = 0
-       
-        cursor.close()    
-        if conn:
-            conn.close()
-
-        return req_nr, rc
-
-
-    sb_dept_key = "sb_dept"
-    reset_sb_dept_key = "reset_sb_dept"
-    req_dept_option = ["DMN-ACCOUNTING", "DTD-DESIGN TECHNICAL DEPARTMENT", "COMMERCIALE AFTER MARKET"]
-    
-    sb_requester_key = "sb_requester"
-    reset_sb_requester_key = "reset_sb_requester"
-    req_requester_option_01 = ["COMELLINI GIORGIO", "ROMANI CORRADO", "ROSSI PAOLA"]
-    req_requester_option_02 = ["CARLINI MICHELE", "FENARA GABRIELE", "PALMA NICOLA"]
-    req_requester_option_03 = ["GIORGI IVAN", "ANGOTTI FRANCESCO", "BALDINI ROBERTO"]
-
-    sb_pline_key = "sb_pline"
-    reset_sb_pline_key = "reset_sb_pline"
-    req_pline_option = ["POWER TAKE OFFs", "HYDRAULICS", "CYLINDERS", "ALL"]
-
-    sb_pfamily_key = "sb_pfamily"
-    reset_sb_pfamily_key = "reset_sb_pfamily"
-    req_pfamily_option_01 = ["GEARBOX PTO", "ENGINE PTO", "SPLIT SHAFT PTO", "PARALLEL GEARBOXES"]
-    req_pfamily_option_02 = ["PUMPS", "MOTORS", "VALVES", "WET KITS"]
-    req_pfamily_option_03 = ["FRONT-END CYLINDERS", "UNDERBODY CYLINDERS", "DOUBLE ACTING CYLINDERS", "BRACKETS FOR CYLINDERS"]
-
-    sb_priority_key = "sb_priority"
-    reset_sb_priority_key = "reset_sb_priority"
-    req_priority_option = ["High", "Medium", "Low"]
-
-    sb_type_key = "sb_type"
-    reset_sb_type_key = "reset_sb_type"
-    req_type_option = ["DOCUMENTATION", "PRODUCT", "SERVICE"]
-
-    sb_category_key = "sb_category"
-    reset_sb_category_key = "reset_sb_category"
-    req_category_option_01 = ["NEW PRODUCT", "PRODUCT CHANG", "OBSOLETE PRODUCT", "PRODUCT VALIDATION"] 
-    req_category_option_02 = ["WEBPTO", "DRAWING", "IMDS (INTERNATIONAL MATERIAL DATA SYSTEM)", "CATALOGUE"]
-    req_category_option_03 = ["VISITING CUSTOMER PLANT", "VISITING SUPPLIER PLANT"]
-
-    ti_title_key = "ti_title"
-    reset_ti_title_key = "reset_ti_detail"
-    ti_detail_key = "ti_detail"
-    reset_ti_detail_key = "reset_ti_detail"
-
-    # Gestione reset selectbox
-    if reset_sb_dept_key not in st.session_state:
-        st.session_state[reset_sb_dept_key] = False
-    if reset_sb_requester_key not in st.session_state:
-        st.session_state[reset_sb_requester_key] = False
-    if reset_sb_pline_key not in st.session_state:
-        st.session_state[reset_sb_pline_key] = False 
-    if reset_sb_pfamily_key not in st.session_state:
-        st.session_state[reset_sb_pfamily_key] = False
-    if reset_sb_type_key not in st.session_state:
-        st.session_state[reset_sb_type_key] = False 
-    if reset_sb_category_key not in st.session_state:
-        st.session_state[reset_sb_category_key] = False                                        
-
-    if st.session_state[reset_sb_dept_key]:
-        st.session_state[sb_dept_key] = None
-        st.session_state[reset_sb_dept_key] = False
-        st.session_state[sb_requester_key] = None
-        st.session_state[reset_sb_requester_key] = False
-        st.session_state[sb_pline_key] = None
-        st.session_state[reset_sb_pline_key] = False   
-        st.session_state[sb_pfamily_key] = None
-        st.session_state[reset_sb_pfamily_key] = False  
-        st.session_state[sb_type_key] = None
-        st.session_state[reset_sb_type_key] = False  
-        st.session_state[sb_category_key] = None
-        st.session_state[reset_sb_category_key] = False                                         
-        st.rerun()
-
-    # Gestione reset text input
-    if reset_ti_title_key not in st.session_state:
-        st.session_state[reset_ti_title_key] = False
-    if reset_ti_detail_key not in st.session_state:
-        st.session_state[reset_ti_detail_key] = False    
-    if st.session_state[reset_ti_title_key]:
-        st.session_state[ti_title_key] = ""
-        st.session_state[reset_ti_title_key] = False
-        st.session_state[ti_detail_key] = ""
-        st.session_state[reset_ti_detail_key] = False
-        st.rerun()
-
-    #Inizializzazione
-    if sb_dept_key not in st.session_state:
-        st.session_state[sb_dept_key] = None
-    if sb_requester_key not in st.session_state:
-        st.session_state[sb_requester_key] = None
-    if sb_pline_key not in st.session_state:
-        st.session_state[sb_pline_key] = None
-    if sb_pfamily_key not in st.session_state:
-        st.session_state[sb_pfamily_key] = None
-    if sb_type_key not in st.session_state:
-        st.session_state[sb_type_key] = None
-    if sb_category_key not in st.session_state:
-        st.session_state[sb_category_key] = None  
-
-    if ti_title_key not in st.session_state:
-        st.session_state[ti_title_key] = ""
-    if ti_detail_key not in st.session_state:
-        st.session_state[ti_detail_key] = ""
-
-    #Inzialize variables
-    req_department = ""
-    req_requester = ""
-    req_pline = ""
-    req_pfamily = ""
-    req_type = ""
-    req_category = ""
-    req_title = ""
-    req_detail = ""          
-    
-    st.header(":orange[Requester informations]")
-    req_department = st.selectbox("Department", req_dept_option, key=sb_dept_key)
-    if req_department == "DMN-ACCOUNTING":
-        req_requester = st.selectbox("Requester", req_requester_option_01, key=sb_requester_key)
-    elif req_department == "DTD-DESIGN TECHNICAL DEPARTMENT":
-        req_requester = st.selectbox("Requester", req_requester_option_02, key=sb_requester_key)            
-    elif req_department == "COMMERCIALE AFTER MARKET":
-        req_requester = st.selectbox("Requester", req_requester_option_03, key=sb_requester_key)
-    st.divider()
-
-    st.header(":orange[Product group informations]")
-    req_pline = st.selectbox("Product line", req_pline_option, key=sb_pline_key)
-    if req_pline == "POWER TAKE OFFs":
-        req_pfamily = st.selectbox(":blue[Product family(:red[*])]", req_pfamily_option_01, index=None, key="sb_pfamily")
-    elif req_pline == "HYDRAULICS":
-        req_pfamily = st.selectbox(":blue[Product family(:red[*])]", req_pfamily_option_02, index=None, key="sb_pfamily")
-    elif req_pline == "CYLINDERS":
-        req_pfamily = st.selectbox(":blue[Product family(:red[*])]", req_pfamily_option_03, index=None, key="sb_pfamily")
-    st.divider()
-
-    st.header(":orange[Request informations]")
-    req_priority = st.selectbox(":blue[Priority]", req_priority_option, index=1)
-    req_type = st.selectbox(":blue[Request type (:red[*])]", req_type_option, index=None, key="sb_type")
-    if req_type == "PRODUCT":
-        req_category = st.selectbox(":blue[Request category(:red[*])]", req_category_option_01, index=None, key="sb_category")  
-    elif req_type == "DOCUMENTATION":
-        req_category = st.selectbox(":blue[Request category(:red[*])]", req_category_option_02, index=None, key="sb_category")  
-    elif req_type == "SERVICE":
-        req_category = st.selectbox(":blue[Request category(:red[*])]", req_category_option_03, index=None, key="sb_category")  
-    
-    req_title = st.text_input(":blue[Request title(:red[*])]", key=ti_title_key)
-    req_detail = st.text_area(":blue[Request detail(:red[*])]", key=ti_detail_key)
-
-    req_insdate = datetime.datetime.now().strftime("%Y-%m-%d")
-    req_user = "RB"
-    req_status = "NEW"
-    request_record =    {
-            "Req_insdate": req_insdate,
-            "Req_user": req_user,
-            "Req_status": req_status,
-            "Req_dept": req_department,
-            "Req_requester": req_requester,
-            "Req_priority": req_priority,
-            "Req_pline": req_pline,
-            "Req_pfamily": req_pfamily,
-            "Req_type": req_type,
-            "Req_category": req_category,
-            "Req_title": req_title,
-            "Req_detail": req_detail
+        PRODUCT_FAMILIES = {
+            "POWER TAKE OFFs": ["GEARBOX PTO", "ENGINE PTO", "SPLIT SHAFT PTO", "PARALLEL GEARBOXES"],
+            "HYDRAULICS": ["PUMPS", "MOTORS", "VALVES", "WET KITS"],
+            "CYLINDERS": ["FRONT-END CYLINDERS", "UNDERBODY CYLINDERS", "DOUBLE ACTING CYLINDERS", "BRACKETS FOR CYLINDERS"],
+            "ALL": ["--"]
         }
-    st.divider()
-    if req_department and req_requester and req_pline and req_pfamily and req_priority and req_type and req_category and req_detail:
-        if st.button("Submit", type="primary", disabled=False):
-            req_nr = ""
-            req_nr, rc = save_request_to_sqlitecloud(request_record)
-            display_request_popup(req_nr, request_record)
-            st.session_state[reset_sb_dept_key] = True
-            st.session_state[reset_sb_requester_key] = True
-            st.session_state[reset_sb_pline_key] = True
-            st.session_state[reset_sb_pfamily_key] = True
-            st.session_state[reset_sb_type_key] = True
-            st.session_state[reset_sb_category_key] = True                                       
-            st.session_state[reset_ti_title_key] = True
-            st.session_state[reset_ti_detail_key] = True            
+        
+        REQUEST_CATEGORIES = {
+            "PRODUCT": ["NEW PRODUCT", "PRODUCT CHANGE", "OBSOLETE PRODUCT", "PRODUCT VALIDATION"],
+            "DOCUMENTATION": ["WEBPTO", "DRAWING", "IMDS (INTERNATIONAL MATERIAL DATA SYSTEM)", "CATALOGUE"],
+            "SERVICE": ["VISITING CUSTOMER PLANT", "VISITING SUPPLIER PLANT"]
+        }
+
+        def __init__(self, conn, cursor):
+            self.conn = conn
+            self.cursor = cursor
+            self.load_initial_data()
+
+        def load_initial_data(self) -> None:
+            """Load initial data from database"""
+            self.df_depts = pd.read_sql_query(
+                "SELECT code AS CODE, name AS NAME FROM TORP_DEPARTMENTS ORDER by name", 
+                self.conn
+            )
+            self.df_depts["DEPT_KEY"] = self.df_depts["NAME"]
+
+            self.df_users = pd.read_sql_query("""
+                SELECT A.code AS CODE, A.name AS NAME, A.deptcode AS DEPTCODE, B.name AS DEPTNAME
+                FROM TORP_USERS A
+                INNER JOIN TORP_DEPARTMENTS B ON B.code = A.deptcode
+                ORDER by A.name
+            """, self.conn)
+
+        def save_request(self, request: RequestData) -> Tuple[str, int]:
+            """Save request to database and return request number and status"""
+            try:
+                next_rownr = self._get_next_row_id()
+                
+                sql = """
+                    INSERT INTO TORP_REQUESTS (
+                        idrow, usercode, status, deptcode, requestername, 
+                        priority, pline, pfamily, type, category, title, 
+                        detail, insdate
+                    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                """
+                
+                values = (
+                    next_rownr, request.user, request.status, request.dept,
+                    request.requester, request.priority, request.pline,
+                    request.pfamily, request.type, request.category,
+                    request.title, request.detail, request.insdate
+                )
+                
+                self.cursor.execute(sql, values)
+                self.conn.commit()
+                return f"R{str(next_rownr).zfill(4)}", 0
+                
+            except Exception as e:
+                st.error(f"**ERROR inserting request in TORP_REQUESTS: \n{e}", icon="🚨")
+                return "", 1
+
+        def _get_next_row_id(self) -> int:
+            """Get next available row ID"""
+            self.cursor.execute('SELECT MAX(idrow) FROM TORP_REQUESTS')
+            max_idrow = self.cursor.fetchone()[0]
+            return (max_idrow + 1) if max_idrow is not None else 1
+        
+    # Inizializzazione delle chiavi di stato per i widget
+    FORM_KEYS = [
+        'sb_dept', 'sb_requester', 'sb_pline', 'sb_pfamily',
+        'sb_type', 'sb_category', #'sb_priority',
+        'ti_title', 'ti_detail'
+    ]
+    
+    # Inizializzazione dello stato del form
+    if 'form_submitted' not in st.session_state:
+        st.session_state.form_submitted = False
+    
+    if 'reset_form' not in st.session_state:
+        st.session_state.reset_form = False
+        
+    # Inizializzazione delle chiavi del form se non esistono
+    for key in FORM_KEYS:
+        if key not in st.session_state:
+            st.session_state[key] = None if key.startswith('sb_') else ""
+
+    request_manager = RequestManager(conn, cursor)  # conn e cursor devono essere definiti globalmente
+    
+    @st.dialog("Request submitted!")
+    def display_request_popup(req_nr: str, request: dict) -> None:
+        """Display confirmation popup after request submission"""
+        st.markdown(
+            """
+            <style>
+            div[data-testid="stTextInput"] > div > div > input:not([disabled]) {
+                color: #28a745;
+                border: 2px solid #28a745;
+                -webkit-text-fill-color: #28a745 !important;
+                font-weight: bold;
+            }
+            div[data-testid="stTextInput"] > div > div input[disabled] {
+                color: #6c757d !important;
+                opacity: 1 !important;
+                -webkit-text-fill-color: #6c757d !important;
+                background-color: #e9ecef !important;
+                border: 1px solid #ced4da !important;
+                font-style: italic;
+            }
+            .stSelectbox > div > div > div > div {
+                color: #007bff;
+            }
+            </style>
+            """,
+            unsafe_allow_html=True,
+        )
+        
+        st.text_input("Request Nr", value=req_nr, disabled=True)
+        st.text_input("Requester", value=request["Req_requester"], disabled=True)
+        st.text_input("Title", value=request["Req_title"], disabled=True)
+        st.text_area("Details", value=request["Req_detail"], disabled=True)
+        
+        status_options = ['NEW', 'ASSIGNED', 'WIP', 'COMPLETED', 'DELETED']
+        idx_status = status_options.index(request["Req_status"])
+        st.selectbox("Status", status_options, disabled=True, index=idx_status)
+        
+        if st.button("Close"):
+            st.session_state.reset_form = True
+            time.sleep(0.1)  # Piccola pausa per assicurare il corretto aggiornamento dello stato
             st.rerun()
-    else:
-        st.button("Submit", type="primary", disabled=True)
+
+    def reset_form_state():
+        """Reset all form fields to their initial state"""
+        for key in FORM_KEYS:
+            if key.startswith('sb_'):
+                st.session_state[key] = None
+            else:
+                st.session_state[key] = ""
+
+    def create_form() -> RequestData:
+        """Create and handle the request form"""
+        st.header(":orange[Requester informations]")
+        
+        # Department and requester selection
+        department = st.selectbox(
+            "Department(:red[*])", 
+            request_manager.df_depts['DEPT_KEY'].tolist(),
+            index=None,
+            key="sb_dept"
+        )
+        
+        requester = None
+        if department:
+            filtered_users = request_manager.df_users[
+                request_manager.df_users["DEPTNAME"] == department
+            ]
+            requester = st.selectbox(
+                "Requester(:red[*])", 
+                filtered_users["NAME"].tolist(),
+                index=None,
+                key="sb_requester"
+            )
+
+        st.header(":orange[Product group informations]")
+        
+        # Product line and family selection
+        pline = st.selectbox(
+            "Product line(:red[*])",
+            ["POWER TAKE OFFs", "HYDRAULICS", "CYLINDERS", "ALL"],
+            index=None,
+            key="sb_pline"
+        )
+        
+        pfamily = None
+        if pline in RequestManager.PRODUCT_FAMILIES:
+            pfamily = st.selectbox(
+                ":blue[Product family(:red[*])]",
+                RequestManager.PRODUCT_FAMILIES[pline],
+                index=None,
+                key="sb_pfamily"
+            )
+
+        st.header(":orange[Request informations]")
+        
+        # Request details
+        priority = st.selectbox(
+            ":blue[Priority]",
+            ["High", "Medium", "Low"],
+            index=1,
+            key="sb_priority"
+        )
+        
+        req_type = st.selectbox(
+            ":blue[Request type (:red[*])]",
+            ["DOCUMENTATION", "PRODUCT", "SERVICE"],
+            index=None,
+            key="sb_type"
+        )
+        
+        category = None
+        if req_type in RequestManager.REQUEST_CATEGORIES:
+            category = st.selectbox(
+                ":blue[Request category(:red[*])]",
+                RequestManager.REQUEST_CATEGORIES[req_type],
+                index=None,
+                key="sb_category"
+            )
+
+        title = st.text_input(":blue[Request title(:red[*])]", key="ti_title")
+        detail = st.text_area(":blue[Request detail(:red[*])]", key="ti_detail")
+
+        return RequestData(
+            insdate=datetime.datetime.now().strftime("%Y-%m-%d"),
+            user="RB",
+            status="NEW",
+            dept=department,
+            requester=requester,
+            priority=priority,
+            pline=pline,
+            pfamily=pfamily,
+            type=req_type,
+            category=category,
+            title=title,
+            detail=detail
+        )
+
+    # Reset del form se necessario
+    if st.session_state.reset_form:
+        reset_form_state()
+        st.session_state.reset_form = False
+        st.rerun()
+
+    # Main form handling
+    request_data = create_form()
+    st.divider()
+
+
+    save_botton_disabled = not all([
+        request_data.dept, request_data.requester, request_data.pline,
+        request_data.pfamily, request_data.type, request_data.category,
+        request_data.detail
+    ])
+
+    if st.button("Submit", type="primary", disabled=save_botton_disabled):
+        req_nr, rc = request_manager.save_request(request_data)
+        if rc == 0:
+            st.session_state.form_submitted = True
+            display_request_popup(req_nr, {
+                "Req_requester": request_data.requester,
+                "Req_title": request_data.title,
+                "Req_detail": request_data.detail,
+                "Req_status": request_data.status
+            })
+
 
 #######################################################################################################
 def view_request():
     # Inzialise variables
     rc = 0
     req_nr = ""
-    db_link = ""
-    db_apikey = ""
-    db_name = ""
 
     # Aggiungere all'inizio della funzione assign_request(), dopo le altre inizializzazioni
     if "grid_refresh" not in st.session_state:
         st.session_state.grid_refresh = False
     
-    # Get database information
-    try:
-        #Search DB credentials using ST.SECRETS
-        db_link = st.secrets["db_credentials"]["SQLITECLOUD_DBLINK"]
-        db_apikey = st.secrets["db_credentials"]["SQLITECLOUD_APIKEY"]
-        db_name = st.secrets["db_credentials"]["SQLITECLOUD_DBNAME"]
-    except Exception as errMsg:
-        st.error(f"**ERROR: DB credentials NOT FOUND: \n{errMsg}", icon="🚨")
-        rc = 1
-        
-    conn_string = "".join([db_link, db_apikey])
-    # Connect to SQLite Cloud platform
-    try:
-        conn = sqlitecloud.connect(conn_string)
-    except Exception as errMsg:
-        st.error(f"**ERROR connecting to database: \n{errMsg}", icon="🚨")
-    
-    # Open SQLite database
-    conn.execute(f"USE DATABASE {db_name}")
-    cursor = conn.cursor()
-
-    # Modifica la query per includere anche il campo r_assignedto
     df_requests = pd.read_sql_query("""
-        SELECT r_id as ROWID, r_user as USER, r_status as STATUS, 
-            r_insdate as DATE, r_dept as DEPARTMENT, r_requester as REQUESTER, 
-            r_priority as PRIORITY, r_pline as PR_LINE, r_pfamily as PR_FAMILY, 
-            r_type as TYPE, r_category as CATEGORY, r_title as TITLE, 
-            r_detail as DETAIL 
-        FROM TORP_REQUESTS
-        ORDER by ROWID desc
+    SELECT idrow as IDROW, usercode as USERCODE, status as STATUS, 
+        insdate as DATE, deptcode as DEPTCODE, requestername as REQUESTERNAME, 
+        priority as PRIORITY, pline as PR_LINE, pfamily as PR_FAMILY, 
+        type as TYPE, category as CATEGORY, title as TITLE, 
+        detail as DETAIL 
+    FROM TORP_REQUESTS
+    ORDER by IDROW desc
     """, conn)
 
     # Aggiungi questo dopo il caricamento dei dati
@@ -376,11 +422,10 @@ def view_request():
         st.session_state.grid_refresh = False    
         df_requests["DATE"] = pd.to_datetime(df_requests["DATE"], format="%Y-%m-%d")
 
-    df_requests["ROWID"] = 'R' + df_requests["ROWID"].astype(str).str.zfill(4)
-    # Custom cell styling based on stock levels
+    df_requests["IDROW"] = 'R' + df_requests["IDROW"].astype(str).str.zfill(4)
     cellStyle = JsCode("""
         function(params) {
-            if (params.column.colId === 'ROWID') {
+            if (params.column.colId === 'IDROW') {
                        return {
                         'backgroundColor': '#ECEBBD',
                         'color': '#111810',
@@ -412,7 +457,7 @@ def view_request():
     header_name="INSERT DATE",
     valueFormatter="value != undefined ? new Date(value).toLocaleString('it-IT', {dateStyle:'short'}): ''",
     )
-    grid_builder.configure_column("ROWID", cellStyle=cellStyle)   
+    grid_builder.configure_column("IDROW", cellStyle=cellStyle)   
     grid_builder.configure_selection(
     selection_mode='single',     # Enable multiple row selection
     use_checkbox=False             # Show checkboxes for selection
@@ -429,15 +474,15 @@ def view_request():
 
     # Sidebar controls - Filters
     st.sidebar.header("Filters")
-    ct_requester = df_requests['REQUESTER'].drop_duplicates()
-    df_ct_requester = pd.DataFrame({"REQUESTER": ct_requester}).sort_values(by="REQUESTER")
+    ct_requester = df_requests['REQUESTERNAME'].drop_duplicates()
+    df_ct_requester = pd.DataFrame({"REQUESTERNAME": ct_requester}).sort_values(by="REQUESTERNAME")
 
     # Get an optional value requester filter
     requester_filter = st.sidebar.selectbox("Select a Requester:", df_ct_requester, index=None)
 
     # Filtro e AGGIORNAMENTO DEI DATI (utilizzando la sessione)
     if requester_filter:
-        st.session_state.grid_data = df_requests.loc[df_requests["REQUESTER"] == requester_filter].copy()
+        st.session_state.grid_data = df_requests.loc[df_requests["REQUESTERNAME"] == requester_filter].copy()
     else:
         st.session_state.grid_data = df_requests.copy() # Mostra tutti i dati se il filtro è None
 
@@ -472,265 +517,384 @@ def view_request():
 #        selected_row = selected_row[0] 
         data_out = {
             'Column name': ["Request Number", "Insert date", "User", "Status", "Department", "Requester", "Priority", "Product Line", "Product Family", "Type", "Category", "Title", "Detail"],
-            'Column value': [selected_row['ROWID'][0], selected_row['DATE'][0], selected_row['USER'][0], selected_row['STATUS'][0], selected_row['DEPARTMENT'][0], selected_row['REQUESTER'][0], selected_row['PRIORITY'][0], selected_row['PR_LINE'][0], selected_row['PR_FAMILY'][0], selected_row['TYPE'][0], selected_row['CATEGORY'][0], selected_row['TITLE'][0], selected_row['DETAIL'][0]]
+            'Column value': [selected_row['IDROW'][0], selected_row['DATE'][0], selected_row['USERCODE'][0], selected_row['STATUS'][0], selected_row['DEPTCODE'][0], selected_row['REQUESTERNAME'][0], selected_row['PRIORITY'][0], selected_row['PR_LINE'][0], selected_row['PR_FAMILY'][0], selected_row['TYPE'][0], selected_row['CATEGORY'][0], selected_row['TITLE'][0], selected_row['DETAIL'][0]]
         }
         df_out = pd.DataFrame(data_out)
         st.subheader("Request details:")         
         st.dataframe(df_out, use_container_width=True, height=500, hide_index=True)
 
+
 #######################################################################################################
 def assign_request():
-
-    # Inzialize variables
-    rc = 0
-    req_nr = ""
-    db_link = ""
-    db_apikey = ""
-    db_name = ""
-    # Get database information
-    try:
-        #Search DB credentials using ST.SECRETS
-        db_link = st.secrets["db_credentials"]["SQLITECLOUD_DBLINK"]
-        db_apikey = st.secrets["db_credentials"]["SQLITECLOUD_APIKEY"]
-        db_name = st.secrets["db_credentials"]["SQLITECLOUD_DBNAME"]
-    except Exception as errMsg:
-        st.error(f"**ERROR: DB credentials NOT FOUND: \n{errMsg}", icon="🚨")
-        rc = 1
+    """
+    Handle request assignments and management through a Streamlit interface.
+    Includes request filtering, display, and assignment management functionality.
+    """
+    # Constants
+    ACTIVE_STATUS = "ACTIVE"
+    DISABLED_STATUS = "DISABLED"
+    DEFAULT_DEPT_CODE = "DTD"
+    STATUS_OPTIONS = ['NEW', 'ASSIGNED', 'WIP', 'COMPLETED', 'DELETED']
+    
+    def reset_application_state():
+        """Reset all session state variables and cached data"""
+        # Lista delle chiavi di sessione da eliminare
+        keys_to_clear = [
+            'grid_data',
+            'grid_response',
+            'dialog_shown',
+            'need_refresh',
+            'main_grid',  # Chiave della griglia AgGrid
+#            'Status_value',  # Chiave del filtro status nella sidebar
+            'selected_rows' # Chiave della selezione delle righe
+        ]
         
-    conn_string = "".join([db_link, db_apikey])
-    # Connect to SQLite Cloud platform
-    try:
-        conn = sqlitecloud.connect(conn_string)
-    except Exception as errMsg:
-        st.error(f"**ERROR connecting to database: \n{errMsg}", icon="🚨")
-    
-    # Open SQLite database
-    conn.execute(f"USE DATABASE {db_name}")
-    cursor = conn.cursor()
-   
-    df_requests = pd.read_sql_query("""
-    SELECT r_id as ROWID, r_user as USER, r_status as STATUS, 
-        r_insdate as DATE, r_dept as DEPARTMENT, r_requester as REQUESTER, 
-        r_priority as PRIORITY, r_pline as PR_LINE, r_pfamily as PR_FAMILY, 
-        r_type as TYPE, r_category as CATEGORY, r_title as TITLE, 
-        r_detail as DETAIL 
-    FROM TORP_REQUESTS
-    ORDER by ROWID desc
-    """, conn)
-    
-    df_requests["DATE"] = pd.to_datetime(df_requests["DATE"], format="%Y-%m-%d")
-
-#    df_requests["ROWID"] = "R"+df_requests["ROWID"]
-    df_requests["ROWID"] = 'R' + df_requests["ROWID"].astype(str).str.zfill(4)
-
-    # Custom cell styling based on stock levels
-    cellStyle = JsCode("""
-        function(params) {
-            if (params.column.colId === 'ROWID') {
-                       return {
-                        'backgroundColor': '#ECEBBD',
-                        'color': '#111810',
-                        'fontWeight': 'bold'
-                    };
-            }
-            return null;
-        }
-        """)
-    grid_builder = GridOptionsBuilder.from_dataframe(df_requests)
-    #gb = GridOptionsBuilder()
-    # makes columns resizable, sortable and filterable by default
-    grid_builder.configure_default_column(
-        resizable=True,
-        filterable=True,
-        sortable=True,
-        editable=False,
-        enableRowGroup=False
-    )
-    # Enalble pagination
-    grid_builder.configure_pagination(paginationAutoPageSize=False, paginationPageSize=12)
-#    gb.configure_selection('single', use_checkbox=True)
-    grid_builder.configure_grid_options(domLayout='normal')
-#    grid_builder.configure_pagination(enabled=True, paginationPageSize=5, paginationAutoPageSize=True)
-#    grid_builder.configure_selection(selection_mode="multiple", use_checkbox=True)
-#    grid_builder.configure_side_bar(filters_panel=True)# defaultToolPanel='filters')    
-    grid_builder.configure_column(
-    field="DATE",
-    header_name="INSERT DATE",
-    valueFormatter="value != undefined ? new Date(value).toLocaleString('it-IT', {dateStyle:'short'}): ''",
-    )
-    grid_builder.configure_column("ROWID", cellStyle=cellStyle)   
-    grid_builder.configure_selection(
-    selection_mode='single',     # Enable multiple row selection
-    use_checkbox=False             # Show checkboxes for selection
-    )
-    grid_options = grid_builder.build()
-    # List of available themes
-    available_themes = ["streamlit", "alpine", "balham", "material"]
-    
-    # Inizializzazione della sessione
-    if "grid_data" not in st.session_state:
-        st.session_state.grid_data = df_requests.copy()  # Copia per evitare modifiche al DataFrame originale
-    if "grid_response" not in st.session_state:
-        st.session_state.grid_response = None
-
-    # Sidebar controls - Filters
-    st.sidebar.header("Filters")
-    ct_status = df_requests['STATUS'].drop_duplicates()
-    df_ct_status = pd.DataFrame({"STATUS": ct_status}).sort_values(by="STATUS")
-
-    # Get an optional value requester filter
-    status_filter = st.sidebar.selectbox("Select a Status value:", df_ct_status, index=None)
-
-    # Filtro e AGGIORNAMENTO DEI DATI (utilizzando la sessione)
-    if status_filter:
-        st.session_state.grid_data = df_requests.loc[df_requests["STATUS"] == status_filter].copy()
-    else:
-        st.session_state.grid_data = df_requests.copy() # Mostra tutti i dati se il filtro è None
-
-    st.subheader("Request list:") 
-    # Creazione/Aggiornamento della griglia (UNA SOLA VOLTA per ciclo di esecuzione)
-    if st.session_state.grid_response is None:
-        st.session_state.grid_response = AgGrid(
-            st.session_state.grid_data,
-            gridOptions=grid_options,
-            allow_unsafe_jscode=True,
-            theme=available_themes[2],
-            fit_columns_on_grid_load=False,
-            update_mode=GridUpdateMode.MODEL_CHANGED,
-            data_return_mode=DataReturnMode.AS_INPUT,
-            key="main_grid"
-        )
-    else:
-        st.session_state.grid_response = AgGrid( # Aggiorna la griglia esistente
-            st.session_state.grid_data,
-            gridOptions=grid_options,
-            allow_unsafe_jscode=True,
-            theme=available_themes[2],
-            fit_columns_on_grid_load=False,
-            update_mode=GridUpdateMode.MODEL_CHANGED,
-            data_return_mode=DataReturnMode.AS_INPUT,
-            key="main_grid"
-        )
-
-    selected_row = st.session_state.grid_response['selected_rows']
-    
+        # Rimuovi tutte le chiavi di sessione specificate
+        for key in keys_to_clear:
+            if key in st.session_state:
+                del st.session_state[key]
         
-    def show_request_dialog(selected_row):
-        popup_title = f'Request {selected_row["ROWID"][0]} detail'
-    
+        # Forza il refresh cambiando la chiave 
+        st.session_state.grid_refresh_key = str(time.time())
+        # # Reset the grid response to remove any selected rows 
+        # st.session_state.grid_response
+        # Forza il rerun dell'applicazione        
+        st.rerun()
+
+    def show_request_dialog(selected_row, df_reqassegnedto, df_users, status_options, default_dept_code, update_status_fn, update_assignments_fn):
+        """
+        Display and handle the request modification dialog.
+        
+        Args:
+            selected_row: The currently selected grid row
+            df_reqassegnedto: DataFrame of request assignments
+            df_users: DataFrame of users
+            status_options: List of available status options
+            default_dept_code: Default department code
+            update_status_fn: Function to update request status
+            update_assignments_fn: Function to update request assignments
+        """
+        popup_title = f'Request {selected_row["IDROW"][0]} detail'
+        
         @st.dialog(popup_title, width="small")
         def dialog_content():
-            rc = 0
-            req_status = ""
-            req_assignedto = ""
-        # Stili personalizzati per gli input
+            # Custom styles for inputs
             st.markdown(
                 """
                 <style>
-                /* Stile per text_input abilitato */
                 div[data-testid="stTextInput"] > div > div > input:not([disabled]) {
-                    color: #28a745; /* Verde scuro */
+                    color: #28a745;
                     border: 2px solid #28a745;
                     -webkit-text-fill-color: #28a745 !important;
                     font-weight: bold;
                 }
 
-                /* Stile per text_input disabilitato */
                 div[data-testid="stTextInput"] > div > div input[disabled] {
-                    color: #6c757d !important; /* Grigio più chiaro */
+                    color: #6c757d !important;
                     opacity: 1 !important;
                     -webkit-text-fill-color: #6c757d !important;
-                    background-color: #e9ecef !important; /* Grigio ancora più chiaro */
+                    background-color: #e9ecef !important;
                     border: 1px solid #ced4da !important;
                     font-style: italic;
                 }
 
-                /* Stile per selectbox abilitato */
                 .stSelectbox > div > div > div > div {
-                    color: #007bff; /* Blu per il testo */
+                    color: #007bff;
                 }
                 </style>
                 """,
                 unsafe_allow_html=True,
             )
 
+            # Extract request ID
+            idrow_nr = int(selected_row["IDROW"][0][1:])
+            
+            # Display request details
             st.text_input(label="Product family", value=selected_row['PR_FAMILY'][0], disabled=True)
-            st.text_input(label="Category", value=selected_row['CATEGORY'][0], disabled=True)                
+            st.text_input(label="Category", value=selected_row['CATEGORY'][0], disabled=True)
             st.text_input(label="Title", value=selected_row['TITLE'][0], disabled=True)
             st.text_area(label="Details", value=selected_row['DETAIL'][0], disabled=True)
-            status_option = ['NEW', 'ASSIGNED', 'WIP', 'COMPLETED', 'DELETED']
-            idx_status = status_option.index(selected_row['STATUS'][0])
-            req_status = st.selectbox("Status", status_option, disabled=False, index=idx_status)
-            assignedto_option = ["TOP_01", "TOP_02", "TOP_03", "TOP_04"]
-            if req_status == "ASSIGNED":
-                req_assignedto = st.multiselect("Assigned to:", assignedto_option)
+            
+            # Status selection
+            idx_status = status_options.index(selected_row['STATUS'][0])
+            req_status = st.selectbox("Status", status_options, disabled=False, index=idx_status)
 
-            # Aggiungi funzioni per pulsante "Save"
-            if req_status != selected_row['STATUS'][0]:
-                if st.button("Save", type="primary", disabled=False, key="save_button"):                       
-                    # Aggiorna il database
-                    try:
-                        cursor.execute("""
-                            UPDATE TORP_REQUESTS 
-                            SET r_status = ? 
-                            WHERE r_id = ?
-                        """, (req_status, selected_row["ROWID"][0][1:]))
-                        conn.commit()
-                        cursor.close()  
-                        if conn:
-                            conn.close()
+            # User assignment selection
+            filtered_assignedto = df_reqassegnedto[
+                (df_reqassegnedto["REQIDROW"] == idrow_nr) & 
+                (df_reqassegnedto["STATUS"] == ACTIVE_STATUS)
+            ]
+            assignedto_default = list(filtered_assignedto["USERNAME"])
+            
+            filtered_users = df_users[df_users["DEPTCODE"] == default_dept_code]
+            assignedto_option = list(filtered_users["NAME"])
+            if req_status not in ("NEW", "DELETED"):
+                assignedto_title = "Assigned to (:red[*]):"
+            else:
+                assignedto_title = "Assigned to:"    
+            req_assignedto = st.multiselect(
+                assignedto_title, 
+                assignedto_option, 
+                default=assignedto_default, 
+                max_selections=3
+            )
+   
 
-                        st.session_state.grid_refresh = True
-                        st.session_state.grid_response = None
-                        st.success("Aggiornamento eseguito con successo!")
-                        
-                        # Imposta una flag per indicare che dobbiamo refreshare
-                        st.session_state.need_refresh = True
-                        time.sleep(3)  # Piccola pausa per mostrare il messaggio di successo
-                        st.rerun()
+            # Validate form
+            disable_save_button = (
+                req_status not in ("NEW", "DELETED") and 
+                len(req_assignedto) == 0
+            )
 
-                    except Exception as errMsg:
-                        st.error(f"**ERROR updating request in tab TORP_REQUESTS: \n{errMsg}", icon="🚨")
-                        return False
+            # Handle save action
+            if st.button("Save", type="primary", disabled=disable_save_button, key="save_button"):
+                success = update_status_fn(idrow_nr, req_status)
+                if success:
+                    success = update_assignments_fn(idrow_nr, req_assignedto, df_users, df_reqassegnedto)
+                
+                if success:
+                    st.session_state.grid_refresh = True
+                    st.session_state.grid_response = None
+                    st.success("Update completed successfully!")
+                    
+                    st.session_state.need_refresh = True
+                    time.sleep(3)
+                    reset_application_state()
+                    st.rerun()
 
-            return False             
+
+            return False
+
         return dialog_content()
+
+    # Database queries
+    def fetch_requests():
+        query = """
+        SELECT 
+            idrow as IDROW, 
+            usercode as USERCODE, 
+            status as STATUS,
+            insdate as DATE, 
+            deptcode as DEPTCODE, 
+            requestername as REQUESTERNAME,
+            priority as PRIORITY, 
+            pline as PR_LINE, 
+            pfamily as PR_FAMILY,
+            type as TYPE, 
+            category as CATEGORY, 
+            title as TITLE,
+            detail as DETAIL
+        FROM TORP_REQUESTS
+        ORDER BY IDROW DESC
+        """
+        df = pd.read_sql_query(query, conn)
+        df["DATE"] = pd.to_datetime(df["DATE"], format="%Y-%m-%d")
+        df["IDROW"] = 'R' + df["IDROW"].astype(str).str.zfill(4)
+        return df
+
+    def fetch_assigned_requests():
+        query = """
+        SELECT 
+            A.usercode as USERCODE, 
+            A.reqidrow as REQIDROW, 
+            A.status as STATUS, 
+            B.name as USERNAME
+        FROM TORP_REQASSIGNEDTO A
+        INNER JOIN TORP_USERS B ON B.code = A.usercode
+        ORDER BY REQIDROW
+        """
+        return pd.read_sql_query(query, conn)
+
+    def fetch_users():
+        query = """
+        SELECT 
+            A.code AS CODE, 
+            A.name AS NAME, 
+            A.deptcode AS DEPTCODE, 
+            B.name AS DEPTNAME
+        FROM TORP_USERS A
+        INNER JOIN TORP_DEPARTMENTS B ON B.code = A.deptcode
+        ORDER BY A.name
+        """
+        return pd.read_sql_query(query, conn)
+
+    # Grid configuration
+    def configure_grid(df_requests):
+        cell_style = JsCode("""
+            function(params) {
+                if (params.column.colId === 'IDROW') {
+                    return {
+                        'backgroundColor': '#ECEBBD',
+                        'color': '#111810',
+                        'fontWeight': 'bold'
+                    };
+                }
+                return null;
+            }
+        """)
+        
+        builder = GridOptionsBuilder.from_dataframe(df_requests)
+        builder.configure_default_column(
+            resizable=True,
+            filterable=True,
+            sortable=True,
+            editable=False,
+            enableRowGroup=False
+        )
+        builder.configure_pagination(paginationAutoPageSize=False, paginationPageSize=12)
+        builder.configure_grid_options(domLayout='normal')
+        builder.configure_column(
+            field="DATE",
+            header_name="INSERT DATE",
+            valueFormatter="value != undefined ? new Date(value).toLocaleString('it-IT', {dateStyle:'short'}): ''"
+        )
+        builder.configure_column("IDROW", cellStyle=cell_style)
+        builder.configure_selection(selection_mode='single', use_checkbox=False)
+        
+        return builder.build()
+
+    # Database update functions
+    def update_request_status(idrow_nr, new_status):
+        try:
+            cursor.execute(
+                "UPDATE TORP_REQUESTS SET status = ? WHERE idrow = ?",
+                (new_status, idrow_nr)
+            )
+            return True
+        except Exception as e:
+            st.error(f"Error updating request status: {str(e)}", icon="🚨")
+            return False
+
+    def update_request_assignments(idrow_nr, assigned_users, df_users, df_reqassegnedto):
+        try:
+            # Disable existing assignments
+            cursor.execute(
+                "UPDATE TORP_REQASSIGNEDTO SET status = ? WHERE reqidrow = ?",
+                (DISABLED_STATUS, idrow_nr)
+            )
+            
+            # Add new assignments
+            for user_name in assigned_users:
+                user_code = df_users[df_users["NAME"] == user_name]["CODE"].iloc[0]
+                existing_assignment = df_reqassegnedto[
+                    (df_reqassegnedto['REQIDROW'] == idrow_nr) & 
+                    (df_reqassegnedto['USERCODE'] == user_code)
+                ]
+                
+                if existing_assignment.empty:
+                    cursor.execute(
+                        "INSERT INTO TORP_REQASSIGNEDTO (usercode, reqidrow, status) VALUES (?, ?, ?)",
+                        (user_code, idrow_nr, ACTIVE_STATUS)
+                    )
+                else:
+                    cursor.execute(
+                        "UPDATE TORP_REQASSIGNEDTO SET status = ? WHERE reqidrow = ? AND usercode = ?",
+                        (ACTIVE_STATUS, idrow_nr, user_code)
+                    )
+            
+            conn.commit()
+            return True
+        except Exception as e:
+            st.error(f"Error updating request assignments: {str(e)}", icon="🚨")
+            conn.rollback()
+            return False
+
+    # Main execution
+    df_requests = fetch_requests()
+    df_reqassegnedto = fetch_assigned_requests()
+    df_users = fetch_users()
     
-    # Nel codice principale:
-    if selected_row is not None and len(selected_row) > 0:
+    # Initialize session state
+    if "grid_data" not in st.session_state:
+        st.session_state.grid_data = df_requests.copy()
+    if "grid_response" not in st.session_state:
+        st.session_state.grid_response = None
+    if "grid_refresh_key" not in st.session_state: 
+        st.session_state.grid_refresh_key = "initial"    
+
+    # Sidebar filters
+    st.sidebar.header("Filters")
+    status_options = df_requests['STATUS'].drop_duplicates().sort_values()
+    status_filter = st.sidebar.selectbox(
+        "Select a Status value:", 
+        status_options, 
+        index=None,
+        key='Status_value'
+    )
+
+    # Apply filters
+    st.session_state.grid_data = (
+        df_requests[df_requests["STATUS"] == status_filter].copy()
+        if status_filter else df_requests.copy()
+    )
+    
+    # Display grid
+    st.subheader("Request list:")
+    grid_options = configure_grid(st.session_state.grid_data)
+    
+    st.session_state.grid_response = AgGrid(
+        st.session_state.grid_data,
+        gridOptions=grid_options,
+        allow_unsafe_jscode=True,
+        theme="balham",
+        fit_columns_on_grid_load=False,
+        update_mode=GridUpdateMode.MODEL_CHANGED,
+        data_return_mode=DataReturnMode.AS_INPUT,
+        #key="main_grid"
+        key=f"main_grid_{st.session_state.grid_refresh_key}"
+    )
+    # Add refresh button in a container below the grid
+    with st.container():
+        col1, col2, col3 = st.columns([1, 1, 4])
+        with col1:
+            if st.button("🔄 Refresh", type="primary"):
+                reset_application_state()
+
+    # Handle row selection and dialog
+    selected_rows = st.session_state.grid_response.get('selected_rows', None)
+    # Per debug
+    #st.write(f"Type of selected_rows: {type(selected_rows)}")
+    #st.write(f"Selected rows content: {selected_rows}")
+    
+    if selected_rows is not None and isinstance(selected_rows, pd.DataFrame) and not selected_rows.empty:
         if 'dialog_shown' not in st.session_state:
             st.session_state.dialog_shown = False
-            
         if 'need_refresh' not in st.session_state:
             st.session_state.need_refresh = False
             
         if st.session_state.need_refresh:
             st.session_state.need_refresh = False
             st.session_state.dialog_shown = False
-        else:
-            if not st.session_state.dialog_shown:
-                if show_request_dialog(selected_row):
-                    st.session_state.dialog_shown = True
-                    st.rerun()
-   
+        elif not st.session_state.dialog_shown:
+            # Modifica anche la funzione show_request_dialog per gestire il DataFrame
+            show_request_dialog(
+                selected_rows, 
+                df_reqassegnedto, 
+                df_users, 
+                STATUS_OPTIONS,
+                DEFAULT_DEPT_CODE,
+                update_request_status,
+                update_request_assignments
+            )
 
 
 #######################################################################################################
-def mytest():
+def my_test():
     pass
-    
 
 #######################################################################################################
 def main():
 #  if not check_password():
 #      st.stop()
   st.set_page_config(layout="wide")
+  open_sqlitecloud_db()
   page_names_to_funcs = {
     "ℹ️ App Info": display_app_info,
     "🪄 Insert Request": insert_request,
     "🔍 View Request ": view_request,
     "📝 Assign Request": assign_request,
-    "MYTEST": mytest
+    "🔐 Close db": close_sqlitecloud_db,
+    "MYTEST": my_test,
 }    
   demo_name = st.sidebar.selectbox("Choose a function", page_names_to_funcs.keys())
   page_names_to_funcs[demo_name]()

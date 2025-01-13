@@ -709,19 +709,19 @@ def manage_request():
             if woidrow > 0:
                 wo_nr = "W" + str(woidrow).zfill(4)
                 wo_type_default = list(df_workorders[df_workorders["IDROW"] == woidrow]["TYPE"])[0]
+                wo_type_index = wo_type_options.index(wo_type_default)
                 wo_startdate_default = list(df_workorders[df_workorders["IDROW"] == woidrow]["STARTDATE"])[0]
                 wo_enddate_default = list(df_workorders[df_workorders["IDROW"] == woidrow]["ENDDATE"])[0]
                 wo_notes_default = list(df_workorders[df_workorders["IDROW"] == woidrow]["NOTES"])[0]                
             else:
                 wo_nr = ""
-                wo_type_index=None
+                wo_type_index = 0
                 wo_startdate_default = None
                 wo_enddate_default = None
                 wo_notes_default = None                    
             
             wo_idrow = st.text_input(label="Work Order", value=wo_nr, disabled=True)
-            wo_type_options=["Standard", "APQP Project"]  #APQP -> ADVANCED PRODUCT QUALITY PLANNING"         
-            wo_type_index = wo_type_options.index(wo_type_default)
+            wo_type_options=["Standard", "APQP Project"]  #APQP -> ADVANCED PRODUCT QUALITY PLANNING"          
             wo_type = st.selectbox(label="Type(:red[*])", options=wo_type_options, index=wo_type_index, disabled=False)            
             wo_startdate = st.date_input(label="Start date(:red[*])", format="DD/MM/YYYY", value=wo_startdate_default, disabled=False)
             wo_enddate = st.date_input(label="End date(:red[*])", format="DD/MM/YYYY", value=wo_enddate_default, disabled=False)

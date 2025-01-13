@@ -4,7 +4,6 @@ import os
 import io
 import time
 import json
-import urllib.parse
 from dataclasses import dataclass
 from typing import Optional, Tuple, Dict, List
 
@@ -16,8 +15,6 @@ import pytz
 import hmac
 from st_aggrid import AgGrid, GridOptionsBuilder, GridUpdateMode, DataReturnMode, JsCode, ColumnsAutoSizeMode
 import numpy as np
-#from streamlit_modal import Modal
-#import extra_streamlit_components as stx
 
 
 # Global constants
@@ -184,15 +181,16 @@ def insert_request() -> None:
                     INSERT INTO TORP_REQUESTS (
                         idrow, usercode, status, deptcode, requestername, 
                         priority, pline, pfamily, type, category, title, 
-                        detail, insdate
-                    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                        detail, insdate, notes, woidrow
+                    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                 """
                 
                 values = (
                     next_rownr, request.user, request.status, request.dept,
                     request.requester, request.priority, request.pline,
                     request.pfamily, request.type, request.category,
-                    request.title, request.detail, request.insdate
+                    request.title, request.detail, request.insdate,
+                    None, 0
                 )
                 
                 self.cursor.execute(sql, values)
@@ -230,47 +228,54 @@ def insert_request() -> None:
 
     request_manager = RequestManager(conn, cursor)  # conn e cursor devono essere definiti globalmente
     
-    @st.dialog("Request submitted!")
+
     def display_request_popup(req_nr: str, request: dict) -> None:
         """Display confirmation popup after request submission"""
-        st.markdown(
-            """
-            <style>
-            div[data-testid="stTextInput"] > div > div > input:not([disabled]) {
-                color: #28a745;
-                border: 2px solid #28a745;
-                -webkit-text-fill-color: #28a745 !important;
-                font-weight: bold;
-            }
-            div[data-testid="stTextInput"] > div > div input[disabled] {
-                color: #6c757d !important;
-                opacity: 1 !important;
-                -webkit-text-fill-color: #6c757d !important;
-                background-color: #e9ecef !important;
-                border: 1px solid #ced4da !important;
-                font-style: italic;
-            }
-            .stSelectbox > div > div > div > div {
-                color: #007bff;
-            }
-            </style>
-            """,
-            unsafe_allow_html=True,
-        )
         
-        st.text_input("Request Nr", value=req_nr, disabled=True)
-        st.text_input("Requester", value=request["Req_requester"], disabled=True)
-        st.text_input("Title", value=request["Req_title"], disabled=True)
-        st.text_area("Details", value=request["Req_detail"], disabled=True)
-        
-        status_options = ['NEW', 'ASSIGNED', 'WIP', 'COMPLETED', 'DELETED']
-        idx_status = status_options.index(request["Req_status"])
-        st.selectbox("Status", status_options, disabled=True, index=idx_status)
-        
-        if st.button("Close"):
-            st.session_state.reset_form = True
-            time.sleep(0.1)  # Piccola pausa per assicurare il corretto aggiornamento dello stato
-            st.rerun()
+        @st.dialog(title=f"Request {req_nr} submitted!")  
+        def create_pop_form():
+            """Form with widgets to collect user information"""
+          
+            st.markdown(
+                """
+                <style>
+                div[data-testid="stTextInput"] > div > div > input:not([disabled]) {
+                    color: #28a745;
+                    border: 2px solid #28a745;
+                    -webkit-text-fill-color: #28a745 !important;
+                    font-weight: bold;
+                }
+                div[data-testid="stTextInput"] > div > div input[disabled] {
+                    color: #6c757d !important;
+                    opacity: 1 !important;
+                    -webkit-text-fill-color: #6c757d !important;
+                    background-color: #e9ecef !important;
+                    border: 1px solid #ced4da !important;
+                    font-style: italic;
+                }
+                .stSelectbox > div > div > div > div {
+                    color: #007bff;
+                }
+                </style>
+                """,
+                unsafe_allow_html=True,
+            )
+            
+#                st.text_input("Request Nr", value=req_nr, disabled=True)
+            st.text_input("Requester", value=request["Req_requester"], disabled=True)
+            st.text_input("Request title", value=request["Req_title"], disabled=True)
+            st.text_area("Request details", value=request["Req_detail"], disabled=True)
+            
+            req_status_options = ['NEW', 'PENDING', 'ASSIGNED', 'WIP', 'COMPLETED', 'DELETED']
+            idx_status = req_status_options.index(request["Req_status"])
+            st.selectbox("Request status", req_status_options, disabled=True, index=idx_status)
+            
+            if st.button("Close"):
+                st.session_state.reset_form = True
+                time.sleep(0.1)  # Piccola pausa per assicurare il corretto aggiornamento dello stato
+                st.rerun()
+
+        return create_pop_form()
 
     def reset_form_state():
         """Reset all form fields to their initial state"""
@@ -327,7 +332,7 @@ def insert_request() -> None:
         
         # Request details
         priority = st.selectbox(
-            ":blue[Priority]",
+            ":blue[Request Priority]",
             ["High", "Medium", "Low"],
             index=1,
             key="sb_priority"
@@ -411,7 +416,7 @@ def view_request():
         insdate as DATE, deptcode as DEPTCODE, requestername as REQUESTERNAME, 
         priority as PRIORITY, pline as PR_LINE, pfamily as PR_FAMILY, 
         type as TYPE, category as CATEGORY, title as TITLE, 
-        detail as DETAIL 
+        detail as DETAIL, notes as NOTES, woidrow as WOIDROW 
     FROM TORP_REQUESTS
     ORDER by IDROW desc
     """, conn)
@@ -460,7 +465,8 @@ def view_request():
     grid_builder.configure_column("IDROW", cellStyle=cellStyle)   
     grid_builder.configure_selection(
     selection_mode='single',     # Enable multiple row selection
-    use_checkbox=False             # Show checkboxes for selection
+    use_checkbox=True,             # Show checkboxes for selection
+    header_checkbox=True
     )
     grid_options = grid_builder.build()
     # List of available themes
@@ -525,7 +531,7 @@ def view_request():
 
 
 #######################################################################################################
-def assign_request():
+def manage_request():
     """
     Handle request assignments and management through a Streamlit interface.
     Includes request filtering, display, and assignment management functionality.
@@ -534,7 +540,7 @@ def assign_request():
     ACTIVE_STATUS = "ACTIVE"
     DISABLED_STATUS = "DISABLED"
     DEFAULT_DEPT_CODE = "DTD"
-    STATUS_OPTIONS = ['NEW', 'ASSIGNED', 'WIP', 'COMPLETED', 'DELETED']
+    REQ_STATUS_OPTIONS = ['NEW', 'PENDING', 'ASSIGNED', 'WIP', 'COMPLETED', 'DELETED']
     
     def reset_application_state():
         """Reset all session state variables and cached data"""
@@ -561,22 +567,19 @@ def assign_request():
         # Forza il rerun dell'applicazione        
         st.rerun()
 
-    def show_request_dialog(selected_row, df_reqassegnedto, df_users, status_options, default_dept_code, update_status_fn, update_assignments_fn):
+    def show_request_dialog(selected_row, req_status_options, update_request_fn):
         """
         Display and handle the request modification dialog.
         
         Args:
             selected_row: The currently selected grid row
-            df_reqassegnedto: DataFrame of request assignments
-            df_users: DataFrame of users
-            status_options: List of available status options
-            default_dept_code: Default department code
-            update_status_fn: Function to update request status
-            update_assignments_fn: Function to update request assignments
+            req_status_options: List of available status options
+            update_request_fn: Function to update request status and notes
+
         """
-        popup_title = f'Request {selected_row["IDROW"][0]} detail'
+        popup_title = f'Request {selected_row["IDROW"][0]}'
         
-        @st.dialog(popup_title, width="small")
+        @st.dialog(popup_title, width="large")
         def dialog_content():
             # Custom styles for inputs
             st.markdown(
@@ -607,51 +610,30 @@ def assign_request():
             )
 
             # Extract request ID
-            idrow_nr = int(selected_row["IDROW"][0][1:])
-            
+            req_idrow = int(selected_row["IDROW"][0][1:])
+            wo_idrow = int(selected_row["WOIDROW"][0])
             # Display request details
             st.text_input(label="Product family", value=selected_row['PR_FAMILY'][0], disabled=True)
             st.text_input(label="Category", value=selected_row['CATEGORY'][0], disabled=True)
             st.text_input(label="Title", value=selected_row['TITLE'][0], disabled=True)
             st.text_area(label="Details", value=selected_row['DETAIL'][0], disabled=True)
-            
-            # Status selection
-            idx_status = status_options.index(selected_row['STATUS'][0])
-            req_status = st.selectbox("Status", status_options, disabled=False, index=idx_status)
-
-            # User assignment selection
-            filtered_assignedto = df_reqassegnedto[
-                (df_reqassegnedto["REQIDROW"] == idrow_nr) & 
-                (df_reqassegnedto["STATUS"] == ACTIVE_STATUS)
-            ]
-            assignedto_default = list(filtered_assignedto["USERNAME"])
-            
-            filtered_users = df_users[df_users["DEPTCODE"] == default_dept_code]
-            assignedto_option = list(filtered_users["NAME"])
-            if req_status not in ("NEW", "DELETED"):
-                assignedto_title = "Assigned to (:red[*]):"
+            st.divider()         
+            idx_status = req_status_options.index(selected_row['STATUS'][0])
+            req_status = st.selectbox(label="Status", options=req_status_options, disabled=False, index=idx_status)
+            req_notes = st.text_area(label="Notes", value=selected_row['NOTES'][0], disabled=False)
+            if wo_idrow > 0:
+                wo_nr = "W" + str(selected_row['WOIDROW'][0]).zfill(4)
             else:
-                assignedto_title = "Assigned to:"    
-            req_assignedto = st.multiselect(
-                assignedto_title, 
-                assignedto_option, 
-                default=assignedto_default, 
-                max_selections=3
-            )
-   
+                wo_nr = ""
+            req_woassigned = st.text_input(label="Work Order", value=wo_nr, disabled=True)
 
-            # Validate form
-            disable_save_button = (
-                req_status not in ("NEW", "DELETED") and 
-                len(req_assignedto) == 0
-            )
-
+            if (selected_row['NOTES'][0] == req_notes) and (selected_row['STATUS'][0] == req_status):
+                disable_save_button = True
+            else:
+                disable_save_button = False    
             # Handle save action
-            if st.button("Save", type="primary", disabled=disable_save_button, key="save_button"):
-                success = update_status_fn(idrow_nr, req_status)
-                if success:
-                    success = update_assignments_fn(idrow_nr, req_assignedto, df_users, df_reqassegnedto)
-                
+            if st.button("Save", type="primary", disabled=disable_save_button, key="req_save_button"):
+                success = update_request_fn(req_idrow, req_status, req_notes)               
                 if success:
                     st.session_state.grid_refresh = True
                     st.session_state.grid_response = None
@@ -667,12 +649,139 @@ def assign_request():
 
         return dialog_content()
 
+#######################################
+    def show_workorder_dialog(selected_row, df_workorders, df_woassegnedto, df_users, active_status, default_dept_code, req_status_options, save_workorder_fn, save_woassignments_fn):
+        """
+        Display and handle the request modification dialog.
+        
+        Args:
+            selected_row: The currently selected grid row
+            df_woassegnedto: DataFrame of request assignments
+            df_users: DataFrame of users
+            req_status_options: List of available status options
+            default_dept_code: Default department code
+            update_request_fn: Function to update request status and notes
+            update_assignments_fn: Function to update request assignments
+        """
+        popup_title = f'Work Order related to request {selected_row["IDROW"][0]}'
+        
+        @st.dialog(popup_title, width="large")
+        def dialog_content():
+            # Custom styles for inputs
+            st.markdown(
+                """
+                <style>
+                div[data-testid="stTextInput"] > div > div > input:not([disabled]) {
+                    color: #28a745;
+                    border: 2px solid #28a745;
+                    -webkit-text-fill-color: #28a745 !important;
+                    font-weight: bold;
+                }
+
+                div[data-testid="stTextInput"] > div > div input[disabled] {
+                    color: #6c757d !important;
+                    opacity: 1 !important;
+                    -webkit-text-fill-color: #6c757d !important;
+                    background-color: #e9ecef !important;
+                    border: 1px solid #ced4da !important;
+                    font-style: italic;
+                }
+
+                .stSelectbox > div > div > div > div {
+                    color: #007bff;
+                }
+                </style>
+                """,
+                unsafe_allow_html=True,
+            )
+
+            # Extract request and work order ID
+            reqidrow = int(selected_row["IDROW"][0][1:])
+            woidrow = int(selected_row["WOIDROW"][0])
+            # Display request details
+#            st.text_input(label="Product family", value=selected_row['PR_FAMILY'][0], disabled=True)
+#            st.text_input(label="Category", value=selected_row['CATEGORY'][0], disabled=True)
+            st.text_input(label="Title", value=selected_row['TITLE'][0], disabled=True)
+            st.text_area(label="Details", value=selected_row['DETAIL'][0], disabled=True)
+            # if selected_rows['NOTES'][0]:
+            #     st.text_area(label="Notes", value=selected_row['NOTES'][0], disabled=True)
+            #st.divider()
+            if woidrow > 0:
+                wo_nr = "W" + str(woidrow).zfill(4)
+                wo_type_default = list(df_workorders[df_workorders["IDROW"] == woidrow]["TYPE"])[0]
+                wo_startdate_default = list(df_workorders[df_workorders["IDROW"] == woidrow]["STARTDATE"])[0]
+                wo_enddate_default = list(df_workorders[df_workorders["IDROW"] == woidrow]["ENDDATE"])[0]
+                wo_notes_default = list(df_workorders[df_workorders["IDROW"] == woidrow]["NOTES"])[0]                
+            else:
+                wo_nr = ""
+                wo_type_index=None
+                wo_startdate_default = None
+                wo_enddate_default = None
+                wo_notes_default = None                    
+            
+            wo_idrow = st.text_input(label="Work Order", value=wo_nr, disabled=True)
+            wo_type_options=["Standard", "APQP Project"]  #APQP -> ADVANCED PRODUCT QUALITY PLANNING"         
+            wo_type_index = wo_type_options.index(wo_type_default)
+            wo_type = st.selectbox(label="Type(:red[*])", options=wo_type_options, index=wo_type_index, disabled=False)            
+            wo_startdate = st.date_input(label="Start date(:red[*])", format="DD/MM/YYYY", value=wo_startdate_default, disabled=False)
+            wo_enddate = st.date_input(label="End date(:red[*])", format="DD/MM/YYYY", value=wo_enddate_default, disabled=False)
+            wo_notes = st.text_area(label="TechDept notes", value=wo_notes_default, disabled=False)
+            # Tech Dept (TD) user assignment selection
+            filtered_woassignedto = df_woassegnedto[
+                (df_woassegnedto["WOIDROW"] == woidrow) & 
+                (df_woassegnedto["STATUS"] == active_status)
+            ]
+
+            wo_assignedto_default = list(filtered_woassignedto["USERNAME"])
+            df_tdusers = df_users[df_users["DEPTCODE"] == default_dept_code]
+            wo_assignedto_option = list(df_tdusers["NAME"])
+            wo_assignedto_title = "Assigned to (:red[*]):"
+            wo_assignedto = st.multiselect(
+                label=wo_assignedto_title, 
+                options=wo_assignedto_option, 
+                default=wo_assignedto_default, 
+                max_selections=3,
+                disabled=False
+            )
+
+            if woidrow > 0:
+                if (wo_type == wo_type_default and wo_startdate == wo_startdate_default and wo_enddate == wo_enddate_default and wo_assignedto == wo_assignedto_default):
+                    disable_save_button = True
+                else:
+                    disable_save_button = False    
+            else:
+                if not (wo_type and wo_startdate and wo_enddate and wo_assignedto):
+                    disable_save_button = True
+                else:
+                    disable_save_button = False    
+            # Handle save action
+            if st.button("Save", type="primary", disabled=disable_save_button, key="wo_save_button"):
+                wo = {"idrow":0, "type": wo_type, "startdate": wo_startdate, "endate": wo_enddate, "title": selected_row["TITLE"][0], "notes": wo_notes, "status": ACTIVE_STATUS, "reqidrow": reqidrow}
+                wo_idrow, success = save_workorder(wo)
+                if success:
+#                    st.success(f"Work order W{str(wo_idrow).zfill(4)} created successfully!")
+                    success = save_workorder_assignments(wo_idrow, wo_assignedto, df_users, df_woassegnedto)
+                    success = update_request(reqidrow, "ASSIGNED", selected_row['NOTES'][0], wo_idrow)
+                    if success:
+                        st.session_state.grid_refresh = True
+                        st.session_state.grid_response = None
+                        st.success(f"Work order W{str(wo_idrow).zfill(4)} assigned successfully!")
+                    
+                    st.session_state.need_refresh = True
+                    time.sleep(3)
+                    reset_application_state()
+                    st.rerun()
+
+            return False
+
+        return dialog_content()
+#######################################
+
     # Database queries
     def fetch_requests():
         query = """
         SELECT 
             idrow as IDROW, 
-            usercode as USERCODE, 
             status as STATUS,
             insdate as DATE, 
             deptcode as DEPTCODE, 
@@ -683,7 +792,9 @@ def assign_request():
             type as TYPE, 
             category as CATEGORY, 
             title as TITLE,
-            detail as DETAIL
+            detail as DETAIL,
+            notes as NOTES,
+            woidrow as WOIDROW
         FROM TORP_REQUESTS
         ORDER BY IDROW DESC
         """
@@ -691,19 +802,6 @@ def assign_request():
         df["DATE"] = pd.to_datetime(df["DATE"], format="%Y-%m-%d")
         df["IDROW"] = 'R' + df["IDROW"].astype(str).str.zfill(4)
         return df
-
-    def fetch_assigned_requests():
-        query = """
-        SELECT 
-            A.usercode as USERCODE, 
-            A.reqidrow as REQIDROW, 
-            A.status as STATUS, 
-            B.name as USERNAME
-        FROM TORP_REQASSIGNEDTO A
-        INNER JOIN TORP_USERS B ON B.code = A.usercode
-        ORDER BY REQIDROW
-        """
-        return pd.read_sql_query(query, conn)
 
     def fetch_users():
         query = """
@@ -717,6 +815,126 @@ def assign_request():
         ORDER BY A.name
         """
         return pd.read_sql_query(query, conn)
+
+    def fetch_workorders():
+        query = """
+        SELECT 
+            A.idrow AS IDROW, 
+            A.type AS TYPE, 
+            A.startdate AS STARTDATE, 
+            A.endate AS ENDATE,
+            A.notes AS NOTES,
+            A.reqid AS REQID,
+        FROM TORP_WORKORDERS A
+        """
+        return pd.read_sql_query(query, conn)
+
+    def fetch_assigned_wo():
+        query = """
+        SELECT 
+            A.usercode as USERCODE, 
+            A.woidrow as WOIDROW, 
+            A.status as STATUS, 
+            B.name as USERNAME 
+        FROM TORP_WOASSIGNEDTO A
+        INNER JOIN TORP_USERS B ON B.code = A.usercode
+        ORDER BY WOIDROW
+        """
+        return pd.read_sql_query(query, conn)
+
+    def fetch_workorders():
+        query = """
+        SELECT 
+            A.idrow as IDROW, 
+            A.type as TYPE, 
+            A.startdate as STARTDATE, 
+            A.enddate as ENDDATE,
+            A.title as TITLE,
+            A.notes as NOTES,
+            A.status as STATUS,
+            A.reqidrow as REQIDROW
+        FROM TORP_WORKORDERS A
+        ORDER BY REQIDROW
+        """
+        return pd.read_sql_query(query, conn)
+    # Database update functions
+    def update_request(idrow_nr, new_status, new_notes, new_woidrow=0):
+        try:
+            cursor.execute(
+                "UPDATE TORP_REQUESTS SET status = ?, notes = ?, woidrow = ? WHERE idrow = ?",
+                (new_status, new_notes, new_woidrow, idrow_nr)
+            )
+            return True
+        except Exception as e:
+            st.error(f"Error updating request status: {str(e)}", icon="🚨")
+            return False
+
+    def save_workorder(wo: dict):
+        # Get next available row ID
+        try:
+            cursor.execute('SELECT MAX(idrow) FROM TORP_WORKORDERS')
+            max_idrow = cursor.fetchone()[0]
+            if max_idrow is not None:
+                next_rownr = max_idrow + 1
+            else:
+                next_rownr = 1    
+                
+            sql = """
+                    INSERT INTO TORP_WORKORDERS (
+                        idrow, type, startdate, enddate, 
+                        title, notes, status, reqidrow
+                    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+                """
+                
+            values = (
+                    next_rownr, wo["type"], wo["startdate"],wo["endate"],
+                    wo["title"], wo["notes"], wo["status"], wo["reqidrow"]
+                )
+                
+            cursor.execute(sql, values)
+            conn.commit()
+            return next_rownr, True
+                
+        except Exception as e:
+            st.error(f"**ERROR inserting request in TORP_WORKORDERS: \n{e}", icon="🚨")
+            return 0, False
+
+        
+    def save_workorder_assignments(wo_idrow, assigned_users, df_users, df_woassegnedto):
+        try:
+            # Disable existing assignments
+            cursor.execute(
+                "UPDATE TORP_WOASSIGNEDTO SET status = ? WHERE woidrow = ?",
+                (DISABLED_STATUS, wo_idrow)
+            )
+            
+            # Add new assignments
+            for user_name in assigned_users:
+                user_code = df_users[df_users["NAME"] == user_name]["CODE"].iloc[0]
+                existing_assignment = df_woassegnedto[
+                    (df_woassegnedto['WOIDROW'] == wo_idrow) & 
+                    (df_woassegnedto['USERCODE'] == user_code)
+                ]
+                
+                if existing_assignment.empty:
+                    cursor.execute(
+                        "INSERT INTO TORP_WOASSIGNEDTO (usercode, woidrow, status) VALUES (?, ?, ?)",
+                        (user_code, wo_idrow, ACTIVE_STATUS)
+                    )
+                else:
+                    cursor.execute(
+                        "UPDATE TORP_WOASSIGNEDTO SET status = ? WHERE woidrow = ? AND usercode = ?",
+                        (ACTIVE_STATUS, wo_idrow, user_code)
+                    )
+            
+            conn.commit()
+            return True
+        except Exception as e:
+            st.error(f"Error updating workorder assignments: {str(e)}", icon="🚨")
+            conn.rollback()
+            return False
+
+
 
     # Grid configuration
     def configure_grid(df_requests):
@@ -749,61 +967,17 @@ def assign_request():
             valueFormatter="value != undefined ? new Date(value).toLocaleString('it-IT', {dateStyle:'short'}): ''"
         )
         builder.configure_column("IDROW", cellStyle=cell_style)
-        builder.configure_selection(selection_mode='single', use_checkbox=False)
+        builder.configure_selection(selection_mode='single', use_checkbox=True, header_checkbox=True)
         
         return builder.build()
 
-    # Database update functions
-    def update_request_status(idrow_nr, new_status):
-        try:
-            cursor.execute(
-                "UPDATE TORP_REQUESTS SET status = ? WHERE idrow = ?",
-                (new_status, idrow_nr)
-            )
-            return True
-        except Exception as e:
-            st.error(f"Error updating request status: {str(e)}", icon="🚨")
-            return False
-
-    def update_request_assignments(idrow_nr, assigned_users, df_users, df_reqassegnedto):
-        try:
-            # Disable existing assignments
-            cursor.execute(
-                "UPDATE TORP_REQASSIGNEDTO SET status = ? WHERE reqidrow = ?",
-                (DISABLED_STATUS, idrow_nr)
-            )
-            
-            # Add new assignments
-            for user_name in assigned_users:
-                user_code = df_users[df_users["NAME"] == user_name]["CODE"].iloc[0]
-                existing_assignment = df_reqassegnedto[
-                    (df_reqassegnedto['REQIDROW'] == idrow_nr) & 
-                    (df_reqassegnedto['USERCODE'] == user_code)
-                ]
-                
-                if existing_assignment.empty:
-                    cursor.execute(
-                        "INSERT INTO TORP_REQASSIGNEDTO (usercode, reqidrow, status) VALUES (?, ?, ?)",
-                        (user_code, idrow_nr, ACTIVE_STATUS)
-                    )
-                else:
-                    cursor.execute(
-                        "UPDATE TORP_REQASSIGNEDTO SET status = ? WHERE reqidrow = ? AND usercode = ?",
-                        (ACTIVE_STATUS, idrow_nr, user_code)
-                    )
-            
-            conn.commit()
-            return True
-        except Exception as e:
-            st.error(f"Error updating request assignments: {str(e)}", icon="🚨")
-            conn.rollback()
-            return False
 
     # Main execution
     df_requests = fetch_requests()
-    df_reqassegnedto = fetch_assigned_requests()
+    df_woassegnedto = fetch_assigned_wo()
+    df_workorders = fetch_workorders()
     df_users = fetch_users()
-    
+#    df_workorders = fetch_workorders()
     # Initialize session state
     if "grid_data" not in st.session_state:
         st.session_state.grid_data = df_requests.copy()
@@ -814,10 +988,10 @@ def assign_request():
 
     # Sidebar filters
     st.sidebar.header("Filters")
-    status_options = df_requests['STATUS'].drop_duplicates().sort_values()
+    req_status_options = df_requests['STATUS'].drop_duplicates().sort_values()
     status_filter = st.sidebar.selectbox(
         "Select a Status value:", 
-        status_options, 
+        req_status_options, 
         index=None,
         key='Status_value'
     )
@@ -847,35 +1021,59 @@ def assign_request():
     with st.container():
         col1, col2, col3 = st.columns([1, 1, 4])
         with col1:
-            if st.button("🔄 Refresh", type="primary"):
+            if st.button("🔄 Refresh", type="tertiary"):
                 reset_application_state()
+        with col2:
+            if st.button("✏️ Modify", type="secondary"):
+                selected_rows = st.session_state.grid_response.get('selected_rows', None)
+                if selected_rows is not None and isinstance(selected_rows, pd.DataFrame) and not selected_rows.empty:
+                    if 'dialog_shown' not in st.session_state:
+                        st.session_state.dialog_shown = False
+                    if 'need_refresh' not in st.session_state:
+                        st.session_state.need_refresh = False
+                        
+                    if st.session_state.need_refresh:
+                        st.session_state.need_refresh = False
+                        st.session_state.dialog_shown = False
+                    elif not st.session_state.dialog_shown:
+                        # Modifica anche la funzione show_request_dialog per gestire il DataFrame
+                        show_request_dialog(
+                            selected_rows, 
+                            REQ_STATUS_OPTIONS,
+                            update_request
+                        )
+     
+        with col3:
+            if st.button("💎 Work Order", type="secondary"):
+                selected_rows = st.session_state.grid_response.get('selected_rows', None)
+                if selected_rows is not None and isinstance(selected_rows, pd.DataFrame) and not selected_rows.empty:
+                    if 'dialog_shown' not in st.session_state:
+                        st.session_state.dialog_shown = False
+                    if 'need_refresh' not in st.session_state:
+                        st.session_state.need_refresh = False
+                        
+                    if st.session_state.need_refresh:
+                        st.session_state.need_refresh = False
+                        st.session_state.dialog_shown = False
+                    elif not st.session_state.dialog_shown:
+                        # Modifica anche la funzione show_request_dialog per gestire il DataFrame
+                        show_workorder_dialog(
+                            selected_rows,
+                            df_workorders, 
+                            df_woassegnedto, 
+                            df_users,
+                            ACTIVE_STATUS, 
+                            DEFAULT_DEPT_CODE,
+                            REQ_STATUS_OPTIONS,
+                            save_workorder,
+                            save_workorder_assignments
+                        )
 
-    # Handle row selection and dialog
-    selected_rows = st.session_state.grid_response.get('selected_rows', None)
-    # Per debug
-    #st.write(f"Type of selected_rows: {type(selected_rows)}")
-    #st.write(f"Selected rows content: {selected_rows}")
-    
-    if selected_rows is not None and isinstance(selected_rows, pd.DataFrame) and not selected_rows.empty:
-        if 'dialog_shown' not in st.session_state:
-            st.session_state.dialog_shown = False
-        if 'need_refresh' not in st.session_state:
-            st.session_state.need_refresh = False
-            
-        if st.session_state.need_refresh:
-            st.session_state.need_refresh = False
-            st.session_state.dialog_shown = False
-        elif not st.session_state.dialog_shown:
-            # Modifica anche la funzione show_request_dialog per gestire il DataFrame
-            show_request_dialog(
-                selected_rows, 
-                df_reqassegnedto, 
-                df_users, 
-                STATUS_OPTIONS,
-                DEFAULT_DEPT_CODE,
-                update_request_status,
-                update_request_assignments
-            )
+
+
+#######################################################################################################
+def manage_wo():
+    pass
 
 
 #######################################################################################################
@@ -884,15 +1082,16 @@ def my_test():
 
 #######################################################################################################
 def main():
-#  if not check_password():
-#      st.stop()
-  st.set_page_config(layout="wide")
+  if not check_password():
+      st.stop()
   open_sqlitecloud_db()
+  st.set_page_config(layout="wide")  
   page_names_to_funcs = {
-    "ℹ️ App Info": display_app_info,
-    "🪄 Insert Request": insert_request,
+    " ℹ️  App Info": display_app_info,
+    "📄 Insert Request": insert_request,
     "🔍 View Request ": view_request,
-    "📝 Assign Request": assign_request,
+    "🗂️ Manage Request": manage_request,
+    "💎 Manage Work Orders": manage_wo,
     "🔐 Close db": close_sqlitecloud_db,
     "MYTEST": my_test,
 }    

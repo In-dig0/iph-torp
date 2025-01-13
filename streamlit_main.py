@@ -706,6 +706,7 @@ def manage_request():
             # if selected_rows['NOTES'][0]:
             #     st.text_area(label="Notes", value=selected_row['NOTES'][0], disabled=True)
             #st.divider()
+            wo_type_options=["Standard", "APQP Project"]  #APQP -> ADVANCED PRODUCT QUALITY PLANNING"  
             if woidrow > 0:
                 wo_nr = "W" + str(woidrow).zfill(4)
                 wo_type_default = list(df_workorders[df_workorders["IDROW"] == woidrow]["TYPE"])[0]
@@ -720,8 +721,7 @@ def manage_request():
                 wo_enddate_default = None
                 wo_notes_default = None                    
             
-            wo_idrow = st.text_input(label="Work Order", value=wo_nr, disabled=True)
-            wo_type_options=["Standard", "APQP Project"]  #APQP -> ADVANCED PRODUCT QUALITY PLANNING"          
+            wo_idrow = st.text_input(label="Work Order", value=wo_nr, disabled=True)        
             wo_type = st.selectbox(label="Type(:red[*])", options=wo_type_options, index=wo_type_index, disabled=False)            
             wo_startdate = st.date_input(label="Start date(:red[*])", format="DD/MM/YYYY", value=wo_startdate_default, disabled=False)
             wo_enddate = st.date_input(label="End date(:red[*])", format="DD/MM/YYYY", value=wo_enddate_default, disabled=False)

@@ -870,7 +870,7 @@ def manage_request():
             return False
 
     def save_workorder(wo: dict):
-        st.write(wo["idrow"])
+
         if wo["idrow"] == 0: # Insert new work order
             try:
                 # Get next available row ID

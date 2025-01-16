@@ -756,7 +756,7 @@ def manage_request():
                     disable_save_button = False    
             # Handle save action
             if st.button("Save", type="primary", disabled=disable_save_button, key="wo_save_button"):
-                wo = {"idrow":0, "type": wo_type, "startdate": wo_startdate, "endate": wo_enddate, "title": selected_row["TITLE"][0], "notes": wo_notes, "status": ACTIVE_STATUS, "reqidrow": reqidrow}
+                wo = {"idrow": woidrow, "type": wo_type, "startdate": wo_startdate, "endate": wo_enddate, "title": selected_row["TITLE"][0], "notes": wo_notes, "status": ACTIVE_STATUS, "reqidrow": reqidrow}
                 wo_idrow, success = save_workorder(wo)
                 if success:
 #                    st.success(f"Work order W{str(wo_idrow).zfill(4)} created successfully!")
@@ -870,35 +870,55 @@ def manage_request():
             return False
 
     def save_workorder(wo: dict):
-        # Get next available row ID
-        try:
-            cursor.execute('SELECT MAX(idrow) FROM TORP_WORKORDERS')
-            max_idrow = cursor.fetchone()[0]
-            if max_idrow is not None:
-                next_rownr = max_idrow + 1
-            else:
-                next_rownr = 1    
-                
-            sql = """
-                    INSERT INTO TORP_WORKORDERS (
-                        idrow, type, startdate, enddate, 
-                        title, notes, status, reqidrow
-                    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?)
-                """
-                
-            values = (
-                    next_rownr, wo["type"], wo["startdate"],wo["endate"],
-                    wo["title"], wo["notes"], wo["status"], wo["reqidrow"]
-                )
-                
-            cursor.execute(sql, values)
-            conn.commit()
-            return next_rownr, True
-                
-        except Exception as e:
-            st.error(f"**ERROR inserting request in TORP_WORKORDERS: \n{e}", icon="🚨")
-            return 0, False
 
+        if wo["idrow"] == 0: # Insert new work order
+            try:
+                # Get next available row ID
+                cursor.execute('SELECT MAX(idrow) FROM TORP_WORKORDERS')
+                max_idrow = cursor.fetchone()[0]
+                if max_idrow is not None:
+                    next_rownr = max_idrow + 1
+                else:
+                    next_rownr = 1    
+                    
+                sql = """
+                        INSERT INTO TORP_WORKORDERS (
+                            idrow, type, startdate, enddate, 
+                            title, notes, status, reqidrow
+                        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+                    """
+                    
+                values = (
+                        next_rownr, wo["type"], wo["startdate"],wo["endate"],
+                        wo["title"], wo["notes"], wo["status"], wo["reqidrow"]
+                    )
+                    
+                cursor.execute(sql, values)
+                conn.commit()
+                return next_rownr, True
+                    
+            except Exception as e:
+                st.error(f"**ERROR inserting TORP_WORKORDERS: \n{e}", icon="🚨")
+                return 0, False
+        else:  # Update work order
+            try:    
+                sql = """
+                        UPDATE TORP_WORKORDERS SET type = ?, startdate = ?, enddate = ? WHERE woidrow = ?
+
+                    """
+                    
+                values = (
+                        wo["idrow"], wo["type"], wo["startdate"],wo["endate"],
+                        wo["title"], wo["notes"], wo["status"], wo["reqidrow"]
+                    )
+                    
+                cursor.execute(sql, values)
+                conn.commit()
+                return next_rownr, True
+                    
+            except Exception as e:
+                st.error(f"**ERROR updating table TORP_WORKORDERS: \n{e}", icon="🚨")
+                return 0, False    
         
     def save_workorder_assignments(wo_idrow, assigned_users, df_users, df_woassegnedto):
         try:

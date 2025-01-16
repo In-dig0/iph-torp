@@ -914,7 +914,7 @@ def manage_request():
                     
                 cursor.execute(sql, values)
                 conn.commit()
-                return next_rownr, True
+                return wo["idrow"], True
                     
             except Exception as e:
                 st.error(f"**ERROR updating table TORP_WORKORDERS: \n{e}", icon="🚨")

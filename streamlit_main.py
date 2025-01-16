@@ -903,13 +903,13 @@ def manage_request():
         else:  # Update work order
             try:    
                 sql = """
-                        UPDATE TORP_WORKORDERS SET type = ?, startdate = ?, enddate = ? WHERE woidrow = ?
+                        UPDATE TORP_WORKORDERS SET type = ?, startdate = ?, enddate = ?, notes = ? WHERE idrow = ?
 
                     """
                     
                 values = (
-                        wo["idrow"], wo["type"], wo["startdate"],wo["endate"],
-                        wo["title"], wo["notes"], wo["status"], wo["reqidrow"]
+                        wo["type"], wo["startdate"],wo["endate"], wo["notes"], wo["idrow"]
+                        #wo["title"], wo["notes"], wo["status"], wo["reqidrow"]
                     )
                     
                 cursor.execute(sql, values)

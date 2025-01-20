@@ -4,6 +4,7 @@ import os
 import io
 import time
 import json
+#import urllib.parse
 from dataclasses import dataclass
 from typing import Optional, Tuple, Dict, List
 
@@ -15,6 +16,9 @@ import pytz
 import hmac
 from st_aggrid import AgGrid, GridOptionsBuilder, GridUpdateMode, DataReturnMode, JsCode, ColumnsAutoSizeMode
 import numpy as np
+from streamlit_extras.app_logo import add_logo
+#from streamlit_modal import Modal
+#import extra_streamlit_components as stx
 
 
 # Global constants
@@ -744,6 +748,7 @@ def manage_request():
                 disabled=False
             )
 
+
             if woidrow > 0:
                 if (wo_type == wo_type_default and wo_startdate == wo_startdate_default and wo_enddate == wo_enddate_default and wo_assignedto == wo_assignedto_default):
                     disable_save_button = True
@@ -756,7 +761,7 @@ def manage_request():
                     disable_save_button = False    
             # Handle save action
             if st.button("Save", type="primary", disabled=disable_save_button, key="wo_save_button"):
-                wo = {"idrow": woidrow, "type": wo_type, "startdate": wo_startdate, "endate": wo_enddate, "title": selected_row["TITLE"][0], "notes": wo_notes, "status": ACTIVE_STATUS, "reqidrow": reqidrow}
+                wo = {"idrow":0, "type": wo_type, "startdate": wo_startdate, "endate": wo_enddate, "title": selected_row["TITLE"][0], "notes": wo_notes, "status": ACTIVE_STATUS, "reqidrow": reqidrow}
                 wo_idrow, success = save_workorder(wo)
                 if success:
 #                    st.success(f"Work order W{str(wo_idrow).zfill(4)} created successfully!")
@@ -815,33 +820,7 @@ def manage_request():
         ORDER BY A.name
         """
         return pd.read_sql_query(query, conn)
-
-    def fetch_workorders():
-        query = """
-        SELECT 
-            A.idrow AS IDROW, 
-            A.type AS TYPE, 
-            A.startdate AS STARTDATE, 
-            A.endate AS ENDATE,
-            A.notes AS NOTES,
-            A.reqid AS REQID,
-        FROM TORP_WORKORDERS A
-        """
-        return pd.read_sql_query(query, conn)
-
-    def fetch_assigned_wo():
-        query = """
-        SELECT 
-            A.usercode as USERCODE, 
-            A.woidrow as WOIDROW, 
-            A.status as STATUS, 
-            B.name as USERNAME 
-        FROM TORP_WOASSIGNEDTO A
-        INNER JOIN TORP_USERS B ON B.code = A.usercode
-        ORDER BY WOIDROW
-        """
-        return pd.read_sql_query(query, conn)
-
+    
     def fetch_workorders():
         query = """
         SELECT 
@@ -857,6 +836,21 @@ def manage_request():
         ORDER BY REQIDROW
         """
         return pd.read_sql_query(query, conn)
+    
+    def fetch_assigned_wo():
+        query = """
+        SELECT 
+            A.usercode as USERCODE, 
+            A.woidrow as WOIDROW, 
+            A.status as STATUS, 
+            B.name as USERNAME 
+        FROM TORP_WOASSIGNEDTO A
+        INNER JOIN TORP_USERS B ON B.code = A.usercode
+        ORDER BY WOIDROW
+        """
+        return pd.read_sql_query(query, conn)
+
+
     # Database update functions
     def update_request(idrow_nr, new_status, new_notes, new_woidrow=0):
         try:
@@ -870,55 +864,35 @@ def manage_request():
             return False
 
     def save_workorder(wo: dict):
+        # Get next available row ID
+        try:
+            cursor.execute('SELECT MAX(idrow) FROM TORP_WORKORDERS')
+            max_idrow = cursor.fetchone()[0]
+            if max_idrow is not None:
+                next_rownr = max_idrow + 1
+            else:
+                next_rownr = 1    
+                
+            sql = """
+                    INSERT INTO TORP_WORKORDERS (
+                        idrow, type, startdate, enddate, 
+                        title, notes, status, reqidrow
+                    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+                """
+                
+            values = (
+                    next_rownr, wo["type"], wo["startdate"],wo["endate"],
+                    wo["title"], wo["notes"], wo["status"], wo["reqidrow"]
+                )
+                
+            cursor.execute(sql, values)
+            conn.commit()
+            return next_rownr, True
+                
+        except Exception as e:
+            st.error(f"**ERROR inserting request in TORP_WORKORDERS: \n{e}", icon="🚨")
+            return 0, False
 
-        if wo["idrow"] == 0: # Insert new work order
-            try:
-                # Get next available row ID
-                cursor.execute('SELECT MAX(idrow) FROM TORP_WORKORDERS')
-                max_idrow = cursor.fetchone()[0]
-                if max_idrow is not None:
-                    next_rownr = max_idrow + 1
-                else:
-                    next_rownr = 1    
-                    
-                sql = """
-                        INSERT INTO TORP_WORKORDERS (
-                            idrow, type, startdate, enddate, 
-                            title, notes, status, reqidrow
-                        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?)
-                    """
-                    
-                values = (
-                        next_rownr, wo["type"], wo["startdate"],wo["endate"],
-                        wo["title"], wo["notes"], wo["status"], wo["reqidrow"]
-                    )
-                    
-                cursor.execute(sql, values)
-                conn.commit()
-                return next_rownr, True
-                    
-            except Exception as e:
-                st.error(f"**ERROR inserting TORP_WORKORDERS: \n{e}", icon="🚨")
-                return 0, False
-        else:  # Update work order
-            try:    
-                sql = """
-                        UPDATE TORP_WORKORDERS SET type = ?, startdate = ?, enddate = ?, notes = ? WHERE idrow = ?
-
-                    """
-                    
-                values = (
-                        wo["type"], wo["startdate"],wo["endate"], wo["notes"], wo["idrow"]
-                        #wo["title"], wo["notes"], wo["status"], wo["reqidrow"]
-                    )
-                    
-                cursor.execute(sql, values)
-                conn.commit()
-                return wo["idrow"], True
-                    
-            except Exception as e:
-                st.error(f"**ERROR updating table TORP_WORKORDERS: \n{e}", icon="🚨")
-                return 0, False    
         
     def save_workorder_assignments(wo_idrow, assigned_users, df_users, df_woassegnedto):
         try:
@@ -993,11 +967,11 @@ def manage_request():
 
 
     # Main execution
+    df_users = fetch_users()    
     df_requests = fetch_requests()
+    df_workorders = fetch_workorders()    
     df_woassegnedto = fetch_assigned_wo()
-    df_workorders = fetch_workorders()
-    df_users = fetch_users()
-#    df_workorders = fetch_workorders()
+
     # Initialize session state
     if "grid_data" not in st.session_state:
         st.session_state.grid_data = df_requests.copy()
@@ -1015,12 +989,22 @@ def manage_request():
         index=None,
         key='Status_value'
     )
-
-    # Apply filters
-    st.session_state.grid_data = (
-        df_requests[df_requests["STATUS"] == status_filter].copy()
-        if status_filter else df_requests.copy()
+    req_pline_options = df_requests['PR_LINE'].drop_duplicates().sort_values()
+    pline_filter = st.sidebar.selectbox(
+        "Select a Product Line value:", 
+        req_pline_options, 
+        index=None,
+        key='Pline_value'
     )
+
+# Apply filters 
+    filtered_data = df_requests.copy() 
+    if status_filter: 
+        filtered_data = filtered_data[filtered_data["STATUS"] == status_filter] 
+    if pline_filter: 
+        filtered_data = filtered_data[filtered_data["PR_LINE"] == pline_filter] 
+    st.session_state.grid_data = filtered_data
+##################
     
     # Display grid
     st.subheader("Request list:")
@@ -1095,6 +1079,165 @@ def manage_request():
 def manage_wo():
     pass
 
+#######################################################################################################
+def manage_wi():
+# Sidebar per selezionare il work-order
+    def fetch_users():
+        query = """
+        SELECT 
+            A.code AS CODE, 
+            A.name AS NAME, 
+            A.deptcode AS DEPTCODE, 
+            B.name AS DEPTNAME
+        FROM TORP_USERS A
+        INNER JOIN TORP_DEPARTMENTS B ON B.code = A.deptcode
+        ORDER BY A.name
+        """
+        return pd.read_sql_query(query, conn)
+    
+    def fetch_workorders():
+        query = """
+        SELECT 
+            A.idrow as IDROW, 
+            A.type as TYPE, 
+            A.startdate as STARTDATE, 
+            A.enddate as ENDDATE,
+            A.title as TITLE,
+            A.notes as NOTES,
+            A.status as STATUS,
+            A.reqidrow as REQIDROW
+        FROM TORP_WORKORDERS A
+        ORDER BY REQIDROW
+        """
+        return pd.read_sql_query(query, conn)
+    
+    def fetch_assigned_wo():
+        query = """
+        SELECT 
+            A.usercode as USERCODE, 
+            A.woidrow as WOIDROW, 
+            A.status as STATUS, 
+            B.name as USERNAME 
+        FROM TORP_WOASSIGNEDTO A
+        INNER JOIN TORP_USERS B ON B.code = A.usercode
+        ORDER BY WOIDROW
+        """
+        return pd.read_sql_query(query, conn)
+
+    def convert_woidrow_to_str(value: int)-> str:
+        return "W" + str(value).zfill(4)
+    def convert_woidrow_to_int(value: str)-> int:
+        return int(value[1:])
+    def convert_reqidrow_to_str(value: int)-> str:
+        return "R" + str(value).zfill(4)
+    def convert_reqidrow_to_int(value: str)-> int:
+        return int(value[1:])
+
+    def save_work_item(witem: dict) -> Tuple[str, bool]:
+        """Save request to database and return request number and status"""
+        try:
+        # # Get next available row ID
+            cursor.execute('SELECT MAX(idrow) FROM TORP_WORKITEMS')
+            max_idrow = cursor.fetchone()[0]
+            if max_idrow is not None:
+                next_idrow = max_idrow + 1
+            else:
+                next_idrow = 1  
+                          
+            sql = """
+                INSERT INTO TORP_WORKITEMS (
+                    idrow, ucode, tskgroup, tskdate, qty, um, 
+                    description, notes, status, woidrow
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            """
+            
+            values = (
+                next_idrow, witem["wi_ucode"], witem["wi_tskgroup"], witem["wi_tskdate"], witem["wi_qty"], witem["wi_um"],
+                witem["wi_desc"], witem["wi_notes"], witem["wi_status"], witem["wi_woidrow"]
+            )
+            
+            cursor.execute(sql, values)
+            conn.commit()
+            return next_idrow, True
+        
+        except Exception as e:
+            st.error(f"**ERROR inserting data in table TORP_WORKITEM: \n{e}", icon="🚨")
+            return "", False
+
+        
+    df_users = fetch_users()    
+    df_workorders = fetch_workorders()    
+    df_woassegnedto = fetch_assigned_wo()
+
+    # Inzialize sessione state
+    if 'selected_username' not in st.session_state:
+        st.session_state.selected_username = False
+    if 'selected_wo' not in st.session_state:
+        st.session_state.selected_wo = False
+
+    # Aggiungi un divisore nella sidebar
+    st.sidebar.divider()
+    st.sidebar.header("Work order filters")
+    
+    unique_usernames = df_woassegnedto['USERNAME'].unique()
+    sorted_usernames = sorted(unique_usernames)
+    wo_username_options = list(sorted_usernames)
+    
+    selected_username = st.sidebar.selectbox(label="TD user:", options=wo_username_options, index=None)
+    
+    df_wi_usercode = df_woassegnedto[df_woassegnedto['USERNAME'] == selected_username]["USERCODE"].unique()
+    wi_usercode = list(df_wi_usercode)
+
+    if selected_username:
+        st.session_state.selected_username = True
+
+
+    wo_idrow = df_woassegnedto[df_woassegnedto['USERNAME'] == selected_username]['WOIDROW'].apply(convert_woidrow_to_str)
+    unique_wo_idrow = wo_idrow.unique()
+    sorted_wo_idrow = sorted(wo_idrow)
+    wo_idrow_options = list(sorted_wo_idrow)
+  
+    selected_wo = st.sidebar.selectbox(label="Work-Order:", options=wo_idrow_options, index=None)
+    if selected_wo:
+        st.session_state.selected_wo = True
+
+    # Input per inserire i dettagli del task svolto
+    if st.session_state.selected_wo:
+        st.header(f"Work Order {selected_wo}")
+        with st.expander("WO details"):
+            df_wo_out = pd.DataFrame()
+            df_wo = df_workorders[df_workorders["IDROW"].apply(convert_woidrow_to_str) == selected_wo]
+            df_wo_out['IDROW'] = df_wo['IDROW'].apply(convert_woidrow_to_str)
+            df_wo_out['TYPE'] = df_wo['TYPE']
+            df_wo_out['STARTDATE'] = df_wo['STARTDATE']
+            df_wo_out['ENDDATE'] = df_wo['ENDDATE']
+            df_wo_out['TITLE'] = df_wo['TITLE']
+            df_wo_out['NOTES'] = df_wo['NOTES']  
+            df_wo_out['REQIDROW'] = df_wo['REQIDROW'].apply(convert_reqidrow_to_str)
+            st.dataframe(df_wo_out, use_container_width=True, hide_index=True)
+        
+        st.subheader(f"Insert a Work Item")
+        wi_description = st.text_input(label="Work item description:", value="")
+        wi_duration = st.number_input(label="Time spent (in hours):", min_value=0.0, step=0.5)
+        wi_date = st.date_input("Date of execution", format="DD/MM/YYYY", disabled=False)
+        wi_notes = st.text_area("Notes")
+        wo_nr = convert_woidrow_to_int(selected_wo)
+        work_item = {"wi_ucode": wi_usercode[0], "wi_tskgroup": "standard", "wi_tskdate": wi_date,"wi_qty": wi_duration, "wi_um": "H", "wi_desc": wi_description, "wi_notes": wi_notes, "wi_status": "ACTIVE", "wi_woidrow": wo_nr}
+        # Bottone per aggiungere il task
+        if st.button("Save Work Item", type="primary"):
+            if wi_description and wi_duration > 0:
+                wi_nr, rc = save_work_item(work_item)
+                #st.success(f"Task '{wi_description}' di durata {wi_duration} ore aggiunto per {selected_wo} il {wi_date}.")
+                if rc == True:
+                    st.success(f"Task {wi_nr} saved successfully!")
+
+            else:
+                st.error("Per favore, inserisci una descrizione valida e una durata maggiore di zero.")
+    else:
+        st.header(f"Please select a work order first!")
+
+        # Visualizzazione dei task (per esempio, da salvare in un dataframe)
+        # Qui potresti implementare la logica per memorizzare e mostrare i task inseriti
 
 #######################################################################################################
 def my_test():
@@ -1102,19 +1245,23 @@ def my_test():
 
 #######################################################################################################
 def main():
-  if not check_password():
-      st.stop()
+#   if not check_password():
+#       st.stop()
   open_sqlitecloud_db()
+  #load_data_from_db()
   st.set_page_config(layout="wide")  
   page_names_to_funcs = {
     " ℹ️  App Info": display_app_info,
     "📄 Insert Request": insert_request,
     "🔍 View Request ": view_request,
     "🗂️ Manage Request": manage_request,
-    "💎 Manage Work Orders": manage_wo,
+    "📌 Manage Work Orders": manage_wo,
+    "🛠️ Manage Work Items": manage_wi,
     "🔐 Close db": close_sqlitecloud_db,
-    "MYTEST": my_test,
+    "MYTEST": my_test
 }    
+  # Aggiungi l'immagine alla sidebar 
+  st.sidebar.image("https://iph.it/wp-content/uploads/2020/02/logo-scritta.png", width=150)
   demo_name = st.sidebar.selectbox("Choose a function", page_names_to_funcs.keys())
   page_names_to_funcs[demo_name]()
 

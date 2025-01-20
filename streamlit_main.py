@@ -16,7 +16,7 @@ import pytz
 import hmac
 from st_aggrid import AgGrid, GridOptionsBuilder, GridUpdateMode, DataReturnMode, JsCode, ColumnsAutoSizeMode
 import numpy as np
-from streamlit_extras.app_logo import add_logo
+#from streamlit_extras.app_logo import add_logo
 #from streamlit_modal import Modal
 #import extra_streamlit_components as stx
 

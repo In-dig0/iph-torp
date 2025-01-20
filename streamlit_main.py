@@ -1246,7 +1246,7 @@ def my_test():
 #######################################################################################################
 def main():
    if not check_password():
-       st.stop()
+    st.stop()
   open_sqlitecloud_db()
   #load_data_from_db()
   st.set_page_config(layout="wide")  

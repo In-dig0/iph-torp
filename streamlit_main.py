@@ -350,7 +350,7 @@ def insert_request() -> None:
         
         # Department and requester selection
         department = st.selectbox(
-            "Department(:red[*])", 
+            ":blue[Department(:red[*])]", 
             request_manager.df_depts['DEPT_KEY'].tolist(),
             index=None,
             key="sb_dept"
@@ -362,7 +362,7 @@ def insert_request() -> None:
                 request_manager.df_users["DEPTNAME"] == department
             ]
             requester = st.selectbox(
-                "Requester(:red[*])", 
+                ":blue[Requester(:red[*])]", 
                 filtered_users["NAME"].tolist(),
                 index=None,
                 key="sb_requester"
@@ -372,7 +372,7 @@ def insert_request() -> None:
         
         # Product line and family selection
         pline = st.selectbox(
-            "Product line(:red[*])",
+            ":blue[Product line(:red[*])]",
             ["POWER TAKE OFFs", "HYDRAULICS", "CYLINDERS", "ALL"],
             index=None,
             key="sb_pline"
@@ -417,7 +417,7 @@ def insert_request() -> None:
         if req_type in RequestManager.REQUEST_CATEGORIES:
             detail = st.selectbox(
                 ":blue[Request detail(:red[*])]",
-                request_manager.df_depts['DEPT_KEY'].tolist(),
+                request_manager.df_detail.tolist(),
                 index=None,
                 key="sb_detail"
             )

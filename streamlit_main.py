@@ -458,9 +458,9 @@ def insert_request() -> None:
         request_data.detail
     ])
     
-    st.write(f"{request_data.dept}-{request_data.requester}-{request_data.pline}")
-    st.write(f"{request_data.pfamily}-{request_data.type}-{request_data.category}")
-    st.write(f"{request_data.detail}-{request_data.title}-{request_data.description}")
+    st.write(f"Dept:{request_data.dept}\n-Requester:{request_data.requester}\n-Pline:{request_data.pline}\n")
+    st.write(f"Pfamily:{request_data.pfamily}\n-Type:{request_data.type}\n-Category:{request_data.category}\n")
+    st.write(f"Detail:{request_data.detail}-\nTitle:{request_data.title}-\nDescription:{request_data.description}")
 
     if st.button("Submit", type="primary", disabled=save_botton_disabled):
         req_nr, rc = request_manager.save_request(request_data)

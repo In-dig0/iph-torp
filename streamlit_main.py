@@ -229,6 +229,8 @@ def insert_request() -> None:
                 ORDER by A.name
             """, self.conn)
 
+            self.df_detail["DETAIL_KEY"] = self.df_detail["NAME"]
+
         def save_request(self, request: RequestData) -> Tuple[str, int]:
             """Save request to database and return request number and status"""
             try:
@@ -415,7 +417,7 @@ def insert_request() -> None:
         if req_type in RequestManager.REQUEST_CATEGORIES:
             detail = st.selectbox(
                 ":blue[Request detail(:red[*])]",
-                RequestManager.REQUEST_DETAIL[req_type],
+                request_manager.df_depts['DEPT_KEY'].tolist(),
                 index=None,
                 key="sb_detail"
             )

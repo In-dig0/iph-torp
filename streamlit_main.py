@@ -457,7 +457,7 @@ def insert_request() -> None:
     save_botton_disabled = not all([
         request_data.dept, request_data.requester, request_data.pline,
         request_data.pfamily, request_data.type, request_data.category,
-        request_data.detail
+        request_data.detail, request_data.title
     ])
     
     #save_botton_disabled = False
@@ -473,7 +473,7 @@ def insert_request() -> None:
             display_request_popup(req_nr, {
                 "Req_requester": request_data.requester,
                 "Req_title": request_data.title,
-                "Req_detail": request_data.description,
+                "Req_description": request_data.description,
                 "Req_status": request_data.status
             })
 

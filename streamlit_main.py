@@ -246,7 +246,7 @@ def insert_request() -> None:
                     next_rownr, request.user, request.status, request.dept,
                     request.requester, request.priority, request.pline,
                     request.pfamily, request.type, request.category,
-                    request.title, request.description, request.insdate, request.detail
+                    request.title, request.description, request.insdate, request.detail,
                     None, 0
                 )
                 

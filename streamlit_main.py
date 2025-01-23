@@ -454,13 +454,14 @@ def insert_request() -> None:
     st.divider()
 
 
-    # save_botton_disabled = not all([
-    #     request_data.dept, request_data.requester, request_data.pline,
-    #     request_data.pfamily, request_data.type, request_data.category,
-    #     request_data.detail
-    # ])
+    save_botton_disabled = not all([
+        request_data.dept, request_data.requester, request_data.pline,
+        request_data.pfamily, request_data.type, request_data.category,
+        request_data.detail
+    ])
     
-    save_botton_disabled = False
+    #save_botton_disabled = False
+    
     # st.write(f"Dept:{request_data.dept}\n-Requester:{request_data.requester}\n-Pline:{request_data.pline}\n")
     # st.write(f"Pfamily:{request_data.pfamily}\n-Type:{request_data.type}\n-Category:{request_data.category}\n")
     # st.write(f"Detail:{request_data.detail}-\nTitle:{request_data.title}-\nDescription:{request_data.description}")

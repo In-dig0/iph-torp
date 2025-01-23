@@ -416,7 +416,7 @@ def insert_request() -> None:
         detail = None
         detail = st.selectbox(
             ":blue[Request detail(:red[*])]",
-            request_manager.df_detail.tolist(),
+            request_manager.df_detail['DEPT_KEY'].tolist(),
             index=None,
             key="sb_detail"
         )

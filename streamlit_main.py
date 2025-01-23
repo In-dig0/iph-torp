@@ -457,6 +457,10 @@ def insert_request() -> None:
         request_data.pfamily, request_data.type, request_data.category,
         request_data.detail
     ])
+    
+    st.write(f"{request_data.dept}-{request_data.requester}-{request_data.pline}")
+    st.write(f"{request_data.pfamily}-{request_data.type}-{request_data.category}")
+    st.write(f"{request_data.detail}-{request_data.title}-{request_data.description}")
 
     if st.button("Submit", type="primary", disabled=save_botton_disabled):
         req_nr, rc = request_manager.save_request(request_data)

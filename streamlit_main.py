@@ -24,7 +24,7 @@ import numpy as np
 # Global constants
 APPNAME = "TORP" #IPH Technical Office Request POC (Proof Of Concept)
 APPCODE = "TORP"
-APPVERSION = "0.1"
+APPVERSION = "0.2"
 
 #######################################################################################################
 def open_sqlitecloud_db():
@@ -122,6 +122,22 @@ def display_app_info():
     st.markdown("Powered with Streamlit :streamlit:")
 
 #######################################################################################################
+# def get_next_rowid(obj_class: str, obj_year: str, obj_pline=None) -> str:
+#     """Get next available row ID"""
+
+#     try:
+#         self.cursor.execute('SELECT prefix AS PREFIX, prog AS PROG FROM TORP_OBJ_NUMERATOR WHERE obj_class=? and obj_year=? and obj_pline=?', (obj_class, obj_year, obj_pline))
+#         results = self.cursor.fetchone()[0]
+#         prefix = results['PREFIX']
+#         prog = results['PROG']
+#         rowid = prefix + prog.zfill(3)
+#     except Exception as errMsg:
+#         prefix = obj_class[1]
+#         prog = 1
+#         rowid = prefix + prog.zfill(3)
+   
+#     return rowid
+#######################################################################################################
 def insert_request() -> None:
     """Main function to handle request insertion"""
     @dataclass
@@ -164,7 +180,7 @@ def insert_request() -> None:
         def load_initial_data(self) -> None:
             """Load initial data from database"""
             self.df_depts = pd.read_sql_query(
-                "SELECT code AS CODE, name AS NAME FROM TORP_DEPARTMENTS ORDER by name", 
+                "SELECT code AS CODE, name AS NAME, mngrcode AS MNGR_CODE, rprofcode AS REQPROF_CODE FROM TORP_DEPARTMENTS ORDER by name", 
                 self.conn
             )
             self.df_depts["DEPT_KEY"] = self.df_depts["NAME"]
@@ -176,6 +192,42 @@ def insert_request() -> None:
                 ORDER by A.name
             """, self.conn)
 
+            self.df_pline = pd.read_sql_query("""
+                SELECT A.code AS CODE, A.name AS NAME
+                FROM TORP_PLINE A
+                ORDER by A.name
+            """, self.conn)
+
+            self.df_pfamily = pd.read_sql_query("""
+                SELECT A.code AS CODE, A.name AS NAME, A.pcode AS PLINE_CODE
+                FROM TORP_PFAMILY A
+                ORDER by A.name
+            """, self.conn)
+
+            self.df_pfamily = pd.read_sql_query("""
+                SELECT A.code AS CODE, A.name AS NAME, A.pcode AS PLINE_CODE
+                FROM TORP_PFAMILY A
+                ORDER by A.name
+            """, self.conn)
+
+            self.df_type = pd.read_sql_query("""
+                SELECT A.code AS CODE, A.name AS NAME
+                FROM TORP_TYPE A
+                ORDER by A.name
+            """, self.conn)
+
+            self.df_category= pd.read_sql_query("""
+                SELECT A.code AS CODE, A.name AS NAME
+                FROM TORP_CATEGORY A
+                ORDER by A.name
+            """, self.conn)
+
+            self.df_detail= pd.read_sql_query("""
+                SELECT A.code AS CODE, A.name AS NAME
+                FROM TORP_CATEGORY A
+                ORDER by A.name
+            """, self.conn)
+
         def save_request(self, request: RequestData) -> Tuple[str, int]:
             """Save request to database and return request number and status"""
             try:
@@ -184,9 +236,9 @@ def insert_request() -> None:
                 sql = """
                     INSERT INTO TORP_REQUESTS (
                         idrow, usercode, status, deptcode, requestername, 
-                        priority, pline, pfamily, type, category, title, 
-                        detail, insdate, notes, woidrow
-                    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                        priority, pline, pfamily, type, category, 
+                        title, description, insdate, notes, woidrow, detail
+                    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                 """
                 
                 values = (
@@ -420,7 +472,7 @@ def view_request():
         insdate as DATE, deptcode as DEPTCODE, requestername as REQUESTERNAME, 
         priority as PRIORITY, pline as PR_LINE, pfamily as PR_FAMILY, 
         type as TYPE, category as CATEGORY, title as TITLE, 
-        detail as DETAIL, notes as NOTES, woidrow as WOIDROW 
+        description as DESCRIPTION, notes as NOTES, woidrow as WOIDROW, detail AS DETAIL 
     FROM TORP_REQUESTS
     ORDER by IDROW desc
     """, conn)
@@ -797,9 +849,10 @@ def manage_request():
             type as TYPE, 
             category as CATEGORY, 
             title as TITLE,
-            detail as DETAIL,
+            description as DESCRIPTION,
             notes as NOTES,
             woidrow as WOIDROW
+            detail as DETAIL,
         FROM TORP_REQUESTS
         ORDER BY IDROW DESC
         """
@@ -1245,8 +1298,8 @@ def my_test():
 
 #######################################################################################################
 def main():
-  if not check_password():
-    st.stop()
+#   if not check_password():
+#     st.stop()
   open_sqlitecloud_db()
   #load_data_from_db()
   st.set_page_config(layout="wide")  

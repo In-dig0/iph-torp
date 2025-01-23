@@ -269,8 +269,8 @@ def insert_request() -> None:
     # Inizializzazione delle chiavi di stato per i widget
     FORM_KEYS = [
         'sb_dept', 'sb_requester', 'sb_pline', 'sb_pfamily',
-        'sb_type', 'sb_category', #'sb_priority',
-        'ti_title', 'ti_detail', 'ti_description'
+        'sb_type', 'sb_category', 'sb_detail', #'sb_priority',
+        'ti_title', 'ti_description'
     ]
     
     # Inizializzazione dello stato del form

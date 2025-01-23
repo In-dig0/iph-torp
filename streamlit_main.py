@@ -421,7 +421,9 @@ def insert_request() -> None:
             key="sb_detail"
         )
 
+        title = None
         title = st.text_input(":blue[Request title(:red[*])]", key="ti_title")
+        description = None
         description = st.text_area(":blue[Request description]", key="ti_description")
 
         return RequestData(

@@ -248,8 +248,8 @@ def insert_request() -> None:
                     next_rownr, request.user, request.status, request.dept,
                     request.requester, request.priority, request.pline,
                     request.pfamily, request.type, request.category,
-                    request.title, request.description, request.insdate, request.detail,
-                    None, 0
+                    request.title, request.description, request.insdate, 
+                    None, 0, request.detail
                 )
                 
                 self.cursor.execute(sql, values)
@@ -323,7 +323,7 @@ def insert_request() -> None:
 #                st.text_input("Request Nr", value=req_nr, disabled=True)
             st.text_input("Requester", value=request["Req_requester"], disabled=True)
             st.text_input("Request title", value=request["Req_title"], disabled=True)
-            #st.text_area("Request details", value=request["Req_detail"], disabled=True)
+            st.text_area("Request description", value=request["Req_description"], disabled=True)
             
             req_status_options = ['NEW', 'PENDING', 'ASSIGNED', 'WIP', 'COMPLETED', 'DELETED']
             idx_status = req_status_options.index(request["Req_status"])
@@ -391,7 +391,7 @@ def insert_request() -> None:
         
         # Request details
         priority = st.selectbox(
-            ":blue[Request Priority]",
+            ":blue[Request Priority(:red[*])]",
             ["High", "Medium", "Low"],
             index=1,
             key="sb_priority"
@@ -460,9 +460,9 @@ def insert_request() -> None:
         request_data.detail
     ])
     
-    st.write(f"Dept:{request_data.dept}\n-Requester:{request_data.requester}\n-Pline:{request_data.pline}\n")
-    st.write(f"Pfamily:{request_data.pfamily}\n-Type:{request_data.type}\n-Category:{request_data.category}\n")
-    st.write(f"Detail:{request_data.detail}-\nTitle:{request_data.title}-\nDescription:{request_data.description}")
+    # st.write(f"Dept:{request_data.dept}\n-Requester:{request_data.requester}\n-Pline:{request_data.pline}\n")
+    # st.write(f"Pfamily:{request_data.pfamily}\n-Type:{request_data.type}\n-Category:{request_data.category}\n")
+    # st.write(f"Detail:{request_data.detail}-\nTitle:{request_data.title}-\nDescription:{request_data.description}")
 
     if st.button("Submit", type="primary", disabled=save_botton_disabled):
         req_nr, rc = request_manager.save_request(request_data)
@@ -471,7 +471,7 @@ def insert_request() -> None:
             display_request_popup(req_nr, {
                 "Req_requester": request_data.requester,
                 "Req_title": request_data.title,
-                "Req_detail": request_data.detail,
+                "Req_detail": request_data.description,
                 "Req_status": request_data.status
             })
 

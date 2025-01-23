@@ -153,8 +153,9 @@ def insert_request() -> None:
         pfamily: str
         type: str
         category: str
-        title: str
         detail: str
+        title: str
+        description: str
 
     class RequestManager:
         """Class to handle request management operations"""
@@ -224,7 +225,7 @@ def insert_request() -> None:
 
             self.df_detail= pd.read_sql_query("""
                 SELECT A.code AS CODE, A.name AS NAME
-                FROM TORP_CATEGORY A
+                FROM TORP_DETAIL A
                 ORDER by A.name
             """, self.conn)
 
@@ -245,7 +246,7 @@ def insert_request() -> None:
                     next_rownr, request.user, request.status, request.dept,
                     request.requester, request.priority, request.pline,
                     request.pfamily, request.type, request.category,
-                    request.title, request.detail, request.insdate,
+                    request.title, request.description, request.insdate, request.detail
                     None, 0
                 )
                 
@@ -267,7 +268,7 @@ def insert_request() -> None:
     FORM_KEYS = [
         'sb_dept', 'sb_requester', 'sb_pline', 'sb_pfamily',
         'sb_type', 'sb_category', #'sb_priority',
-        'ti_title', 'ti_detail'
+        'ti_title', 'ti_detail', 'ti_description'
     ]
     
     # Inizializzazione dello stato del form
@@ -320,7 +321,7 @@ def insert_request() -> None:
 #                st.text_input("Request Nr", value=req_nr, disabled=True)
             st.text_input("Requester", value=request["Req_requester"], disabled=True)
             st.text_input("Request title", value=request["Req_title"], disabled=True)
-            st.text_area("Request details", value=request["Req_detail"], disabled=True)
+            #st.text_area("Request details", value=request["Req_detail"], disabled=True)
             
             req_status_options = ['NEW', 'PENDING', 'ASSIGNED', 'WIP', 'COMPLETED', 'DELETED']
             idx_status = req_status_options.index(request["Req_status"])
@@ -396,7 +397,7 @@ def insert_request() -> None:
         
         req_type = st.selectbox(
             ":blue[Request type (:red[*])]",
-            ["DOCUMENTATION", "PRODUCT", "SERVICE"],
+            ["PRODUCT","COMPONENT", "DOCUMENTATION",  "SERVICE"],
             index=None,
             key="sb_type"
         )
@@ -410,8 +411,18 @@ def insert_request() -> None:
                 key="sb_category"
             )
 
+        detail = None
+        if req_type in RequestManager.REQUEST_CATEGORIES:
+            detail = st.selectbox(
+                ":blue[Request detail(:red[*])]",
+                RequestManager.REQUEST_DETAIL[req_type],
+                index=None,
+                key="sb_detail"
+            )
+
         title = st.text_input(":blue[Request title(:red[*])]", key="ti_title")
-        detail = st.text_area(":blue[Request detail(:red[*])]", key="ti_detail")
+        description = st.text_area(":blue[Request description]", key="ti_description")
+        #detail = st.text_area(":blue[Request description(:red[*])]", key="ti_detail")
 
         return RequestData(
             insdate=datetime.datetime.now().strftime("%Y-%m-%d"),
@@ -578,8 +589,8 @@ def view_request():
     if selected_row is not None and len(selected_row) > 0:
 #        selected_row = selected_row[0] 
         data_out = {
-            'Column name': ["Request Number", "Insert date", "User", "Status", "Department", "Requester", "Priority", "Product Line", "Product Family", "Type", "Category", "Title", "Detail"],
-            'Column value': [selected_row['IDROW'][0], selected_row['DATE'][0], selected_row['USERCODE'][0], selected_row['STATUS'][0], selected_row['DEPTCODE'][0], selected_row['REQUESTERNAME'][0], selected_row['PRIORITY'][0], selected_row['PR_LINE'][0], selected_row['PR_FAMILY'][0], selected_row['TYPE'][0], selected_row['CATEGORY'][0], selected_row['TITLE'][0], selected_row['DETAIL'][0]]
+            'Column name': ["Request Number", "Insert date", "User", "Status", "Department", "Requester", "Priority", "Product Line", "Product Family", "Type", "Category", "Detail", "Title", "Description"],
+            'Column value': [selected_row['IDROW'][0], selected_row['DATE'][0], selected_row['USERCODE'][0], selected_row['STATUS'][0], selected_row['DEPTCODE'][0], selected_row['REQUESTERNAME'][0], selected_row['PRIORITY'][0], selected_row['PR_LINE'][0], selected_row['PR_FAMILY'][0], selected_row['TYPE'][0], selected_row['CATEGORY'][0], selected_row['DETAIL'][0], selected_row['TITLE'][0], selected_row['DESCRIPTION'][0]]
         }
         df_out = pd.DataFrame(data_out)
         st.subheader("Request details:")         
@@ -672,7 +683,8 @@ def manage_request():
             st.text_input(label="Product family", value=selected_row['PR_FAMILY'][0], disabled=True)
             st.text_input(label="Category", value=selected_row['CATEGORY'][0], disabled=True)
             st.text_input(label="Title", value=selected_row['TITLE'][0], disabled=True)
-            st.text_area(label="Details", value=selected_row['DETAIL'][0], disabled=True)
+            st.text_input(label="Detail", value=selected_row['DETAIL'][0], disabled=True)            
+            st.text_area(label="Description", value=selected_row['DESCRIPTION'][0], disabled=True)
             st.divider()         
             idx_status = req_status_options.index(selected_row['STATUS'][0])
             req_status = st.selectbox(label="Status", options=req_status_options, disabled=False, index=idx_status)
@@ -758,7 +770,7 @@ def manage_request():
 #            st.text_input(label="Product family", value=selected_row['PR_FAMILY'][0], disabled=True)
 #            st.text_input(label="Category", value=selected_row['CATEGORY'][0], disabled=True)
             st.text_input(label="Title", value=selected_row['TITLE'][0], disabled=True)
-            st.text_area(label="Details", value=selected_row['DETAIL'][0], disabled=True)
+            st.text_area(label="Detail", value=selected_row['DETAIL'][0], disabled=True)
             # if selected_rows['NOTES'][0]:
             #     st.text_area(label="Notes", value=selected_row['NOTES'][0], disabled=True)
             #st.divider()

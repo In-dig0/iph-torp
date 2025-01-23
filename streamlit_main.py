@@ -435,8 +435,10 @@ def insert_request() -> None:
             pfamily=pfamily,
             type=req_type,
             category=category,
+            detail=detail,            
             title=title,
-            detail=detail
+            description=description 
+
         )
 
     # Reset del form se necessario

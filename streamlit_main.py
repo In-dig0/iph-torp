@@ -414,17 +414,15 @@ def insert_request() -> None:
             )
 
         detail = None
-        if req_type in RequestManager.REQUEST_CATEGORIES:
-            detail = st.selectbox(
-                ":blue[Request detail(:red[*])]",
-                request_manager.df_detail.tolist(),
-                index=None,
-                key="sb_detail"
-            )
+        detail = st.selectbox(
+            ":blue[Request detail(:red[*])]",
+            request_manager.df_detail.tolist(),
+            index=None,
+            key="sb_detail"
+        )
 
         title = st.text_input(":blue[Request title(:red[*])]", key="ti_title")
         description = st.text_area(":blue[Request description]", key="ti_description")
-        #detail = st.text_area(":blue[Request description(:red[*])]", key="ti_detail")
 
         return RequestData(
             insdate=datetime.datetime.now().strftime("%Y-%m-%d"),

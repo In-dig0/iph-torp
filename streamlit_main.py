@@ -421,6 +421,14 @@ def insert_request() -> None:
             key="sb_detail"
         )
 
+        df_detail = request_manager.df_detail[request_manager.df_detail["NAME"] == detail]["CODE"]
+        # Verifica se df_detail non è vuoto
+        if not df_detail.empty:
+            detail_code = list(df_detail)[0]
+            st.write(detail_code)
+        else:
+            detail_code = ""
+            
         title = None
         title = st.text_input(":blue[Request title(:red[*])]", key="ti_title")
         description = None
@@ -437,7 +445,7 @@ def insert_request() -> None:
             pfamily=pfamily,
             type=req_type,
             category=category,
-            detail=detail,            
+            detail=detail_code,            
             title=title,
             description=description 
 

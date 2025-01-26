@@ -4,7 +4,7 @@ import os
 import io
 import time
 import json
-#import urllib.parse
+import re
 from dataclasses import dataclass
 from typing import Optional, Tuple, Dict, List
 
@@ -16,9 +16,6 @@ import pytz
 import hmac
 from st_aggrid import AgGrid, GridOptionsBuilder, GridUpdateMode, DataReturnMode, JsCode, ColumnsAutoSizeMode
 import numpy as np
-#from streamlit_extras.app_logo import add_logo
-#from streamlit_modal import Modal
-#import extra_streamlit_components as stx
 
 
 # Global constants
@@ -68,6 +65,178 @@ def close_sqlitecloud_db():
             st.error(f"**ERROR closing database connection: \n{errMsg}", icon="🚨")
         else:
             st.success(f"Database closed successfully!")   
+
+#######################################################################################################
+def load_initial_data() -> None:
+    """Load initial data from database"""
+    global df_depts
+    global df_users
+    global df_pline
+    global df_pfamily
+    global df_type
+    global df_category
+    global df_detail
+    global df_lk_category_detail
+    global df_lk_pline_tdtl
+
+
+    df_depts = pd.read_sql_query("""
+        SELECT 
+            A.code AS CODE, 
+            A.name AS NAME, 
+            A.mngrcode AS MNGR_CODE, 
+            A.rprofcode AS REQPROF_CODE 
+        FROM TORP_DEPARTMENTS AS A
+        ORDER by name
+        """, conn)
+
+    df_users = pd.read_sql_query("""
+        SELECT 
+            A.code AS CODE, 
+            A.name AS NAME, 
+            A.deptcode AS DEPTCODE, 
+            B.name AS DEPTNAME
+        FROM TORP_USERS A
+        INNER JOIN TORP_DEPARTMENTS B ON B.code = A.deptcode
+        ORDER by A.name
+        """, conn)
+
+    df_pline = pd.read_sql_query("""
+        SELECT 
+            A.code AS CODE, 
+            A.name AS NAME
+        FROM TORP_PLINE A
+        ORDER by A.name
+        """, conn)
+
+    df_pfamily = pd.read_sql_query("""
+        SELECT 
+            A.code AS CODE, 
+            A.name AS NAME, 
+            A.pcode AS PLINE_CODE
+        FROM TORP_PFAMILY A
+        ORDER by A.name
+        """, conn)
+
+    df_type = pd.read_sql_query("""
+        SELECT 
+            A.code AS CODE, 
+            A.name AS NAME
+        FROM TORP_TYPE A
+        ORDER by A.name
+        """, conn)
+
+    df_category= pd.read_sql_query("""
+        SELECT 
+            A.code AS CODE, 
+            A.name AS NAME
+        FROM TORP_CATEGORY A
+        ORDER by A.name
+        """, conn)
+
+    df_detail= pd.read_sql_query("""
+        SELECT 
+            A.code AS CODE,                                    
+            A.name AS NAME
+        FROM TORP_DETAIL A
+        ORDER by A.name
+        """, conn)
+
+    df_lk_type_category= pd.read_sql_query("""
+        SELECT 
+            A.typecode AS TYPE_CODE, 
+            A.categorycode AS CATEGORY_CODE
+        FROM TORP_LINK_TYPE_CATEGORY A
+        ORDER by A.typecode 
+        """, conn)
+
+    df_lk_category_detail= pd.read_sql_query("""
+        SELECT 
+            A.categorycode AS CATEGORY_CODE, 
+            A.detailcode AS DETAIL_CODE
+        FROM TORP_LINK_CATEGORY_DETAIL A
+        ORDER by A.categorycode 
+        """, conn)
+
+    df_lk_pline_tdtl= pd.read_sql_query("""
+        SELECT 
+            A.plinecode AS PLINE_CODE, 
+            A.usercode AS USER_CODE
+        FROM TORP_LINK_PLINE_TDTL A
+        ORDER by A.plinecode 
+        """, conn)
+
+#######################################################################################################
+def load_requests_data():
+    """ Load requests from database to df """
+    global df_requests
+    global df_reqassignedto
+    
+    df_requests = pd.read_sql_query("""
+    SELECT 
+        A.reqid as REQID, 
+        A.status as STATUS, 
+        A.insdate as INSDATE, 
+        A.dept as DEPT, 
+        A.requester as REQUESTER, 
+        A.user as USER, 
+        A.priority as PRIORITY, 
+        A.pline as PR_LINE, 
+        A.pfamily as PR_FAMILY, 
+        A.type as TYPE, 
+        A.category as CATEGORY, 
+        A.detail AS DETAIL, 
+        A.title as TITLE, 
+        A.description as DESCRIPTION, 
+        A.note_td as NOTE_TD, 
+        A.woid as WOID  
+    FROM TORP_REQUESTS A
+    ORDER by REQID desc
+    """, conn)
+
+    df_reqassignedto = pd.read_sql_query("""
+    SELECT 
+        A.userid as USERID, 
+        A.reqid as REQID,
+        A.status as STATUS 
+    FROM TORP_REQASSIGNEDTO A
+    ORDER by USERID desc
+    """, conn)
+
+
+#######################################################################################################
+def load_workorders_data():
+    """ """
+    global df_workorders
+    global df_woassignedto
+
+    df_workorders = pd.read_sql_query ("""
+    SELECT 
+        A.woid as WOID, 
+        A.type as TYPE, 
+        A.title as TITLE,
+        A.description as DESCRIPTION,
+        A.time_qty AS TIME_QTY,
+        A.time_um AS TIME_UM,                                                                
+        A.status as STATUS,
+        A.startdate as STARTDATE, 
+        A.enddate as ENDDATE,                                       
+        A.reqid as REQID
+    FROM TORP_WORKORDERS A
+    ORDER BY REQID
+    """, conn)
+
+
+    df_woassignedto = pd.read_sql_query("""
+    SELECT 
+        A.userid as USERID, 
+        A.woid as WOID, 
+        A.status as STATUS, 
+        B.name as USERNAME 
+    FROM TORP_WOASSIGNEDTO A
+    INNER JOIN TORP_USERS B ON B.code = A.userid
+    ORDER BY WOID
+    """, conn)
 
 
 #######################################################################################################
@@ -122,21 +291,48 @@ def display_app_info():
     st.markdown("Powered with Streamlit :streamlit:")
 
 #######################################################################################################
-# def get_next_rowid(obj_class: str, obj_year: str, obj_pline=None) -> str:
-#     """Get next available row ID"""
+def get_next_object_id(obj_class: str, obj_year: str, obj_pline="") -> str:
+    """Get next available row ID"""
 
-#     try:
-#         self.cursor.execute('SELECT prefix AS PREFIX, prog AS PROG FROM TORP_OBJ_NUMERATOR WHERE obj_class=? and obj_year=? and obj_pline=?', (obj_class, obj_year, obj_pline))
-#         results = self.cursor.fetchone()[0]
-#         prefix = results['PREFIX']
-#         prog = results['PROG']
-#         rowid = prefix + prog.zfill(3)
-#     except Exception as errMsg:
-#         prefix = obj_class[1]
-#         prog = 1
-#         rowid = prefix + prog.zfill(3)
-   
-#     return rowid
+    ZERO_PADDING_NR = 4
+    SEP_CHAR = '-'
+
+    try:
+        cursor.execute('SELECT prefix AS PREFIX, prog AS PROG FROM TORP_OBJNUMERATOR WHERE obj_class=? and obj_year=? and obj_pline=?', (obj_class, obj_year, obj_pline))
+        results = cursor.fetchone()
+        if results:
+            prefix = results[0]
+            next_prog = int(results[1]) + 1
+            next_rowid = prefix + obj_year[2:4] + SEP_CHAR + str(next_prog).zfill(ZERO_PADDING_NR)
+            cursor.execute(
+                "UPDATE TORP_OBJNUMERATOR SET prog = ? WHERE obj_class=? and obj_year=? and obj_pline=?",
+                (next_prog, obj_class, obj_year, obj_pline)
+            )               
+        else:        
+            prefix = obj_class[0]
+            next_prog = 1
+            next_rowid = prefix + obj_year[2:4] + SEP_CHAR + str(next_prog).zfill(ZERO_PADDING_NR)
+            cursor.execute(
+                "INSERT INTO TORP_OBJNUMERATOR (obj_class, obj_year, obj_pline, prefix, prog) VALUES (?, ?, ?, ?, ?)",
+                (obj_class, obj_year, obj_pline, prefix, next_prog)
+            )
+
+        conn.commit()                        
+    except Exception as errMsg:
+        st.error(f"**ERROR impossbile to get the next rowid from table TORP_OBJNUMERATOR: {errMsg}")
+        conn.rollback()
+        return ""
+    return next_rowid
+
+#######################################################################################################
+def get_code_from_name(df, name, code_column):
+    result = df[df["NAME"] == name][code_column]
+    return list(result)[0] if not result.empty else ""
+
+def get_description_from_code(df, code, description_column):
+    result = df[df["CODE"] == code][description_column]
+    return list(result)[0] if not result.empty else ""
+
 #######################################################################################################
 def insert_request() -> None:
     """Main function to handle request insertion"""
@@ -156,23 +352,11 @@ def insert_request() -> None:
         detail: str
         title: str
         description: str
+        tdtl: list[str]
 
     class RequestManager:
         """Class to handle request management operations"""
     
-        PRODUCT_FAMILIES = {
-            "POWER TAKE OFFs": ["GEARBOX PTO", "ENGINE PTO", "SPLIT SHAFT PTO", "PARALLEL GEARBOXES"],
-            "HYDRAULICS": ["PUMPS", "MOTORS", "VALVES", "WET KITS"],
-            "CYLINDERS": ["FRONT-END CYLINDERS", "UNDERBODY CYLINDERS", "DOUBLE ACTING CYLINDERS", "BRACKETS FOR CYLINDERS"],
-            "ALL": ["--"]
-        }
-        
-        REQUEST_CATEGORIES = {
-            "PRODUCT": ["NEW PRODUCT", "PRODUCT CHANGE", "OBSOLETE PRODUCT", "PRODUCT VALIDATION"],
-            "DOCUMENTATION": ["WEBPTO", "DRAWING", "IMDS (INTERNATIONAL MATERIAL DATA SYSTEM)", "CATALOGUE"],
-            "SERVICE": ["VISITING CUSTOMER PLANT", "VISITING SUPPLIER PLANT"]
-        }
-
         def __init__(self, conn, cursor):
             self.conn = conn
             self.cursor = cursor
@@ -205,12 +389,6 @@ def insert_request() -> None:
                 ORDER by A.name
             """, self.conn)
 
-            self.df_pfamily = pd.read_sql_query("""
-                SELECT A.code AS CODE, A.name AS NAME, A.pcode AS PLINE_CODE
-                FROM TORP_PFAMILY A
-                ORDER by A.name
-            """, self.conn)
-
             self.df_type = pd.read_sql_query("""
                 SELECT A.code AS CODE, A.name AS NAME
                 FROM TORP_TYPE A
@@ -229,36 +407,73 @@ def insert_request() -> None:
                 ORDER by A.name
             """, self.conn)
 
-            self.df_detail["DETAIL_KEY"] = self.df_detail["NAME"]
+            self.df_lk_type_category= pd.read_sql_query("""
+                SELECT A.typecode AS TYPE_CODE, A.categorycode AS CATEGORY_CODE
+                FROM TORP_LINK_TYPE_CATEGORY A
+                ORDER by A.typecode 
+            """, self.conn)
+
+            self.df_lk_category_detail= pd.read_sql_query("""
+                SELECT A.categorycode AS CATEGORY_CODE, A.detailcode AS DETAIL_CODE
+                FROM TORP_LINK_CATEGORY_DETAIL A
+                ORDER by A.categorycode 
+            """, self.conn)
+
+            self.df_lk_pline_tdtl= pd.read_sql_query("""
+                SELECT A.plinecode AS PLINE_CODE, A.usercode AS USER_CODE
+                FROM TORP_LINK_PLINE_TDTL A
+                ORDER by A.plinecode 
+            """, self.conn)
 
         def save_request(self, request: RequestData) -> Tuple[str, int]:
             """Save request to database and return request number and status"""
+
             try:
-                next_rownr = self._get_next_row_id()
-                
+
+                #next_rownr = self._get_next_row_id()
+                next_reqid = get_next_object_id("REQ", request.insdate[0:4])
                 sql = """
                     INSERT INTO TORP_REQUESTS (
-                        idrow, usercode, status, deptcode, requestername, 
-                        priority, pline, pfamily, type, category, 
-                        title, description, insdate, notes, woidrow, detail
+                        reqid, status, insdate, dept, requester, user, 
+                        priority, pline, pfamily, type, category, detail,
+                        title, description, note_td, woid
                     ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                 """
                 
                 values = (
-                    next_rownr, request.user, request.status, request.dept,
-                    request.requester, request.priority, request.pline,
-                    request.pfamily, request.type, request.category,
-                    request.title, request.description, request.insdate, 
-                    None, 0, request.detail
+                    next_reqid, request.status, request.insdate, request.dept,
+                    request.requester, request.user, request.priority, 
+                    request.pline, request.pfamily, request.type, request.category,
+                    request.detail, request.title, request.description, None, 0 
                 )
                 
                 self.cursor.execute(sql, values)
                 self.conn.commit()
-                return f"R{str(next_rownr).zfill(4)}", 0
                 
             except Exception as e:
                 st.error(f"**ERROR inserting request in TORP_REQUESTS: \n{e}", icon="🚨")
-                return "", 1
+                return "", False
+
+            try:               
+                sql = """
+                    INSERT INTO TORP_REQASSIGNEDTO (
+                        userid, reqid, status
+                    ) VALUES (?, ?, ?)
+                """
+                values = (
+                    request.tdtl[0], next_reqid, "ACTIVE"
+
+                )
+                
+                self.cursor.execute(sql, values)
+                self.conn.commit()
+                          
+            except Exception as e:
+                st.error(f"**ERROR inserting request in TORP_REQASSIGNEDTO: \n{e}", icon="🚨")
+                return "", False
+
+            #return f"R{str(next_rownr).zfill(4)}", 0
+            return next_reqid, True 
 
         def _get_next_row_id(self) -> int:
             """Get next available row ID"""
@@ -266,10 +481,12 @@ def insert_request() -> None:
             max_idrow = self.cursor.fetchone()[0]
             return (max_idrow + 1) if max_idrow is not None else 1
         
+   
+        
     # Inizializzazione delle chiavi di stato per i widget
     FORM_KEYS = [
         'sb_dept', 'sb_requester', 'sb_pline', 'sb_pfamily',
-        'sb_type', 'sb_category', 'sb_detail', #'sb_priority',
+        'sb_type', 'sb_category', 'sb_detail',
         'ti_title', 'ti_description'
     ]
     
@@ -294,7 +511,6 @@ def insert_request() -> None:
         @st.dialog(title=f"Request {req_nr} submitted!")  
         def create_pop_form():
             """Form with widgets to collect user information"""
-          
             st.markdown(
                 """
                 <style>
@@ -304,7 +520,7 @@ def insert_request() -> None:
                     -webkit-text-fill-color: #28a745 !important;
                     font-weight: bold;
                 }
-                div[data-testid="stTextInput"] > div > div input[disabled] {
+                div[data-testid="stTextInput"] > div > div > input[disabled] {
                     color: #6c757d !important;
                     opacity: 1 !important;
                     -webkit-text-fill-color: #6c757d !important;
@@ -313,22 +529,37 @@ def insert_request() -> None:
                     font-style: italic;
                 }
                 .stSelectbox > div > div > div > div {
-                    color: #007bff;
+                    color: #28a745;
+                }
+                .stMultiSelect > div > div > div > div {
+                    color: #28a745 !important;
+                }
+                .stMultiSelect div[role="option"] {
+                    color: #28a745 !important;
+                }
+                .stMultiSelect div[role="option"] > div > div {
+                    color: #28a745 !important;
                 }
                 </style>
                 """,
-                unsafe_allow_html=True,
-            )
-            
-#                st.text_input("Request Nr", value=req_nr, disabled=True)
-            st.text_input("Requester", value=request["Req_requester"], disabled=True)
-            st.text_input("Request title", value=request["Req_title"], disabled=True)
-            st.text_area("Request description", value=request["Req_description"], disabled=True)
+                unsafe_allow_html=True
+            )          
+               
+            st.text_input(label=":blue[Requester]", value=request["Req_requester"], disabled=True)
+            st.text_input(label=":blue[Request title]", value=request["Req_title"], disabled=True)
+            st.text_area(label=":blue[Request description]", value=request["Req_description"], disabled=True)
             
             req_status_options = ['NEW', 'PENDING', 'ASSIGNED', 'WIP', 'COMPLETED', 'DELETED']
             idx_status = req_status_options.index(request["Req_status"])
-            st.selectbox("Request status", req_status_options, disabled=True, index=idx_status)
-            
+            st.selectbox(label=":blue[Request status]", options=req_status_options, disabled=True, index=idx_status)
+
+            df = request_manager.df_users
+            # La lista di codici che vuoi convertire in descrizioni.
+            tdtl_codes = request["Req_tdtl"]
+            # Richiama la funzione per ogni codice nella lista.
+            tdtl_descriptions = [get_description_from_code(df_users, code, "NAME") for code in tdtl_codes]
+            st.multiselect(label=":blue[TD Team Leader]", options=tdtl_descriptions, default=tdtl_descriptions, key="sb_tdtl", disabled=True)
+
             if st.button("Close"):
                 st.session_state.reset_form = True
                 time.sleep(0.1)  # Piccola pausa per assicurare il corretto aggiornamento dello stato
@@ -344,110 +575,122 @@ def insert_request() -> None:
             else:
                 st.session_state[key] = ""
 
+    def create_selectbox(label, options, key, default_index=None):
+        return st.selectbox(label, options, index=default_index, key=key)
+
+    def get_code_from_name(df, name, code_column):
+        result = df[df["NAME"] == name][code_column]
+        return list(result)[0] if not result.empty else ""
+
+    def get_description_from_code(df, code, description_column):
+        result = df[df["CODE"] == code][description_column]
+        return list(result)[0] if not result.empty else ""
+
     def create_form() -> RequestData:
         """Create and handle the request form"""
+ 
+        # REQUESTER INFO SECTION
         st.header(":orange[Requester informations]")
         
-        # Department and requester selection
-        department = st.selectbox(
-            ":blue[Department(:red[*])]", 
-            request_manager.df_depts['DEPT_KEY'].tolist(),
-            index=None,
-            key="sb_dept"
-        )
-        
+        # 'Department' selection
+        department = None
+        department = create_selectbox(":blue[Department(:red[*])]", request_manager.df_depts['NAME'].tolist(), "sb_dept")
+        dept_code = get_code_from_name(request_manager.df_depts, department, "CODE")
+ 
+        # 'Requester' selection
         requester = None
         if department:
-            filtered_users = request_manager.df_users[
-                request_manager.df_users["DEPTNAME"] == department
-            ]
-            requester = st.selectbox(
-                ":blue[Requester(:red[*])]", 
-                filtered_users["NAME"].tolist(),
-                index=None,
-                key="sb_requester"
-            )
-
+            filtered_users = request_manager.df_users[request_manager.df_users["DEPTNAME"] == department]
+        else:
+            filtered_users = request_manager.df_users
+        requester_option = filtered_users["NAME"].tolist()
+        requester = create_selectbox(":blue[Requester(:red[*])]", requester_option, "sb_requester")
+        requester_code = get_code_from_name(request_manager.df_users, requester, "CODE")
+        
         st.header(":orange[Product group informations]")
         
-        # Product line and family selection
-        pline = st.selectbox(
-            ":blue[Product line(:red[*])]",
-            ["POWER TAKE OFFs", "HYDRAULICS", "CYLINDERS", "ALL"],
-            index=None,
-            key="sb_pline"
-        )
-        
-        pfamily = None
-        if pline in RequestManager.PRODUCT_FAMILIES:
-            pfamily = st.selectbox(
-                ":blue[Product family(:red[*])]",
-                RequestManager.PRODUCT_FAMILIES[pline],
-                index=None,
-                key="sb_pfamily"
-            )
+        # 'Product line' selection
+        pline = None
+        pline = create_selectbox(":blue[Product line(:red[*])]", request_manager.df_pline['NAME'].tolist(), "sb_pline")
+        pline_code = get_code_from_name(request_manager.df_pline, pline, "CODE")
 
+        # 'Product family' selection
+        pfamily = None
+        if pline:
+            filtered_pfamily = request_manager.df_pfamily[request_manager.df_pfamily["PLINE_CODE"] == pline_code]
+        else:
+            filtered_pfamily = request_manager.df_pfamily
+        pfamily_option = filtered_pfamily["NAME"].tolist()
+        pfamily = create_selectbox(":blue[Product family(:red[*])]", pfamily_option, "sb_pfamily")
+        pfamily_code = get_code_from_name(request_manager.df_pfamily, pfamily, "CODE")
+
+        # REQUEST INFO SECTION
         st.header(":orange[Request informations]")
         
-        # Request details
-        priority = st.selectbox(
-            ":blue[Request Priority(:red[*])]",
-            ["High", "Medium", "Low"],
-            index=1,
-            key="sb_priority"
-        )
-        
-        req_type = st.selectbox(
-            ":blue[Request type (:red[*])]",
-            ["PRODUCT","COMPONENT", "DOCUMENTATION",  "SERVICE"],
-            index=None,
-            key="sb_type"
-        )
-        
-        category = None
-        if req_type in RequestManager.REQUEST_CATEGORIES:
-            category = st.selectbox(
-                ":blue[Request category(:red[*])]",
-                RequestManager.REQUEST_CATEGORIES[req_type],
-                index=None,
-                key="sb_category"
-            )
+        # 'Priority' selection
+        priority = create_selectbox(":blue[Request priorty(:red[*])]", ["High", "Medium", "Low"], "sb_priority", 1)    
 
-        detail = None
-        detail = st.selectbox(
-            ":blue[Request detail(:red[*])]",
-            request_manager.df_detail["DETAIL_KEY"].tolist(),
-            index=None,
-            key="sb_detail"
-        )
+        # 'Type' selection
+        reqtype = None
+        reqtype = create_selectbox(":blue[Request type(:red[*])]", request_manager.df_type['NAME'].tolist(), "sb_type")
+        reqtype_code = get_code_from_name(request_manager.df_type, reqtype, "CODE")
 
-        df_detail = request_manager.df_detail[request_manager.df_detail["NAME"] == detail]["CODE"]
-        # Verifica se df_detail non è vuoto
-        if not df_detail.empty:
-            detail_code = list(df_detail)[0]
-            st.write(detail_code)
-        else:
-            detail_code = ""
-            
+        # 'Category' selection
+        reqcategory = None       
+        # Filtro sul DataFrame delle categorie ammesse
+        category_filter = request_manager.df_lk_type_category[request_manager.df_lk_type_category["TYPE_CODE"] == reqtype_code]
+        # Applicazione del filtro basato sui codici di categoria
+        filtered_reqcategory = request_manager.df_category[request_manager.df_category["CODE"].isin(category_filter["CATEGORY_CODE"])]
+        # Creazione della lista di opzioni per le categorie
+        reqcategory_option = filtered_reqcategory["NAME"].tolist()
+        reqcategory = create_selectbox(":blue[Request category(:red[*])]", reqcategory_option, "sb_category")
+        reqcategory_code = get_code_from_name(request_manager.df_category, reqcategory, "CODE")
+
+        # 'Detail' selection
+        detail = None    
+        # Filtro sul DataFrame delle categorie ammesse
+        detail_filter = request_manager.df_lk_category_detail[request_manager.df_lk_category_detail["CATEGORY_CODE"] == reqcategory_code]
+        # Applicazione del filtro basato sui codici di categoria
+        filtered_detail = request_manager.df_detail[request_manager.df_detail["CODE"].isin(detail_filter["DETAIL_CODE"])]
+        # Creazione della lista di opzioni per le categorie
+        detail_option = filtered_detail["NAME"].tolist()
+        detail = create_selectbox(":blue[Request detail(:red[*])]", detail_option, "sb_detail")
+        detail_code = get_code_from_name(request_manager.df_detail, detail, "CODE")
+
+        # 'Title' selection
         title = None
         title = st.text_input(":blue[Request title(:red[*])]", key="ti_title")
+
+        # 'Description' selection        
         description = None
         description = st.text_area(":blue[Request description]", key="ti_description")
 
+        # 'TD Team Leader' selection (hidden)
+        tdtl = None       
+        # Filtro sul DataFrame delle linee ammesse
+        tdtl_filter = request_manager.df_lk_pline_tdtl[request_manager.df_lk_pline_tdtl["PLINE_CODE"] == pline_code]
+        # Applicazione del filtro basato sui codici di utenti
+        tdtl_option = request_manager.df_users[request_manager.df_users["CODE"].isin(tdtl_filter["USER_CODE"])]
+        # Creazione della lista di opzioni per il multiselect
+        tdtl_code_list = tdtl_option["CODE"].tolist()        
+        tdtl_name_list = tdtl_option["NAME"].tolist()
+        #st.multiselect(label=":blue[TD Team Leader]", options=tdtl_name_list, default=tdtl_name_list, key="sb_tdtl2", disabled=True)
+       
         return RequestData(
             insdate=datetime.datetime.now().strftime("%Y-%m-%d"),
             user="RB",
             status="NEW",
-            dept=department,
-            requester=requester,
+            dept=dept_code,
+            requester=requester_code,
             priority=priority,
-            pline=pline,
-            pfamily=pfamily,
-            type=req_type,
-            category=category,
+            pline=pline_code,
+            pfamily=pfamily_code,
+            type=reqtype_code,
+            category=reqcategory_code,
             detail=detail_code,            
             title=title,
-            description=description 
+            description=description,
+            tdtl=tdtl_code_list
 
         )
 
@@ -460,7 +703,7 @@ def insert_request() -> None:
     # Main form handling
     request_data = create_form()
     st.divider()
-
+    
 
     save_botton_disabled = not all([
         request_data.dept, request_data.requester, request_data.pline,
@@ -468,21 +711,16 @@ def insert_request() -> None:
         request_data.detail, request_data.title
     ])
     
-    #save_botton_disabled = False
-    
-    # st.write(f"Dept:{request_data.dept}\n-Requester:{request_data.requester}\n-Pline:{request_data.pline}\n")
-    # st.write(f"Pfamily:{request_data.pfamily}\n-Type:{request_data.type}\n-Category:{request_data.category}\n")
-    # st.write(f"Detail:{request_data.detail}-\nTitle:{request_data.title}-\nDescription:{request_data.description}")
-
     if st.button("Submit", type="primary", disabled=save_botton_disabled):
         req_nr, rc = request_manager.save_request(request_data)
-        if rc == 0:
+        if rc == True:
             st.session_state.form_submitted = True
             display_request_popup(req_nr, {
                 "Req_requester": request_data.requester,
                 "Req_title": request_data.title,
                 "Req_description": request_data.description,
-                "Req_status": request_data.status
+                "Req_status": request_data.status,
+                "Req_tdtl": request_data.tdtl
             })
 
 
@@ -496,28 +734,30 @@ def view_request():
     if "grid_refresh" not in st.session_state:
         st.session_state.grid_refresh = False
     
-    df_requests = pd.read_sql_query("""
-    SELECT idrow as IDROW, usercode as USERCODE, status as STATUS, 
-        insdate as DATE, deptcode as DEPTCODE, requestername as REQUESTERNAME, 
-        priority as PRIORITY, pline as PR_LINE, pfamily as PR_FAMILY, 
-        type as TYPE, category as CATEGORY, title as TITLE, 
-        description as DESCRIPTION, notes as NOTES, woidrow as WOIDROW, detail AS DETAIL 
-    FROM TORP_REQUESTS
-    ORDER by IDROW desc
-    """, conn)
+    load_requests_data()
+    df_requests_grid = pd.DataFrame()
+    df_requests_grid['REQID'] = df_requests['REQID']
+    df_requests_grid['STATUS'] = df_requests['STATUS']
+    df_requests_grid['INSDATE'] = df_requests['INSDATE']
+#    df_requests_grid['DEPTNAME'] = df_requests['DEPT'].apply(lambda dept_code: get_description_from_code(df_depts, dept_code, "NAME"))
+    df_requests_grid['PRIORITY'] = df_requests['PRIORITY']
+    df_requests_grid['PRLINE_NAME'] = df_requests['PR_LINE'].apply(lambda pline_code: get_description_from_code(df_pline, pline_code, "NAME"))
+    df_requests_grid['TITLE'] = df_requests['TITLE']
+    df_requests_grid['REQUESTER_NAME'] = df_requests['REQUESTER'].apply(lambda requester_code: get_description_from_code(df_users, requester_code, "NAME"))
 
-    # Aggiungi questo dopo il caricamento dei dati
+    #df_requests_grid['REQUESTERNAME'] = df_requests['REQUESTER'].apply(lambda requester_code: get_description_from_code(df_users, requester_code, "NAME"))
+
+
     if st.session_state.grid_refresh:
-        st.session_state.grid_data = df_requests.copy()
+        st.session_state.grid_data = df_requests_grid.copy()
         st.session_state.grid_refresh = False    
-        df_requests["DATE"] = pd.to_datetime(df_requests["DATE"], format="%Y-%m-%d")
+        #df_requests_grid["INSDATE"] = pd.to_datetime(df_requests_grid["INSDATE"], format="%Y-%m-%d")
 
-    df_requests["IDROW"] = 'R' + df_requests["IDROW"].astype(str).str.zfill(4)
     cellStyle = JsCode("""
         function(params) {
-            if (params.column.colId === 'IDROW') {
+            if (params.column.colId === 'REQID') {
                        return {
-                        'backgroundColor': '#ECEBBD',
+                        'backgroundColor': '#CCE9E4',
                         'color': '#111810',
                         'fontWeight': 'bold'
                     };
@@ -526,7 +766,7 @@ def view_request():
         }
         """)
 
-    grid_builder = GridOptionsBuilder.from_dataframe(df_requests)
+    grid_builder = GridOptionsBuilder.from_dataframe(df_requests_grid)
     # makes columns resizable, sortable and filterable by default
     grid_builder.configure_default_column(
         resizable=True,
@@ -542,12 +782,13 @@ def view_request():
 #    grid_builder.configure_pagination(enabled=True, paginationPageSize=5, paginationAutoPageSize=True)
 #    grid_builder.configure_selection(selection_mode="multiple", use_checkbox=True)
 #    grid_builder.configure_side_bar(filters_panel=True)# defaultToolPanel='filters')    
-    grid_builder.configure_column(
-    field="DATE",
-    header_name="INSERT DATE",
-    valueFormatter="value != undefined ? new Date(value).toLocaleString('it-IT', {dateStyle:'short'}): ''",
-    )
-    grid_builder.configure_column("IDROW", cellStyle=cellStyle)   
+    
+    # grid_builder.configure_column(
+    # field="INSDATE",
+    # header_name="INSERT DATE",
+    # valueFormatter="value != undefined ? new Date(value).toLocaleString('it-IT', {dateStyle:'short'}): ''",
+    # )
+    grid_builder.configure_column("REQID", cellStyle=cellStyle)   
     grid_builder.configure_selection(
     selection_mode='single',     # Enable multiple row selection
     use_checkbox=True,             # Show checkboxes for selection
@@ -559,23 +800,30 @@ def view_request():
     
     # Inizializzazione della sessione
     if "grid_data" not in st.session_state:
-        st.session_state.grid_data = df_requests.copy()  # Copia per evitare modifiche al DataFrame originale
+        st.session_state.grid_data = df_requests_grid.copy()  # Copia per evitare modifiche al DataFrame originale
     if "grid_response" not in st.session_state:
         st.session_state.grid_response = None
 
     # Sidebar controls - Filters
     st.sidebar.header("Filters")
-    ct_requester = df_requests['REQUESTERNAME'].drop_duplicates()
-    df_ct_requester = pd.DataFrame({"REQUESTERNAME": ct_requester}).sort_values(by="REQUESTERNAME")
+    # Creation of a filter REQUESTERNAME
+    ct_requester = df_requests_grid['REQUESTER_NAME'].drop_duplicates().sort_values()
+    df_requestername = df_users[df_users["CODE"].isin(ct_requester)]
+    option_requestername = df_requestername['NAME'].sort_values()
+    
+    
+    option_requestername_list = ct_requester.tolist()
 
     # Get an optional value requester filter
-    requester_filter = st.sidebar.selectbox("Select a Requester:", df_ct_requester, index=None)
+    requestername_filter = st.sidebar.selectbox("Select a Requester Name:", option_requestername_list, index=None)
+    #requester_filter_code = get_code_from_name(df_users, requester_filter, "CODE")
+    
 
     # Filtro e AGGIORNAMENTO DEI DATI (utilizzando la sessione)
-    if requester_filter:
-        st.session_state.grid_data = df_requests.loc[df_requests["REQUESTERNAME"] == requester_filter].copy()
+    if requestername_filter:
+        st.session_state.grid_data = df_requests_grid.loc[df_requests_grid["REQUESTERNAME"] == requestername_filter].copy()
     else:
-        st.session_state.grid_data = df_requests.copy() # Mostra tutti i dati se il filtro è None
+        st.session_state.grid_data = df_requests_grid.copy() # Mostra tutti i dati se il filtro è None
 
     st.subheader("Request list:") 
     # Creazione/Aggiornamento della griglia (UNA SOLA VOLTA per ciclo di esecuzione)
@@ -605,15 +853,140 @@ def view_request():
     selected_row = st.session_state.grid_response['selected_rows']
 
     if selected_row is not None and len(selected_row) > 0:
-#        selected_row = selected_row[0] 
+        reqid = selected_row['REQID'][0]
+        insdate = selected_row['INSDATE'][0]
+        status = selected_row['STATUS'][0]
+        requester_name = selected_row['REQUESTER_NAME'][0]
+        pline_name = selected_row['PRLINE_NAME'][0]
+
+        dept_code = df_requests[df_requests["REQID"] == reqid]["DEPT"].values[0]
+        dept_name = get_description_from_code(df_depts, dept_code, "NAME")
+
+        family_code = df_requests[df_requests["REQID"] == reqid]["PR_FAMILY"].values[0]
+        family_name = get_description_from_code(df_pfamily, family_code, "NAME")
+
+        type_code = df_requests[df_requests["REQID"] == reqid]["TYPE"].values[0]
+        type_name = get_description_from_code(df_type, type_code, "NAME")
+        
+        category_code = df_requests[df_requests["REQID"] == reqid]["CATEGORY"].values[0]
+        category_name = get_description_from_code(df_category, category_code, "NAME")
+
+        detail_code = df_requests[df_requests["REQID"] == reqid]["DETAIL"].values[0]
+        detail_name = get_description_from_code(df_detail, detail_code, "NAME")
+
+        title = selected_row['TITLE'][0]
+        description = df_requests[df_requests["REQID"] == reqid]["DESCRIPTION"].values[0]
+        note_td = df_requests[df_requests["REQID"] == reqid]["NOTE_TD"].values[0]
+
+        tdtl_code = df_reqassignedto[df_reqassignedto["REQID"] == reqid]["USERID"].values[0]
+        tdtl_name = get_description_from_code(df_users, tdtl_code, "NAME")
+
+        # Dati aggiornati
         data_out = {
-            'Column name': ["Request Number", "Insert date", "User", "Status", "Department", "Requester", "Priority", "Product Line", "Product Family", "Type", "Category", "Detail", "Title", "Description"],
-            'Column value': [selected_row['IDROW'][0], selected_row['DATE'][0], selected_row['USERCODE'][0], selected_row['STATUS'][0], selected_row['DEPTCODE'][0], selected_row['REQUESTERNAME'][0], selected_row['PRIORITY'][0], selected_row['PR_LINE'][0], selected_row['PR_FAMILY'][0], selected_row['TYPE'][0], selected_row['CATEGORY'][0], selected_row['DETAIL'][0], selected_row['TITLE'][0], selected_row['DESCRIPTION'][0]]
+            "Column name": [
+                "Request Id", "Insert date", "Status", "Department", "Requester", 
+                "Product line", "Product family", "Type", "Category", "Detail", 
+                "Title", "Description", "Tech Department Note", "Tech Department Team Leader"],
+            "Column value": [
+                reqid, insdate, status, dept_name, requester_name, pline_name, 
+                family_name, type_name, category_name, detail_name, title, 
+                description, note_td, tdtl_name]
         }
         df_out = pd.DataFrame(data_out)
-        st.subheader("Request details:")         
-        st.dataframe(df_out, use_container_width=True, height=500, hide_index=True)
 
+        # Formattazione Request Id in grassetto
+        df_out.loc[df_out["Column name"] == "Request Id", "Column value"] = df_out.loc[
+            df_out["Column name"] == "Request Id", "Column value"].apply(lambda x: f"<b>{x}</b>")
+
+        # Formattazione Status in verde
+        df_out.loc[df_out["Column name"] == "Status", "Column value"] = df_out.loc[
+            df_out["Column name"] == "Status", "Column value"].apply(lambda x: f"<span style='color: green;'>{x}</span>")
+
+        # Convertiamo il DataFrame in HTML con testo allineato a sinistra e senza id riga
+        html_table = df_out.to_html(escape=False, index=False, classes='mystyle')
+        table_width = 900  # Adjust this width value as needed
+        # Convertiamo il DataFrame in HTML con testo allineato a sinistra e senza id riga
+        html_table = df_out.to_html(escape=False, index=False, table_id='styled-table')
+
+        # # CSS per lo stile della tabella
+        # st.markdown("""
+        #     <style>
+        #         #styled-table {
+        #             width: 100%;
+        #             text-align: left;
+        #             border-collapse: collapse;
+        #         }
+        #         #styled-table th {
+        #             width: 20%;
+        #         }
+        #         #styled-table td {
+        #             width: 80%;
+        #         }
+        #         #styled-table th, #styled-table td {
+        #             text-align: left;
+        #             padding: 8px;
+        #             border: 1px solid #ddd;
+        #         }
+        #         #styled-table thead tr {
+        #             background-color: lightblue;
+        #         }
+        #     </style>
+        #     """, unsafe_allow_html=True)
+
+        # CSS per lo stile della tabella e adattamento delle larghezze delle colonne
+        st.markdown("""
+            <style>
+                #styled-table {
+                    width: 100%;
+                    text-align: left;
+                    border-collapse: collapse;
+                }
+                #styled-table th:nth-child(1), #styled-table td:nth-child(1) {
+                    text-align: left;
+                    width: 30%;
+                    padding: 12px;
+                }
+                #styled-table th:nth-child(2), #styled-table td:nth-child(2) {
+                    text-align: left;
+                    width: 70%;
+                    padding: 12px;
+                }
+                #styled-table th, #styled-table td {
+                    padding: 8px;
+                }
+                #styled-table th, #styled-table thead tr {
+                    background-color: lightblue;
+                }
+                #styled-table tr:nth-child(odd) {
+                    background-color: #f9f9f9;
+                }
+            </style>
+            """, unsafe_allow_html=True)
+
+        st.subheader("Request details:")
+        st.write(html_table, unsafe_allow_html=True)
+         # Aggiunta del pulsante di esportazione
+        def remove_html_tags(text):
+            """Rimuove i tag HTML da una stringa, ignorando eventuali valori None."""
+            if text is None:
+                return ""
+            clean = re.compile('<.*?>')
+            return re.sub(clean, '', text)
+
+        def convert_df(df):
+            df_clean = df.copy()
+            df_clean["Column value"] = df_clean["Column value"].apply(remove_html_tags)
+            return df_clean.to_csv(index=False, sep=';').encode('utf-8')
+
+        csv = convert_df(df_out)
+
+        st.download_button(
+            label="Export data",
+            data=csv,
+            file_name='request_details.csv',
+            mime='text/csv',
+            type="primary"
+        )        
 
 #######################################################################################################
 def manage_request():
@@ -864,75 +1237,46 @@ def manage_request():
         return dialog_content()
 #######################################
 
-    # Database queries
-    def fetch_requests():
-        query = """
-        SELECT 
-            idrow as IDROW, 
-            status as STATUS,
-            insdate as DATE, 
-            deptcode as DEPTCODE, 
-            requestername as REQUESTERNAME,
-            priority as PRIORITY, 
-            pline as PR_LINE, 
-            pfamily as PR_FAMILY,
-            type as TYPE, 
-            category as CATEGORY, 
-            title as TITLE,
-            description as DESCRIPTION,
-            notes as NOTES,
-            woidrow as WOIDROW
-            detail as DETAIL,
-        FROM TORP_REQUESTS
-        ORDER BY IDROW DESC
-        """
-        df = pd.read_sql_query(query, conn)
-        df["DATE"] = pd.to_datetime(df["DATE"], format="%Y-%m-%d")
-        df["IDROW"] = 'R' + df["IDROW"].astype(str).str.zfill(4)
-        return df
+    # # Database queries
+    # def fetch_requests():
+    #     query = """
+    #     SELECT 
+    #         idrow as IDROW, 
+    #         status as STATUS,
+    #         insdate as DATE, 
+    #         deptcode as DEPTCODE, 
+    #         requestername as REQUESTERNAME,
+    #         priority as PRIORITY, 
+    #         pline as PR_LINE, 
+    #         pfamily as PR_FAMILY,
+    #         type as TYPE, 
+    #         category as CATEGORY, 
+    #         title as TITLE,
+    #         description as DESCRIPTION,
+    #         notes as NOTES,
+    #         woidrow as WOIDROW
+    #         detail as DETAIL,
+    #     FROM TORP_REQUESTS
+    #     ORDER BY IDROW DESC
+    #     """
+    #     df = pd.read_sql_query(query, conn)
+    #     df["DATE"] = pd.to_datetime(df["DATE"], format="%Y-%m-%d")
+    #     df["IDROW"] = 'R' + df["IDROW"].astype(str).str.zfill(4)
+    #     return df
 
-    def fetch_users():
-        query = """
-        SELECT 
-            A.code AS CODE, 
-            A.name AS NAME, 
-            A.deptcode AS DEPTCODE, 
-            B.name AS DEPTNAME
-        FROM TORP_USERS A
-        INNER JOIN TORP_DEPARTMENTS B ON B.code = A.deptcode
-        ORDER BY A.name
-        """
-        return pd.read_sql_query(query, conn)
+    # def fetch_users():
+    #     query = """
+    #     SELECT 
+    #         A.code AS CODE, 
+    #         A.name AS NAME, 
+    #         A.deptcode AS DEPTCODE, 
+    #         B.name AS DEPTNAME
+    #     FROM TORP_USERS A
+    #     INNER JOIN TORP_DEPARTMENTS B ON B.code = A.deptcode
+    #     ORDER BY A.name
+    #     """
+    #     return pd.read_sql_query(query, conn)
     
-    def fetch_workorders():
-        query = """
-        SELECT 
-            A.idrow as IDROW, 
-            A.type as TYPE, 
-            A.startdate as STARTDATE, 
-            A.enddate as ENDDATE,
-            A.title as TITLE,
-            A.notes as NOTES,
-            A.status as STATUS,
-            A.reqidrow as REQIDROW
-        FROM TORP_WORKORDERS A
-        ORDER BY REQIDROW
-        """
-        return pd.read_sql_query(query, conn)
-    
-    def fetch_assigned_wo():
-        query = """
-        SELECT 
-            A.usercode as USERCODE, 
-            A.woidrow as WOIDROW, 
-            A.status as STATUS, 
-            B.name as USERNAME 
-        FROM TORP_WOASSIGNEDTO A
-        INNER JOIN TORP_USERS B ON B.code = A.usercode
-        ORDER BY WOIDROW
-        """
-        return pd.read_sql_query(query, conn)
-
 
     # Database update functions
     def update_request(idrow_nr, new_status, new_notes, new_woidrow=0):
@@ -1050,11 +1394,14 @@ def manage_request():
 
 
     # Main execution
-    df_users = fetch_users()    
-    df_requests = fetch_requests()
-    df_workorders = fetch_workorders()    
-    df_woassegnedto = fetch_assigned_wo()
+    # df_users = fetch_users()    
+    # df_requests = fetch_requests()
+    # df_workorders = fetch_workorders()    
+    # df_woassegnedto = fetch_assigned_wo()
 
+    load_initial_data()
+    load_requests_data()
+    load_workorders_data()
     # Initialize session state
     if "grid_data" not in st.session_state:
         st.session_state.grid_data = df_requests.copy()
@@ -1331,7 +1678,7 @@ def main():
 #   if not check_password():
 #     st.stop()
   open_sqlitecloud_db()
-  #load_data_from_db()
+  load_initial_data()
   st.set_page_config(layout="wide")  
   page_names_to_funcs = {
     " ℹ️  App Info": display_app_info,

@@ -550,7 +550,7 @@ def insert_request() -> None:
             )          
                
             requester_code = request["Req_requester"]
-            requester_name = get_description_from_code(df_users, code, "NAME")
+            requester_name = get_description_from_code(df_users, requester_code, "NAME")
             st.text_input(label=":blue[Requester]", value=requester_name, disabled=True)
             st.text_input(label=":blue[Request title]", value=request["Req_title"], disabled=True)
             st.text_area(label=":blue[Request description]", value=request["Req_description"], disabled=True)

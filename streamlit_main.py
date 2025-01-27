@@ -1067,27 +1067,59 @@ def manage_request():
                 unsafe_allow_html=True,
             )
 
-            # Extract request ID
+            # Display Request ID
             req_id = selected_row["REQID"][0]
-            # Display request details
+            # Display Product Line
             st.text_input(label="Product line", value=selected_row['PRLINE_NAME'][0], disabled=True)
+            
+            # Display request details
+
+            # dept_code = df_requests[df_requests["REQID"] == reqid]["DEPT"].values[0]
+            # dept_name = get_description_from_code(df_depts, dept_code, "NAME")
+
+            # family_code = df_requests[df_requests["REQID"] == reqid]["PR_FAMILY"].values[0]
+            # family_name = get_description_from_code(df_pfamily, family_code, "NAME")
+
+            # type_code = df_requests[df_requests["REQID"] == reqid]["TYPE"].values[0]
+            # type_name = get_description_from_code(df_type, type_code, "NAME")
+            
+            # category_code = df_requests[df_requests["REQID"] == reqid]["CATEGORY"].values[0]
+            # category_name = get_description_from_code(df_category, category_code, "NAME")
+
+            # detail_code = df_requests[df_requests["REQID"] == reqid]["DETAIL"].values[0]
+            # detail_name = get_description_from_code(df_detail, detail_code, "NAME")
+
+            # title = selected_row['TITLE'][0]
+            # description = df_requests[df_requests["REQID"] == reqid]["DESCRIPTION"].values[0]
+            # note_td = df_requests[df_requests["REQID"] == reqid]["NOTE_TD"].values[0]
+
+            # tdtl_code = df_reqassignedto[df_reqassignedto["REQID"] == reqid]["USERID"].values[0]
+            # tdtl_name = get_description_from_code(df_users, tdtl_code, "NAME")
+
             #st.text_input(label="Product family", value=selected_row['PR_FAMILY'][0], disabled=True)
             #st.text_input(label="Category", value=selected_row['CATEGORY'][0], disabled=True)
             #st.text_input(label="Detail", value=selected_row['DETAIL'][0], disabled=True)            
+            
+            # Display Title
             st.text_input(label="Title", value=selected_row['TITLE'][0], disabled=True)
-            st.text_area(label="Description", value=selected_row['DESCRIPTION'][0], disabled=True)
-            st.divider()         
+            # Display Description
+            description = df_requests[df_requests["REQID"] == reqid]["DESCRIPTION"].values[0]
+            st.text_area(label="Description", value=description, disabled=True)
+
+            st.divider()
+
             idx_status = req_status_options.index(selected_row['STATUS'][0])
             req_status = st.selectbox(label="Status", options=req_status_options, index=idx_status, disabled=False)
-            req_note_td = st.text_area(label="Notes", value=selected_row['NOTE_TD'][0], disabled=False)
-            req_woassigned = st.text_input(label="Work Order", value=wo_nr, disabled=True)
+            default_note_td = df_requests[df_requests["REQID"] == reqid]["NOTE_TD"].values[0]
+            req_note_td = st.text_area(label="Notes", value=default_note_td, disabled=False)
+
             if (selected_row['NOTE_TD'][0] == req_note_td) and (selected_row['STATUS'][0] == req_status):
                 disable_save_button = True
             else:
                 disable_save_button = False    
             # Handle save action
             if st.button("Save", type="primary", disabled=disable_save_button, key="req_save_button"):
-                success = update_request_fn(req_id, req_status, req_notetd)               
+                success = update_request_fn(req_id, req_status, req_note_td)               
                 if success:
                     st.session_state.grid_refresh = True
                     st.session_state.grid_response = None

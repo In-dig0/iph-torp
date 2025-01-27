@@ -1111,7 +1111,7 @@ def manage_request():
             idx_status = req_status_options.index(selected_row['STATUS'][0])
             req_status = st.selectbox(label="Status", options=req_status_options, index=idx_status, disabled=False)
             default_note_td = df_requests[df_requests["REQID"] == reqid]["NOTE_TD"].values[0]
-            req_note_td = st.text_area(label="Notes", value=default_note_td, disabled=False)
+            req_note_td = st.text_area(label="Tech Department Notes", value=default_note_td, disabled=False)
 
             if (req_note_td == default_note_td) and (selected_row['STATUS'][0] == req_status):
                 disable_save_button = True
@@ -1119,11 +1119,11 @@ def manage_request():
                 disable_save_button = False    
             # Handle save action
             if st.button("Save", type="primary", disabled=disable_save_button, key="req_save_button"):
-                success = update_request_fn(req_id, req_status, req_note_td)               
+                success = update_request_fn(reqid, req_status, req_note_td)               
                 if success:
                     st.session_state.grid_refresh = True
                     st.session_state.grid_response = None
-                    st.success("Update completed successfully!")
+                    st.success(f"Request {reqid} updated successfully!")
                     
                     st.session_state.need_refresh = True
                     time.sleep(3)
@@ -1265,11 +1265,11 @@ def manage_request():
    
 
     # Database update functions
-    def update_request(idrow_nr, new_status, new_notes, new_woidrow=0):
+    def update_request(reqid, new_status, new_note_td, new_woid=0):
         try:
             cursor.execute(
-                "UPDATE TORP_REQUESTS SET status = ?, notes = ?, woidrow = ? WHERE idrow = ?",
-                (new_status, new_notes, new_woidrow, idrow_nr)
+                "UPDATE TORP_REQUESTS SET status = ?, note_td = ?, woid = ? WHERE reqid = ?",
+                (new_status, new_note_td, new_woid, reqid)
             )
             return True
         except Exception as e:

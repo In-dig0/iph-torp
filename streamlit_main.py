@@ -880,8 +880,8 @@ def view_request():
         description = df_requests[df_requests["REQID"] == reqid]["DESCRIPTION"].values[0]
         note_td = df_requests[df_requests["REQID"] == reqid]["NOTE_TD"].values[0]
 
-        tdtl_code = df_reqassignedto[df_reqassignedto["REQID"] == reqid]["USERID"].values[0]
-        tdtl_name = get_description_from_code(df_users, tdtl_code, "NAME")
+        tdtl_code_list = df_reqassignedto[df_reqassignedto["REQID"] == reqid]["USERID"].tolist()
+        tdtl_name_list = get_description_from_code(df_users, tdtl_code_list, "NAME")
 
         # Dati aggiornati
         data_out = {
@@ -892,7 +892,7 @@ def view_request():
             "Column value": [
                 reqid, insdate, status, dept_name, requester_name, pline_name, 
                 family_name, type_name, category_name, detail_name, title, 
-                description, note_td, tdtl_name]
+                description, note_td, tdtl_name_list]
         }
         df_out = pd.DataFrame(data_out)
 

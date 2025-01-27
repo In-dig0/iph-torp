@@ -828,46 +828,6 @@ def view_request():
     else:
         st.session_state.grid_data = df_requests_grid.copy() # Mostra tutti i dati se il filtro è None
 
-    # # Inserire il CSS per evidenziare le righe in modo alternato
-    # st.markdown(
-    #     """
-    #     <style>
-    #     .ag-row:nth-child(even) {
-    #         background-color: #f2f2f2;
-    #     }
-    #     .ag-row:nth-child(odd) {
-    #         background-color: #ffffff;
-    #     }
-    #     </style>
-    #     """,
-    #     unsafe_allow_html=True,
-    # )
-    #     st.markdown(
-    #     """
-    #     <style>
-    #     .ag-row:nth-of-type(even) {
-    #         background-color: #f2f2f2;
-    #     }
-    #     .ag-row:nth-of-type(odd) {
-    #         background-color: #ffffff;
-    #     }
-    #     </style>
-    #     """,
-    #     unsafe_allow_html=True,
-    # )
-    st.markdown(
-    """
-    <style>
-    .ag-row-even {
-        background-color: #f2f2f2;
-    }
-    .ag-row-odd {
-        background-color: #ffffff;
-    }
-    </style>
-    """,
-    unsafe_allow_html=True,
-)
     st.subheader("Request list:") 
     # Creazione/Aggiornamento della griglia (UNA SOLA VOLTA per ciclo di esecuzione)
     if st.session_state.grid_response is None:
@@ -1404,7 +1364,7 @@ def manage_request():
     def configure_grid(df_requests):
         cell_style = JsCode("""
             function(params) {
-                if (params.column.colId === 'IDROW') {
+                if (params.column.colId === 'REQID') {
                     return {
                         'backgroundColor': '#ECEBBD',
                         'color': '#111810',
@@ -1430,7 +1390,7 @@ def manage_request():
             header_name="INSERT DATE",
             valueFormatter="value != undefined ? new Date(value).toLocaleString('it-IT', {dateStyle:'short'}): ''"
         )
-        builder.configure_column("IDROW", cellStyle=cell_style)
+        builder.configure_column("REQID", cellStyle=cell_style)
         builder.configure_selection(selection_mode='single', use_checkbox=True, header_checkbox=True)
         
         return builder.build()

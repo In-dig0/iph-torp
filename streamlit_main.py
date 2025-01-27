@@ -958,7 +958,7 @@ def view_request():
                     padding: 8px;
                 }
                 #styled-table th, #styled-table thead tr {
-                    background-color: lightblue;
+                    background-color: #8ebfde;
                 }
                 #styled-table tr:nth-child(odd) {
                     background-color: #f9f9f9;

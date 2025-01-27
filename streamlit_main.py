@@ -1452,7 +1452,7 @@ def manage_request():
     st.sidebar.header("Filters")
     req_status_options = df_requests_grid['STATUS'].drop_duplicates().sort_values()
     status_filter = st.sidebar.selectbox(
-        "Select a Status value ZZ:", 
+        "Select a Status value:", 
         req_status_options, 
         index=None,
         key='Status_value'
@@ -1460,7 +1460,7 @@ def manage_request():
     
     req_pline_options = df_requests_grid['PRLINE_NAME'].drop_duplicates().sort_values()
     pline_filter = st.sidebar.selectbox(
-        "Select a Product Line value WW:", 
+        "Select a Product Line value:", 
         req_pline_options, 
         index=None,
         key='Pline_value'

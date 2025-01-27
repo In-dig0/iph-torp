@@ -1108,10 +1108,10 @@ def manage_request():
 
             st.divider()
 
-            tdtl_codes = df_reqassignedto[df_reqassignedto == reqid]["USERID"]
+            tdtl_default_codes = df_reqassignedto[df_reqassignedto["REQID"] == reqid]["USERID"]
             # Richiama la funzione per ogni codice nella lista.
-            tdtl_descriptions = [get_description_from_code(df_users, code, "NAME") for code in tdtl_codes]
-            st.multiselect(label=":blue[TD Team Leader]", options=tdtl_descriptions, default=tdtl_descriptions, key="sb_tdtl_reqmanage", disabled=False)
+            tdtl_default_descriptions = [get_description_from_code(df_users, code, "NAME") for code in tdtl_default_codes]
+            st.multiselect(label=":blue[Tech Department Team Leader]", options=tdtl_descriptions, default=tdtl_default_descriptions, key="sb_tdtl_reqmanage", disabled=False)
 
             idx_status = req_status_options.index(selected_row['STATUS'][0])
             req_status = st.selectbox(label=":blue[Status]", options=req_status_options, index=idx_status, disabled=False)
@@ -1466,22 +1466,13 @@ def manage_request():
         key='Pline_value'
     )
 
-# Apply filters 
+    # Apply filters 
     filtered_data = df_requests_grid.copy() 
     if status_filter: 
         filtered_data = filtered_data[filtered_data["STATUS"] == status_filter] 
     if pline_filter: 
         filtered_data = filtered_data[filtered_data["PRLINE_NAME"] == pline_filter] 
     st.session_state.grid_data = filtered_data
-##################
-
-    # # Filtro e AGGIORNAMENTO DEI DATI (utilizzando la sessione)
-    # if status_filter:
-    #     st.session_state.grid_data = df_requests_grid.loc[df_requests_grid["STATUS"] == status_filter].copy()
-    # else:
-    #     st.session_state.grid_data = df_requests_grid.copy() # Mostra tutti i dati se il filtro è None
-
-
 
     # Display grid
     st.subheader("Request list:")

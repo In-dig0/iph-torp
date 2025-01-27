@@ -987,7 +987,7 @@ def view_request():
             type="primary"
         )        
 
-#######################################################################################################
+
 #######################################################################################################
 def manage_request():
     """
@@ -1113,7 +1113,7 @@ def manage_request():
             tdtl_default_codes = df_reqassignedto[df_reqassignedto["REQID"] == reqid]["USERID"]
             tdtl_option = df_users[df_users["CODE"].isin(tdtl_default_codes)]    
             default_tdtl_name = tdtl_option["NAME"].tolist()
-            tdtl = st.multiselect(label=":blue[Tech Department Team Leader]", options=tdtl_username_list, default=default_tdtl_name, key="sb_tdtl_reqmanage", disabled=False)
+            req_tdtl = st.multiselect(label=":blue[Tech Department Team Leader]", options=tdtl_username_list, default=default_tdtl_name, key="sb_tdtl_reqmanage", disabled=False)
             
             # Display Status 
             idx_status = req_status_options.index(selected_row['STATUS'][0])
@@ -1123,13 +1123,14 @@ def manage_request():
             default_note_td = df_requests[df_requests["REQID"] == reqid]["NOTE_TD"].values[0]
             req_note_td = st.text_area(label=":blue[Tech Department Notes]", value=default_note_td, disabled=False)
 
-            if (req_note_td == default_note_td) and (selected_row['STATUS'][0] == req_status) and (tdtl == default_tdtl_name):
+
+            if (req_note_td == default_note_td) and (selected_row['STATUS'][0] == req_status) and (req_tdtl == default_tdtl_name):
                 disable_save_button = True
             else:
                 disable_save_button = False    
             # Handle save action
             if st.button("Save", type="primary", disabled=disable_save_button, key="req_save_button"):
-                success = update_request_fn(reqid, req_status, req_note_td)               
+                success = update_request_fn(reqid, req_status, req_note_td, 0, req_tdtl)               
                 if success:
                     st.session_state.grid_refresh = True
                     st.session_state.grid_response = None
@@ -1257,7 +1258,7 @@ def manage_request():
                 if success:
 #                    st.success(f"Work order W{str(wo_idrow).zfill(4)} created successfully!")
                     success = save_workorder_assignments(wo_idrow, wo_assignedto, df_users, df_woassegnedto)
-                    success = update_request(reqidrow, "ASSIGNED", selected_row['NOTES'][0], wo_idrow)
+                    success = update_request(reqidrow, "ASSIGNED", selected_row['NOTES'][0], wo_idrow, "")
                     if success:
                         st.session_state.grid_refresh = True
                         st.session_state.grid_response = None
@@ -1274,16 +1275,51 @@ def manage_request():
    
 
     # Database update functions
-    def update_request(reqid, new_status, new_note_td, new_woid=0):
+    def update_request(reqid, new_status, new_note_td, new_woid=0, new_tdtl=""):
         try:
             cursor.execute(
                 "UPDATE TORP_REQUESTS SET status = ?, note_td = ?, woid = ? WHERE reqid = ?",
                 (new_status, new_note_td, new_woid, reqid)
             )
+            
+        except Exception as e:
+            st.error(f"Error updating TORP_REQUESTS: {str(e)}", icon="🚨")
+            return False
+
+        try:
+            # Disable existing assignments
+            cursor.execute(
+                "UPDATE TORP_REQASSIGNEDTO SET status = ? WHERE reqid = ?",
+                (DISABLED_STATUS, reqid)
+            )
+            
+            # Add new assignments
+            for user_name in new_tdtl:
+                user_code = df_users[df_users["NAME"] == user_name]["CODE"].iloc[0]
+                existing_assignment = df_reqassegnedto[
+                    (df_reqassegnedto['REQID'] == reqid) & 
+                    (df_reqassegnedto['USERID'] == user_code)
+                ]
+                
+                if existing_assignment.empty:
+                    cursor.execute(
+                        "INSERT INTO TORP_REQASSIGNEDTO (userid, reqid, status) VALUES (?, ?, ?)",
+                        (user_code, reqid, ACTIVE_STATUS)
+                    )
+                else:
+                    cursor.execute(
+                        "UPDATE TORP_REQASSIGNEDTO SET status = ? WHERE userid = ? AND reqid = ?",
+                        (ACTIVE_STATUS, user_code, reqid)
+                    )
+            
+            conn.commit()
             return True
         except Exception as e:
-            st.error(f"Error updating request status: {str(e)}", icon="🚨")
+            st.error(f"Error updating REQASSIGNEDTO: {str(e)}", icon="🚨")
+            conn.rollback()
             return False
+
+
 
     def save_workorder(wo: dict):
         # Get next available row ID

@@ -1,5 +1,10 @@
 import streamlit as st
 
+# Global variables
+APPNAME = "TORP" #IPH Technical Office Request POC (Proof Of Concept)
+APPCODE = "TORP"
+APPVERSION = "0.2"
+
 def display_app_info():
     """ Show app title and description """
     

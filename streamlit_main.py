@@ -989,7 +989,7 @@ def view_request():
 
 #######################################################################################################
 #######################################################################################################
-def manage_request_old():
+def manage_request():
     """
     Handle request assignments and management through a Streamlit interface.
     Includes request filtering, display, and assignment management functionality.

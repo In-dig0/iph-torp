@@ -828,20 +828,33 @@ def view_request():
     else:
         st.session_state.grid_data = df_requests_grid.copy() # Mostra tutti i dati se il filtro è None
 
-    # Inserire il CSS per evidenziare le righe in modo alternato
+    # # Inserire il CSS per evidenziare le righe in modo alternato
+    # st.markdown(
+    #     """
+    #     <style>
+    #     .ag-row:nth-child(even) {
+    #         background-color: #f2f2f2;
+    #     }
+    #     .ag-row:nth-child(odd) {
+    #         background-color: #ffffff;
+    #     }
+    #     </style>
+    #     """,
+    #     unsafe_allow_html=True,
+    # )
     st.markdown(
-        """
-        <style>
-        .ag-row:nth-child(even) {
-            background-color: #f2f2f2;
-        }
-        .ag-row:nth-child(odd) {
-            background-color: #ffffff;
-        }
-        </style>
-        """,
-        unsafe_allow_html=True,
-    )
+    """
+    <style>
+    .ag-row:nth-of-type(even) {
+        background-color: #f2f2f2;
+    }
+    .ag-row:nth-of-type(odd) {
+        background-color: #ffffff;
+    }
+    </style>
+    """,
+    unsafe_allow_html=True,
+)
     st.subheader("Request list:") 
     # Creazione/Aggiornamento della griglia (UNA SOLA VOLTA per ciclo di esecuzione)
     if st.session_state.grid_response is None:

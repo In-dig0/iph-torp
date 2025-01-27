@@ -880,7 +880,7 @@ def view_request():
         description = df_requests[df_requests["REQID"] == reqid]["DESCRIPTION"].values[0]
         note_td = df_requests[df_requests["REQID"] == reqid]["NOTE_TD"].values[0]
 
-        tdtl_code_list = df_reqassignedto[df_reqassignedto["REQID"] == reqid]["USERID"].tolist()
+        tdtl_code_list = df_reqassignedto[df_reqassignedto["REQID"] == reqid]["USERID"]
         tdtl_name_list = get_description_from_code(df_users, tdtl_code_list, "NAME")
 
         # Dati aggiornati

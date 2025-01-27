@@ -1559,7 +1559,8 @@ def manage_request():
             if st.button("🔄 Refresh", type="tertiary"):
                 reset_application_state()
         with col2:
-            if st.button("✏️ Modify", type="secondary"):
+            modify_button_disable = selected_rows is not None and isinstance(selected_rows, pd.DataFrame) and not selected_rows.empty
+            if st.button("✏️ Modify", type="secondary", disabled=modify_button_disable):
                 selected_rows = st.session_state.grid_response.get('selected_rows', None)
                 if selected_rows is not None and isinstance(selected_rows, pd.DataFrame) and not selected_rows.empty:
                     if 'dialog_shown' not in st.session_state:

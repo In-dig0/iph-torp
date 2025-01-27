@@ -1111,7 +1111,7 @@ def manage_request():
 
             st.divider()
             tdtl_usercode = df_lk_pline_tdtl["USER_CODE"].drop_duplicates().sort_values()
-            tdtl_username = df_users[df_users["CODE"].isin(tdtl_usercode)]
+            tdtl_username = df_users[df_users["CODE"].isin(tdtl_usercode)]["NAME"]
             #st.write(tdtl_usercode)
             #tdtl_username = df_users[df_users["CODE"] == tdtl_usercode]["NAME"].values[0]
             tdtl_tmp = st.multiselect(label=":blue[Tech Department Team Leader List]", options=tdtl_username, default=None, key="sb_tdtl_reqmanage", disabled=False)

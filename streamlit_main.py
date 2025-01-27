@@ -960,9 +960,9 @@ def view_request():
                 #styled-table th, #styled-table thead tr {
                     background-color: #8ebfde;
                 }
-                #styled-table tr:nth-child(odd) {
-                    background-color: #f9f9f9;
-                }
+                # #styled-table tr:nth-child(odd) {
+                #     background-color: #f9f9f9;
+                # }
             </style>
             """, unsafe_allow_html=True)
 

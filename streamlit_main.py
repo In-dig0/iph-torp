@@ -1035,7 +1035,7 @@ def manage_request():
             update_request_fn: Function to update request status and notes
 
         """
-        popup_title = f'Request {selected_row["IDROW"][0]}'
+        popup_title = f'Request {selected_row["REQID"][0]}'
         
         @st.dialog(popup_title, width="large")
         def dialog_content():
@@ -1068,31 +1068,26 @@ def manage_request():
             )
 
             # Extract request ID
-            req_idrow = int(selected_row["IDROW"][0][1:])
-            wo_idrow = int(selected_row["WOIDROW"][0])
+            req_id = selected_row["REQID"][0]
+            wo_id = selected_row["WOID"][0]
             # Display request details
-            st.text_input(label="Product family", value=selected_row['PR_FAMILY'][0], disabled=True)
-            st.text_input(label="Category", value=selected_row['CATEGORY'][0], disabled=True)
+            #st.text_input(label="Product family", value=selected_row['PR_FAMILY'][0], disabled=True)
+            #st.text_input(label="Category", value=selected_row['CATEGORY'][0], disabled=True)
+            #st.text_input(label="Detail", value=selected_row['DETAIL'][0], disabled=True)            
             st.text_input(label="Title", value=selected_row['TITLE'][0], disabled=True)
-            st.text_input(label="Detail", value=selected_row['DETAIL'][0], disabled=True)            
             st.text_area(label="Description", value=selected_row['DESCRIPTION'][0], disabled=True)
             st.divider()         
             idx_status = req_status_options.index(selected_row['STATUS'][0])
-            req_status = st.selectbox(label="Status", options=req_status_options, disabled=False, index=idx_status)
-            req_notes = st.text_area(label="Notes", value=selected_row['NOTES'][0], disabled=False)
-            if wo_idrow > 0:
-                wo_nr = "W" + str(selected_row['WOIDROW'][0]).zfill(4)
-            else:
-                wo_nr = ""
+            req_status = st.selectbox(label="Status", options=req_status_options, index=idx_status, disabled=False)
+            req_note_td = st.text_area(label="Notes", value=selected_row['NOTE_TD'][0], disabled=False)
             req_woassigned = st.text_input(label="Work Order", value=wo_nr, disabled=True)
-
-            if (selected_row['NOTES'][0] == req_notes) and (selected_row['STATUS'][0] == req_status):
+            if (selected_row['NOTE_TD'][0] == req_note_td) and (selected_row['STATUS'][0] == req_status):
                 disable_save_button = True
             else:
                 disable_save_button = False    
             # Handle save action
             if st.button("Save", type="primary", disabled=disable_save_button, key="req_save_button"):
-                success = update_request_fn(req_idrow, req_status, req_notes)               
+                success = update_request_fn(req_id, req_status, req_notetd)               
                 if success:
                     st.session_state.grid_refresh = True
                     st.session_state.grid_response = None

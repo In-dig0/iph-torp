@@ -1119,18 +1119,6 @@ def manage_request():
             tdtl = st.multiselect(label=":blue[Tech Department Team Leader]", options=tdtl_username_list, default=default_tdtl_name, key="sb_tdtl_reqmanage", disabled=False)
             
             idx_status = req_status_options.index(selected_row['STATUS'][0])
-            st.markdown(
-                """
-                <style>
-                /* Stile per il selectbox con identificatore unico */
-                div[data-testid="status_selectbox"] div[data-baseweb="select"] > div {
-                    color: green !important;
-                }
-                </style>
-                """,
-                unsafe_allow_html=True
-            )
-            # req_status = st.selectbox(label=":blue[Status]", options=req_status_options, index=idx_status, disabled=False)
             req_status = st.selectbox(label=":blue[Status]", options=req_status_options, index=idx_status, disabled=False, key="status_selectbox")
             default_note_td = df_requests[df_requests["REQID"] == reqid]["NOTE_TD"].values[0]
             req_note_td = st.text_area(label=":blue[Tech Department Notes]", value=default_note_td, disabled=False)

@@ -1110,7 +1110,7 @@ def manage_request():
             st.text_area(label="Description", value=description, disabled=True)
 
             st.divider()
-            tdtl_usercode = df_lk_pline_tdtl["USER_CODE"].values[0]
+            tdtl_usercode = df_lk_pline_tdtl["USER_CODE"]
             tdtl_username = list(df_users[df_users["CODE"] == tdtl_usercode]["NAME"])
             tdtl_tmp = st.multiselect(label=":blue[Tech Department Team Leader List]", options=tdtl_username, default=None, key="sb_tdtl_reqmanage", disabled=False)
 

@@ -188,6 +188,7 @@ def load_requests_data():
     global df_requests
     global df_reqassignedto
     
+    
     df_requests = pd.read_sql_query("""
     SELECT 
         A.reqid as REQID, 
@@ -1296,9 +1297,9 @@ def manage_request():
             # Add new assignments
             for user_name in new_tdtl:
                 user_code = df_users[df_users["NAME"] == user_name]["CODE"].iloc[0]
-                existing_assignment = df_reqassegnedto[
-                    (df_reqassegnedto['REQID'] == reqid) & 
-                    (df_reqassegnedto['USERID'] == user_code)
+                existing_assignment = df_reqassignedto[
+                    (df_reqassignedto['REQID'] == reqid) & 
+                    (df_reqassignedto['USERID'] == user_code)
                 ]
                 
                 if existing_assignment.empty:

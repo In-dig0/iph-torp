@@ -1044,7 +1044,7 @@ def manage_request():
                 """
                 <style>
                 div[data-testid="stTextInput"] > div > div > input:not([disabled]) {
-                    color: #28a745;
+                    color: #28a745; !important; 
                     border: 2px solid #28a745;
                     -webkit-text-fill-color: #28a745 !important;
                     font-weight: bold;

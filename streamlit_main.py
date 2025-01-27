@@ -1695,6 +1695,16 @@ def main():
 }    
   # Aggiungi l'immagine alla sidebar 
   st.sidebar.image("https://iph.it/wp-content/uploads/2020/02/logo-scritta.png", width=150)
+  st.markdown(
+    """
+    <style>
+    div[data-baseweb="select"] > div {
+        border: 2px solid red !important;
+    }
+    </style>
+    """,
+    unsafe_allow_html=True
+  )
   demo_name = st.sidebar.selectbox("Choose a function", page_names_to_funcs.keys())
   page_names_to_funcs[demo_name]()
 

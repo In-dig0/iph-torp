@@ -1699,7 +1699,7 @@ def main():
     """
     <style>
     div[data-baseweb="select"] > div {
-        border: 2px solid red !important;
+        border: 2px solid !important;
     }
     </style>
     """,

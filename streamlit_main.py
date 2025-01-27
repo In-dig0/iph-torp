@@ -1671,8 +1671,8 @@ def manage_wi():
         # Qui potresti implementare la logica per memorizzare e mostrare i task inseriti
 
 #######################################################################################################
-# def my_test():
-#     pass
+def my_test():
+     st.write("Local my_test(): --> OK")
 
 #######################################################################################################
 def main():

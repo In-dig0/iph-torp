@@ -883,7 +883,8 @@ def view_request():
         tdtl_code_list = df_reqassignedto[df_reqassignedto["REQID"] == reqid]["USERID"]
         #tdtl_name_list = get_description_from_code(df_users, tdtl_code_list, "NAME")
         tdtl_name_list = [get_description_from_code(df_users, code, "NAME") for code in tdtl_code_list]
-
+        tdtl_name_string = "-".join(lista_di_stdtl_name_list)
+        
         # Dati aggiornati
         data_out = {
             "Column name": [

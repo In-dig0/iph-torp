@@ -1672,7 +1672,7 @@ def main():
   st.set_page_config(layout="wide")  
   page_names_to_funcs = {
     "ℹ️ App Info": module_display_app_info.display_app_info(APPNAME, APPCODE, APPVERSION),
-    "📄 Insert Request": module_insert_request.insert_request(conn, cursor),
+    "📄 Insert Request": insert_request,
     "🔍 View Request ": view_request,
     "🗂️ Manage Request": manage_request,
     "📌 Manage Work Orders": manage_wo,

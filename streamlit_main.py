@@ -842,13 +842,26 @@ def view_request():
     #     """,
     #     unsafe_allow_html=True,
     # )
+    #     st.markdown(
+    #     """
+    #     <style>
+    #     .ag-row:nth-of-type(even) {
+    #         background-color: #f2f2f2;
+    #     }
+    #     .ag-row:nth-of-type(odd) {
+    #         background-color: #ffffff;
+    #     }
+    #     </style>
+    #     """,
+    #     unsafe_allow_html=True,
+    # )
     st.markdown(
     """
     <style>
-    .ag-row:nth-of-type(even) {
+    .ag-row-even {
         background-color: #f2f2f2;
     }
-    .ag-row:nth-of-type(odd) {
+    .ag-row-odd {
         background-color: #ffffff;
     }
     </style>

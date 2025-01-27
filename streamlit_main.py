@@ -11,6 +11,7 @@ from typing import Optional, Tuple, Dict, List
 # 3th party packages
 import mytest
 import module_display_app_info
+import module_insert_request
 import streamlit as st
 import pandas as pd
 import sqlitecloud
@@ -1671,7 +1672,7 @@ def main():
   st.set_page_config(layout="wide")  
   page_names_to_funcs = {
     " ℹ️  App Info": module_display_app_info.display_app_info,
-    "📄 Insert Request": insert_request,
+    "📄 Insert Request": module_insert_request.insert_request,
     "🔍 View Request ": view_request,
     "🗂️ Manage Request": manage_request,
     "📌 Manage Work Orders": manage_wo,

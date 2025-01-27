@@ -1108,10 +1108,15 @@ def manage_request():
 
             st.divider()
 
+            tdtl_codes = df_reqassignedto[df_reqassignedto == reqid]["USERID"]
+            # Richiama la funzione per ogni codice nella lista.
+            tdtl_descriptions = [get_description_from_code(df_users, code, "NAME") for code in tdtl_codes]
+            st.multiselect(label=":blue[TD Team Leader]", options=tdtl_descriptions, default=tdtl_descriptions, key="sb_tdtl_reqmanage", disabled=False)
+
             idx_status = req_status_options.index(selected_row['STATUS'][0])
-            req_status = st.selectbox(label="Status", options=req_status_options, index=idx_status, disabled=False)
+            req_status = st.selectbox(label=":blue[Status]", options=req_status_options, index=idx_status, disabled=False)
             default_note_td = df_requests[df_requests["REQID"] == reqid]["NOTE_TD"].values[0]
-            req_note_td = st.text_area(label="Tech Department Notes", value=default_note_td, disabled=False)
+            req_note_td = st.text_area(label=":blue[Tech Department Notes]", value=default_note_td, disabled=False)
 
             if (req_note_td == default_note_td) and (selected_row['STATUS'][0] == req_status):
                 disable_save_button = True

@@ -884,7 +884,7 @@ def view_request():
         #tdtl_name_list = get_description_from_code(df_users, tdtl_code_list, "NAME")
         tdtl_name_list = [get_description_from_code(df_users, code, "NAME") for code in tdtl_code_list]
         tdtl_name_string = "-".join(lista_di_stdtl_name_list)
-        
+
         # Dati aggiornati
         data_out = {
             "Column name": [
@@ -894,7 +894,7 @@ def view_request():
             "Column value": [
                 reqid, insdate, status, dept_name, requester_name, pline_name, 
                 family_name, type_name, category_name, detail_name, title, 
-                description, note_td, tdtl_name_list]
+                description, note_td, tdtl_name_string]
         }
         df_out = pd.DataFrame(data_out)
 

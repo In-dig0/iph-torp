@@ -1762,10 +1762,10 @@ def main():
     div[data-baseweb="input"] > div {
         border: 2px solid !important;
     }
-    #     /* Stile per st.text_area */
-    # div[data-baseweb="textarea"] > div {
-    #     border: 2px solid !important;
-    # }
+         /* Stile per st.text_area */
+     div[data-baseweb="textarea"] > div {
+         border: 2px solid !important;
+     }
     </style>
     """,
     unsafe_allow_html=True

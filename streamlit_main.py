@@ -1752,20 +1752,12 @@ def main():
   st.sidebar.image("https://iph.it/wp-content/uploads/2020/02/logo-scritta.png", width=150)
   
   st.markdown(
-    """
+        """
+    <style>
         /* Stile per st.selectbox */
     div[data-baseweb="select"] > div {
         border: 2px solid !important;
     }
-    <style>
-        /* Stile per st.text_input */
-    div[data-baseweb="input"] > div {
-        border: 2px solid !important;
-    }
-         /* Stile per st.text_area */
-     div[data-baseweb="textarea"] > div {
-         border: 2px solid !important;
-     }
     </style>
     """,
     unsafe_allow_html=True

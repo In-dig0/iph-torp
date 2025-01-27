@@ -1068,7 +1068,7 @@ def manage_request():
             )
 
             # Display Request ID
-            req_id = selected_row["REQID"][0]
+            reqid = selected_row["REQID"][0]
             # Display Product Line
             st.text_input(label="Product line", value=selected_row['PRLINE_NAME'][0], disabled=True)
             

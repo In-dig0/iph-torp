@@ -1123,7 +1123,7 @@ def manage_request():
             tdtl_name_list = tdtl_option["NAME"].tolist()
             #st.multiselect(label=":blue[TD Team Leader]", options=tdtl_name_list, default=tdtl_name_list, key="sb_tdtl2", disabled=True)
 
-            tdtl = st.multiselect(label=":blue[Tech Department Team Leader]", options=tdtl_default_descriptions, default=tdtl_name_list, key="sb_tdtl_reqmanage2", disabled=False)
+            tdtl = st.multiselect(label=":blue[Tech Department Team Leader]", options=tdtl_username, default=tdtl_name_list, key="sb_tdtl_reqmanage2", disabled=False)
             
             idx_status = req_status_options.index(selected_row['STATUS'][0])
             req_status = st.selectbox(label=":blue[Status]", options=req_status_options, index=idx_status, disabled=False)

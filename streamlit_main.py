@@ -1073,8 +1073,7 @@ def manage_request():
             selected_pline_name = selected_row['PRLINE_NAME'][0]
             selected_pline_code = df_pline[df_pline["NAME"] == selected_pline_name]["CODE"].values[0]
             st.text_input(label="Product line", value=selected_pline_name, disabled=True)
-
-            
+           
             # Display request details
 
             # dept_code = df_requests[df_requests["REQID"] == reqid]["DEPT"].values[0]
@@ -1098,10 +1097,7 @@ def manage_request():
 
             # tdtl_code = df_reqassignedto[df_reqassignedto["REQID"] == reqid]["USERID"].values[0]
             # tdtl_name = get_description_from_code(df_users, tdtl_code, "NAME")
-
-            #st.text_input(label="Product family", value=selected_row['PR_FAMILY'][0], disabled=True)
-            #st.text_input(label="Category", value=selected_row['CATEGORY'][0], disabled=True)
-            #st.text_input(label="Detail", value=selected_row['DETAIL'][0], disabled=True)            
+       
             
             # Display Title
             st.text_input(label="Title", value=selected_row['TITLE'][0], disabled=True)
@@ -1110,6 +1106,7 @@ def manage_request():
             st.text_area(label="Description", value=description, disabled=True)
 
             st.divider()
+
             # Display TD Team Leader            
             tdtl_usercode = df_lk_pline_tdtl["USER_CODE"].drop_duplicates().sort_values()
             tdtl_username_list = df_users[df_users["CODE"].isin(tdtl_usercode)]["NAME"]                        
@@ -1118,8 +1115,11 @@ def manage_request():
             default_tdtl_name = tdtl_option["NAME"].tolist()
             tdtl = st.multiselect(label=":blue[Tech Department Team Leader]", options=tdtl_username_list, default=default_tdtl_name, key="sb_tdtl_reqmanage", disabled=False)
             
+            # Display Status 
             idx_status = req_status_options.index(selected_row['STATUS'][0])
             req_status = st.selectbox(label=":blue[Status]", options=req_status_options, index=idx_status, disabled=False, key="status_selectbox")
+            
+            # Display Tech Dept Note
             default_note_td = df_requests[df_requests["REQID"] == reqid]["NOTE_TD"].values[0]
             req_note_td = st.text_area(label=":blue[Tech Department Notes]", value=default_note_td, disabled=False)
 
@@ -1139,7 +1139,6 @@ def manage_request():
                     time.sleep(3)
                     reset_application_state()
                     st.rerun()
-
 
             return False
 
@@ -1538,7 +1537,7 @@ def manage_request():
                         )
      
         with col3:
-            if st.button("💎 Work Order", type="secondary"):
+            if st.button("📌 Work Order", type="secondary"):
                 selected_rows = st.session_state.grid_response.get('selected_rows', None)
                 if selected_rows is not None and isinstance(selected_rows, pd.DataFrame) and not selected_rows.empty:
                     if 'dialog_shown' not in st.session_state:

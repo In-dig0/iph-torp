@@ -561,7 +561,7 @@ def insert_request() -> None:
             tdtl_codes = request["Req_tdtl"]
             # Richiama la funzione per ogni codice nella lista.
             tdtl_descriptions = [get_description_from_code(df_users, code, "NAME") for code in tdtl_codes]
-            st.multiselect(label=":blue[TD Team Leader]", options=tdtl_descriptions, default=tdtl_descriptions, key="sb_tdtl", disabled=True)
+            st.multiselect(label=":blue[Tech Department Team Leader]", options=tdtl_descriptions, default=tdtl_descriptions, key="sb_tdtl", disabled=True)
 
             if st.button("Close"):
                 st.session_state.reset_form = True
@@ -1114,7 +1114,7 @@ def manage_request():
             tdtl_default_codes = df_reqassignedto[df_reqassignedto["REQID"] == reqid]["USERID"]
             # Richiama la funzione per ogni codice nella lista.
             tdtl_default_descriptions = [get_description_from_code(df_users, code, "NAME") for code in tdtl_default_codes]
-            st.multiselect(label=":blue[Tech Department Team Leader]", options=tdtl_descriptions, default=tdtl_default_descriptions, key="sb_tdtl_reqmanage", disabled=False)
+            tdtl = st.multiselect(label=":blue[Tech Department Team Leader]", options=tdtl_descriptions, default=tdtl_default_descriptions, key="sb_tdtl_reqmanage", disabled=False)
 
             idx_status = req_status_options.index(selected_row['STATUS'][0])
             req_status = st.selectbox(label=":blue[Status]", options=req_status_options, index=idx_status, disabled=False)

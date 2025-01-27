@@ -1556,8 +1556,8 @@ def manage_request():
     with st.container():
 
         selected_rows = st.session_state.grid_response.get('selected_rows', None)
-        modify_request_button_disable = selected_rows is not None and isinstance(selected_rows, pd.DataFrame) and not selected_rows.empty
-        workorder_button_disable = selected_rows is not None and isinstance(selected_rows, pd.DataFrame) and not selected_rows.empty
+        modify_request_button_disable = not (selected_rows is not None and isinstance(selected_rows, pd.DataFrame) and not selected_rows.empty)
+        workorder_button_disable = not (selected_rows is not None and isinstance(selected_rows, pd.DataFrame) and not selected_rows.empty)
 
         col1, col2, col3 = st.columns([1, 1, 4])
         with col1:

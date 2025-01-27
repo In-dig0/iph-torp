@@ -2,7 +2,7 @@ import streamlit as st
 from dataclasses import dataclass
 from typing import Optional, Tuple, Dict, List
 
-def insert_request() -> None:
+def insert_request(conn, cursor) -> None:
     """Main function to handle request insertion"""
     @dataclass
     class RequestData:

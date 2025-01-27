@@ -217,6 +217,7 @@ def load_requests_data():
         A.reqid as REQID,
         A.status as STATUS 
     FROM TORP_REQASSIGNEDTO A
+    WHERE A.status = "ACTIVE"
     ORDER by USERID desc
     """, conn)
 

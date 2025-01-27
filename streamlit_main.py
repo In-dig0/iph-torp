@@ -881,7 +881,8 @@ def view_request():
         note_td = df_requests[df_requests["REQID"] == reqid]["NOTE_TD"].values[0]
 
         tdtl_code_list = df_reqassignedto[df_reqassignedto["REQID"] == reqid]["USERID"]
-        tdtl_name_list = get_description_from_code(df_users, tdtl_code_list, "NAME")
+        #tdtl_name_list = get_description_from_code(df_users, tdtl_code_list, "NAME")
+        tdtl_name_list = [get_description_from_code(df_users, code, "NAME") for code in tdtl_code_list]
 
         # Dati aggiornati
         data_out = {

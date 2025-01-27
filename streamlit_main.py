@@ -1115,15 +1115,15 @@ def manage_request():
             tdtl_username_list = df_users[df_users["CODE"].isin(tdtl_usercode)]["NAME"]                        
             tdtl_default_codes = df_reqassignedto[df_reqassignedto["REQID"] == reqid]["USERID"]
             tdtl_option = df_users[df_users["CODE"].isin(tdtl_default_codes)]    
-            tdtl_name = tdtl_option["NAME"].tolist()
-            tdtl = st.multiselect(label=":blue[Tech Department Team Leader]", options=tdtl_username_list, default=tdtl_name, key="sb_tdtl_reqmanage", disabled=False)
+            default_tdtl_name = tdtl_option["NAME"].tolist()
+            tdtl = st.multiselect(label=":blue[Tech Department Team Leader]", options=tdtl_username_list, default=default_tdtl_name, key="sb_tdtl_reqmanage", disabled=False)
             
             idx_status = req_status_options.index(selected_row['STATUS'][0])
             req_status = st.selectbox(label=":blue[Status]", options=req_status_options, index=idx_status, disabled=False)
             default_note_td = df_requests[df_requests["REQID"] == reqid]["NOTE_TD"].values[0]
             req_note_td = st.text_area(label=":blue[Tech Department Notes]", value=default_note_td, disabled=False)
 
-            if (req_note_td == default_note_td) and (selected_row['STATUS'][0] == req_status):
+            if (req_note_td == default_note_td) and (selected_row['STATUS'][0] == req_status) and (tdtl == tdtl_name):
                 disable_save_button = True
             else:
                 disable_save_button = False    

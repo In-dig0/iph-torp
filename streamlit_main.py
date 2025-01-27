@@ -1689,7 +1689,7 @@ def main():
     "📌 Manage Work Orders": manage_wo,
     "🛠️ Manage Work Items": manage_wi,
     "🔐 Close db": close_sqlitecloud_db,
-    "MYTEST": my_test
+    "MYTEST": my_test()
 }    
   # Aggiungi l'immagine alla sidebar 
   st.sidebar.image("https://iph.it/wp-content/uploads/2020/02/logo-scritta.png", width=150)

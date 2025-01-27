@@ -10,6 +10,7 @@ from typing import Optional, Tuple, Dict, List
 
 # 3th party packages
 import mytest
+import module_display_app_info
 import streamlit as st
 import pandas as pd
 import sqlitecloud
@@ -1682,7 +1683,7 @@ def main():
   load_initial_data()
   st.set_page_config(layout="wide")  
   page_names_to_funcs = {
-    " ℹ️  App Info": display_app_info,
+    " ℹ️  App Info": module_display_app_info.display_app_info,
     "📄 Insert Request": insert_request,
     "🔍 View Request ": view_request,
     "🗂️ Manage Request": manage_request,

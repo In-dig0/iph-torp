@@ -760,7 +760,7 @@ def view_request():
         function(params) {
             if (params.column.colId === 'REQID') {
                        return {
-                        'backgroundColor': '#CCE9E4',
+                        'backgroundColor': '#8ebfde',
                         'color': '#111810',
                         'fontWeight': 'bold'
                     };

@@ -549,7 +549,9 @@ def insert_request() -> None:
                 unsafe_allow_html=True
             )          
                
-            st.text_input(label=":blue[Requester]", value=request["Req_requester"], disabled=True)
+            requester_code = request["Req_requester"]
+            requester_name = get_description_from_code(df_users, code, "NAME")
+            st.text_input(label=":blue[Requester]", value=requester_name, disabled=True)
             st.text_input(label=":blue[Request title]", value=request["Req_title"], disabled=True)
             st.text_area(label=":blue[Request description]", value=request["Req_description"], disabled=True)
             
@@ -557,7 +559,7 @@ def insert_request() -> None:
             idx_status = req_status_options.index(request["Req_status"])
             st.selectbox(label=":blue[Request status]", options=req_status_options, disabled=True, index=idx_status)
 
-            df = request_manager.df_users
+            #df = request_manager.df_users
             # La lista di codici che vuoi convertire in descrizioni.
             tdtl_codes = request["Req_tdtl"]
             # Richiama la funzione per ogni codice nella lista.

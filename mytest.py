@@ -1,1 +1,2 @@
-print(f"test compleato con successo!!")
+def my_test():
+  print(f"test completato con successo!!")

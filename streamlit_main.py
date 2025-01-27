@@ -1111,8 +1111,8 @@ def manage_request():
 
             st.divider()
             tdtl_usercode = df_lk_pline_tdtl[df_lk_pline_tdtl["PLINE_CODE"] == selected_pline_code]["USER_CODE"]
-            tdtl_username = df_users[df_requests["CODE"] == tdtl_usercode]["NAME"]
-            tdtl_tmp = st.multiselect(label=":blue[Tech Department Team Leader List]", options=tdtl_username, default=tdtl_username, key="sb_tdtl_reqmanage", disabled=False)
+            tdtl_username = list(df_users[df_users["CODE"] == tdtl_usercode]["NAME"])
+            tdtl_tmp = st.multiselect(label=":blue[Tech Department Team Leader List]", options=tdtl_username, default=None, key="sb_tdtl_reqmanage", disabled=False)
 
 
             tdtl_default_codes = df_reqassignedto[df_reqassignedto["REQID"] == reqid]["USERID"]

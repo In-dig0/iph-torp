@@ -1070,7 +1070,10 @@ def manage_request():
             # Display Request ID
             reqid = selected_row["REQID"][0]
             # Display Product Line
-            st.text_input(label="Product line", value=selected_row['PRLINE_NAME'][0], disabled=True)
+            selected_pline_name = selected_row['PRLINE_NAME'][0]
+            selected_pline_code = df_pline[df_pline["NAME"] == selected_pline_name]["CODE"].values[0]
+            st.text_input(label="Product line", value=selected_pline_name, disabled=True)
+
             
             # Display request details
 
@@ -1107,7 +1110,7 @@ def manage_request():
             st.text_area(label="Description", value=description, disabled=True)
 
             st.divider()
-
+            tdtl_descriptions = df_lk_pline_tdtl[df_lk_pline_tdtl["PLINECODE"] == selected_pline_code]["USERCODE"]
             tdtl_default_codes = df_reqassignedto[df_reqassignedto["REQID"] == reqid]["USERID"]
             # Richiama la funzione per ogni codice nella lista.
             tdtl_default_descriptions = [get_description_from_code(df_users, code, "NAME") for code in tdtl_default_codes]

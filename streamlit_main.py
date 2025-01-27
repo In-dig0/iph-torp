@@ -55,7 +55,6 @@ def open_sqlitecloud_db():
     global cursor
     cursor = conn.cursor()
 
-
 #######################################################################################################
 def close_sqlitecloud_db():
     with st.container(border=True):
@@ -68,7 +67,21 @@ def close_sqlitecloud_db():
             st.error(f"**ERROR closing database connection: \n{errMsg}", icon="🚨")
         else:
             st.success(f"Database closed successfully!")   
-
+            
+#######################################################################################################
+def display_app_info() -> None:
+    """ Show app title and description """
+    
+    st.header(":blue[TORP Web Application]", divider="blue")
+    st.subheader(
+        """
+        TORP - Technical Office Requests POC (Proof Of Concept), is a simple web application to manage requests to IPH Technical Office.
+        """
+    )
+    st.markdown(f":grey[Version: {APPVERSION}]")
+    st.divider()
+    st.markdown("Powered with Streamlit :streamlit:")
+    
 #######################################################################################################
 def load_initial_data() -> None:
     """Load initial data from database"""

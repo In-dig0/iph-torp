@@ -748,13 +748,9 @@ def view_request():
     df_requests_grid['TITLE'] = df_requests['TITLE']
     df_requests_grid['REQUESTER_NAME'] = df_requests['REQUESTER'].apply(lambda requester_code: get_description_from_code(df_users, requester_code, "NAME"))
 
-    #df_requests_grid['REQUESTERNAME'] = df_requests['REQUESTER'].apply(lambda requester_code: get_description_from_code(df_users, requester_code, "NAME"))
-
-
     if st.session_state.grid_refresh:
         st.session_state.grid_data = df_requests_grid.copy()
         st.session_state.grid_refresh = False    
-        #df_requests_grid["INSDATE"] = pd.to_datetime(df_requests_grid["INSDATE"], format="%Y-%m-%d")
 
     cellStyle = JsCode("""
         function(params) {
@@ -1238,48 +1234,7 @@ def manage_request():
             return False
 
         return dialog_content()
-#######################################
-
-    # # Database queries
-    # def fetch_requests():
-    #     query = """
-    #     SELECT 
-    #         idrow as IDROW, 
-    #         status as STATUS,
-    #         insdate as DATE, 
-    #         deptcode as DEPTCODE, 
-    #         requestername as REQUESTERNAME,
-    #         priority as PRIORITY, 
-    #         pline as PR_LINE, 
-    #         pfamily as PR_FAMILY,
-    #         type as TYPE, 
-    #         category as CATEGORY, 
-    #         title as TITLE,
-    #         description as DESCRIPTION,
-    #         notes as NOTES,
-    #         woidrow as WOIDROW
-    #         detail as DETAIL,
-    #     FROM TORP_REQUESTS
-    #     ORDER BY IDROW DESC
-    #     """
-    #     df = pd.read_sql_query(query, conn)
-    #     df["DATE"] = pd.to_datetime(df["DATE"], format="%Y-%m-%d")
-    #     df["IDROW"] = 'R' + df["IDROW"].astype(str).str.zfill(4)
-    #     return df
-
-    # def fetch_users():
-    #     query = """
-    #     SELECT 
-    #         A.code AS CODE, 
-    #         A.name AS NAME, 
-    #         A.deptcode AS DEPTCODE, 
-    #         B.name AS DEPTNAME
-    #     FROM TORP_USERS A
-    #     INNER JOIN TORP_DEPARTMENTS B ON B.code = A.deptcode
-    #     ORDER BY A.name
-    #     """
-    #     return pd.read_sql_query(query, conn)
-    
+   
 
     # Database update functions
     def update_request(idrow_nr, new_status, new_notes, new_woidrow=0):
@@ -1396,12 +1351,6 @@ def manage_request():
         return builder.build()
 
 
-    # Main execution
-    # df_users = fetch_users()    
-    # df_requests = fetch_requests()
-    # df_workorders = fetch_workorders()    
-    # df_woassegnedto = fetch_assigned_wo()
-
     load_initial_data()
     load_requests_data()
     load_workorders_data()
@@ -1451,7 +1400,6 @@ def manage_request():
         fit_columns_on_grid_load=False,
         update_mode=GridUpdateMode.MODEL_CHANGED,
         data_return_mode=DataReturnMode.AS_INPUT,
-        #key="main_grid"
         key=f"main_grid_{st.session_state.grid_refresh_key}"
     )
     # Add refresh button in a container below the grid

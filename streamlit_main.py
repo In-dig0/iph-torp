@@ -1116,7 +1116,7 @@ def manage_request():
 
 
             # Applicazione del filtro basato sui codici di utenti
-            tdtl_default_codes = df_reqassignedto[df_reqassignedto["REQID"] == reqid]["USERCODE"]
+            tdtl_default_codes = df_reqassignedto[df_reqassignedto["REQID"] == reqid]["USER_CODE"]
             tdtl_option = df_users[df_users["CODE"].isin(tdtl_default_codes)]
             # Creazione della lista di opzioni per il multiselect
             tdtl_code_list = tdtl_option["CODE"].tolist()        

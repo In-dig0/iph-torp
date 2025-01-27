@@ -1110,9 +1110,10 @@ def manage_request():
             st.text_area(label="Description", value=description, disabled=True)
 
             st.divider()
+            # Display TD Team Leader            
             tdtl_usercode = df_lk_pline_tdtl["USER_CODE"].drop_duplicates().sort_values()
-            tdtl_username = df_users[df_users["CODE"].isin(tdtl_usercode)]["NAME"]
-            tdtl_tmp = st.multiselect(label=":blue[Tech Department Team Leader List]", options=tdtl_username, default=None, key="sb_tdtl_reqmanage", disabled=False)
+            tdtl_username_list = df_users[df_users["CODE"].isin(tdtl_usercode)]["NAME"]
+            #tdtl_tmp = st.multiselect(label=":blue[Tech Department Team Leader List]", options=tdtl_username, default=None, key="sb_tdtl_reqmanage", disabled=False)
 
 
             # Applicazione del filtro basato sui codici di utenti
@@ -1120,10 +1121,10 @@ def manage_request():
             tdtl_option = df_users[df_users["CODE"].isin(tdtl_default_codes)]
             # Creazione della lista di opzioni per il multiselect
             tdtl_code_list = tdtl_option["CODE"].tolist()        
-            tdtl_name_list = tdtl_option["NAME"].tolist()
+            tdtl_name = tdtl_option["NAME"].tolist()
             #st.multiselect(label=":blue[TD Team Leader]", options=tdtl_name_list, default=tdtl_name_list, key="sb_tdtl2", disabled=True)
 
-            tdtl = st.multiselect(label=":blue[Tech Department Team Leader]", options=tdtl_username, default=tdtl_name_list, key="sb_tdtl_reqmanage2", disabled=False)
+            tdtl = st.multiselect(label=":blue[Tech Department Team Leader]", options=tdtl_username_list, default=tdtl_name, key="sb_tdtl_reqmanage2", disabled=False)
             
             idx_status = req_status_options.index(selected_row['STATUS'][0])
             req_status = st.selectbox(label=":blue[Status]", options=req_status_options, index=idx_status, disabled=False)

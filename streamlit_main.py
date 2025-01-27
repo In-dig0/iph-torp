@@ -1757,11 +1757,11 @@ def main():
     div[data-baseweb="select"] > div {
         border: 2px solid !important;
     }
-    # <style>
-    #     /* Stile per st.text_input */
-    # div[data-baseweb="input"] > div {
-    #     border: 2px solid !important;
-    # }
+    <style>
+        /* Stile per st.text_input */
+    div[data-baseweb="input"] > div {
+        border: 2px solid !important;
+    }
     #     /* Stile per st.text_area */
     # div[data-baseweb="textarea"] > div {
     #     border: 2px solid !important;

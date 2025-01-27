@@ -1123,7 +1123,7 @@ def manage_request():
             default_note_td = df_requests[df_requests["REQID"] == reqid]["NOTE_TD"].values[0]
             req_note_td = st.text_area(label=":blue[Tech Department Notes]", value=default_note_td, disabled=False)
 
-            if (req_note_td == default_note_td) and (selected_row['STATUS'][0] == req_status) and (tdtl == tdtl_name):
+            if (req_note_td == default_note_td) and (selected_row['STATUS'][0] == req_status) and (tdtl == default_tdtl_name):
                 disable_save_button = True
             else:
                 disable_save_button = False    

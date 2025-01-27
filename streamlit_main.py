@@ -1110,12 +1110,17 @@ def manage_request():
             st.text_area(label="Description", value=description, disabled=True)
 
             st.divider()
-            tdtl_descriptions = df_lk_pline_tdtl[df_lk_pline_tdtl["PLINE_CODE"] == selected_pline_code]["USER_CODE"]
+            tdtl_usercode = df_lk_pline_tdtl[df_lk_pline_tdtl["PLINE_CODE"] == selected_pline_code]["USER_CODE"]
+            tdtl_username = df_users[df_requests["CODE"] == tdtl_usercode]["NAME"]
+            tdtl_tmp = st.multiselect(label=":blue[Tech Department Team Leader List]", options=tdtl_username, default=tdtl_username, key="sb_tdtl_reqmanage", disabled=False)
+
+
             tdtl_default_codes = df_reqassignedto[df_reqassignedto["REQID"] == reqid]["USERID"]
             # Richiama la funzione per ogni codice nella lista.
             tdtl_default_descriptions = [get_description_from_code(df_users, code, "NAME") for code in tdtl_default_codes]
-            tdtl = st.multiselect(label=":blue[Tech Department Team Leader]", options=tdtl_descriptions, default=tdtl_default_descriptions, key="sb_tdtl_reqmanage", disabled=False)
-
+            tdtl = st.multiselect(label=":blue[Tech Department Team Leader]", options=tdtl_default_descriptions, default=tdtl_default_descriptions, key="sb_tdtl_reqmanage", disabled=False)
+            tdtl_tmp = st.multiselect(label=":blue[Tech Department Team Leader List]", options=tdtl_descriptions, default=tdtl_default_descriptions, key="sb_tdtl_reqmanage", disabled=False)
+            
             idx_status = req_status_options.index(selected_row['STATUS'][0])
             req_status = st.selectbox(label=":blue[Status]", options=req_status_options, index=idx_status, disabled=False)
             default_note_td = df_requests[df_requests["REQID"] == reqid]["NOTE_TD"].values[0]

@@ -1051,9 +1051,9 @@ def manage_request():
                 }
 
                 div[data-testid="stTextInput"] > div > div input[disabled] {
-                    color: #28a745 !important;  
+                    color: #6c757d !important;  
                     opacity: 1 !important;
-                    -webkit-text-fill-color: #28a745 !important;
+                    -webkit-text-fill-color: #6c757d !important;
                     background-color: #e9ecef !important;
                     border: 1px solid #ced4da !important;
                     font-style: italic;

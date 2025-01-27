@@ -1554,13 +1554,17 @@ def manage_request():
     
     # Add refresh button in a container below the grid
     with st.container():
+
+        selected_rows = st.session_state.grid_response.get('selected_rows', None)
+        modify_request_button_disable = selected_rows is not None and isinstance(selected_rows, pd.DataFrame) and not selected_rows.empty
+        workorder_button_disable = selected_rows is not None and isinstance(selected_rows, pd.DataFrame) and not selected_rows.empty
+
         col1, col2, col3 = st.columns([1, 1, 4])
         with col1:
             if st.button("🔄 Refresh", type="tertiary"):
                 reset_application_state()
         with col2:
-            modify_button_disable = selected_rows is not None and isinstance(selected_rows, pd.DataFrame) and not selected_rows.empty
-            if st.button("✏️ Modify", type="secondary", disabled=modify_button_disable):
+            if st.button("✏️ Modify", type="secondary", disabled=modify_request_button_disable):
                 selected_rows = st.session_state.grid_response.get('selected_rows', None)
                 if selected_rows is not None and isinstance(selected_rows, pd.DataFrame) and not selected_rows.empty:
                     if 'dialog_shown' not in st.session_state:
@@ -1580,7 +1584,7 @@ def manage_request():
                         )
      
         with col3:
-            if st.button("📌 Work Order", type="secondary"):
+            if st.button("📌 Work Order", type="secondary", disabled=workorder_button_disable):
                 selected_rows = st.session_state.grid_response.get('selected_rows', None)
                 if selected_rows is not None and isinstance(selected_rows, pd.DataFrame) and not selected_rows.empty:
                     if 'dialog_shown' not in st.session_state:

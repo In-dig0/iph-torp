@@ -1671,8 +1671,8 @@ def main():
   load_initial_data()
   st.set_page_config(layout="wide")  
   page_names_to_funcs = {
-    " ℹ️  App Info": module_display_app_info.display_app_info,
-    "📄 Insert Request": module_insert_request.insert_request,
+    " ℹ️  App Info": module_display_app_info.display_app_info(APPNAME, APPCODE, APPVERSION)
+    "📄 Insert Request": module_insert_request.insert_request(conn, cursor),
     "🔍 View Request ": view_request,
     "🗂️ Manage Request": manage_request,
     "📌 Manage Work Orders": manage_wo,
@@ -1684,7 +1684,6 @@ def main():
   st.sidebar.image("https://iph.it/wp-content/uploads/2020/02/logo-scritta.png", width=150)
   demo_name = st.sidebar.selectbox("Choose a function", page_names_to_funcs.keys())
   page_names_to_funcs[demo_name]()
-
 
 if __name__ == "__main__":
     main()

@@ -824,7 +824,7 @@ def view_request():
 
     # Filtro e AGGIORNAMENTO DEI DATI (utilizzando la sessione)
     if requestername_filter:
-        st.session_state.grid_data = df_requests_grid.loc[df_requests_grid["REQUESTERNAME"] == requestername_filter].copy()
+        st.session_state.grid_data = df_requests_grid.loc[df_requests_grid["REQUESTER_NAME"] == requestername_filter].copy()
     else:
         st.session_state.grid_data = df_requests_grid.copy() # Mostra tutti i dati se il filtro è None
 

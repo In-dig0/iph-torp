@@ -1070,7 +1070,7 @@ def manage_request():
             # Extract request ID
             req_id = selected_row["REQID"][0]
             # Display request details
-            st.text_input(label="Product line", value=selected_row['PR_LINE'][0], disabled=True)
+            st.text_input(label="Product line", value=selected_row['PRLINE_NAME'][0], disabled=True)
             #st.text_input(label="Product family", value=selected_row['PR_FAMILY'][0], disabled=True)
             #st.text_input(label="Category", value=selected_row['CATEGORY'][0], disabled=True)
             #st.text_input(label="Detail", value=selected_row['DETAIL'][0], disabled=True)            

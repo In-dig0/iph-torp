@@ -1,4 +1,4 @@
-import streamlit
+import streamlit as st
 
 def display_app_info():
     """ Show app title and description """

@@ -1,2 +1,5 @@
+import streamlit as st
+
 def my_test():
-  print(f"test completato con successo!!")
+  print(f"Modulo mytest")
+  st.write(f"test completato con successo!!")

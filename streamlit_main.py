@@ -1671,7 +1671,7 @@ def main():
   load_initial_data()
   st.set_page_config(layout="wide")  
   page_names_to_funcs = {
-    " ℹ️  App Info": module_display_app_info.display_app_info(APPNAME, APPCODE, APPVERSION)
+    "ℹ️ App Info": module_display_app_info.display_app_info(APPNAME, APPCODE, APPVERSION),
     "📄 Insert Request": module_insert_request.insert_request(conn, cursor),
     "🔍 View Request ": view_request,
     "🗂️ Manage Request": manage_request,

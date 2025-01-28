@@ -1241,24 +1241,19 @@ def manage_request():
             if not wo_timeqty_filtered.empty:
                 wo_timeqty_default = int(wo_timeqty_filtered.values[0])
             else:
-                wo_timeqty_default = 0  # O un valore di default appropriato                    
+                wo_timeqty_default = None  # O un valore di default appropriato                    
                  
             
             #wo_woid = st.text_input(label="Work Order", value=wo_nr, disabled=True)        
             wo_type = st.selectbox(label="Type(:red[*])", options=wo_type_options, index=wo_type_index, disabled=False)
-            wo_time_qty = st.number_input(label="Time estimated(:red[*]):", min_value=0.0, step=0.5)
-            wo_time_um = "H"    
-            wo_startdate = st.date_input(label="Start date", format="DD/MM/YYYY", value=wo_startdate_default, disabled=False)
-            wo_enddate = st.date_input(label="End date", format="DD/MM/YYYY", value=wo_enddate_default, disabled=False)
-
-            
+            wo_time_qty = st.number_input(label="Time estimated(:red[*]):", value=wo_timeqty_default, min_value=0.0, step=0.5)
+            wo_time_um = "H" 
 
             # Tech Dept (TD) user assignment selection
             filtered_woassignedto = df_woassignedto[
                 (df_woassignedto["WOID"] == woid) & 
                 (df_woassignedto["STATUS"] == active_status)
             ]
-
             wo_assignedto_default = list(filtered_woassignedto["USERNAME"])
             df_tdusers = df_users[df_users["DEPTCODE"] == default_dept_code]
             wo_assignedto_option = list(df_tdusers["NAME"])
@@ -1271,6 +1266,9 @@ def manage_request():
                 disabled=False
             )
 
+            wo_startdate = st.date_input(label="Start date", format="DD/MM/YYYY", value=wo_startdate_default, disabled=False)
+            wo_enddate = st.date_input(label="End date", format="DD/MM/YYYY", value=wo_enddate_default, disabled=False)
+       
 
             if not wo_nr.empty:
                 if (wo_type == wo_type_default and wo_startdate == wo_startdate_default and wo_enddate == wo_enddate_default and wo_assignedto == wo_assignedto_default and wo_time_qty == wo_timeqty_default):

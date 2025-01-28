@@ -1251,23 +1251,23 @@ def manage_request():
 
             
 
-#             # Tech Dept (TD) user assignment selection
-#             filtered_woassignedto = df_woassegnedto[
-#                 (df_woassegnedto["WOID"] == wo_nr) & 
-#                 (df_woassegnedto["STATUS"] == active_status)
-#             ]
+            # Tech Dept (TD) user assignment selection
+            filtered_woassignedto = df_woassegnedto[
+                (df_woassegnedto["WOID"] == woid) & 
+                (df_woassegnedto["STATUS"] == active_status)
+            ]
 
-#             wo_assignedto_default = list(filtered_woassignedto["USERNAME"])
-#             df_tdusers = df_users[df_users["DEPTCODE"] == default_dept_code]
-#             wo_assignedto_option = list(df_tdusers["NAME"])
-#             wo_assignedto_title = "Assigned to (:red[*]):"
-#             wo_assignedto = st.multiselect(
-#                 label=wo_assignedto_title, 
-#                 options=wo_assignedto_option, 
-#                 default=wo_assignedto_default, 
-#                 max_selections=3,
-#                 disabled=False
-#             )
+            wo_assignedto_default = list(filtered_woassignedto["USERNAME"])
+            df_tdusers = df_users[df_users["DEPTCODE"] == default_dept_code]
+            wo_assignedto_option = list(df_tdusers["NAME"])
+            wo_assignedto_title = "Assigned to (:red[*]):"
+            wo_assignedto = st.multiselect(
+                label=wo_assignedto_title, 
+                options=wo_assignedto_option, 
+                default=wo_assignedto_default, 
+                max_selections=3,
+                disabled=False
+            )
 
 
 #             if woidrow > 0:

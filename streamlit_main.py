@@ -1165,7 +1165,7 @@ def manage_request():
             update_request_fn: Function to update request status and notes
             update_assignments_fn: Function to update request assignments
         """
-        popup_title = f'Work Order related to request {selected_row["IDROW"][0]}'
+        popup_title = f'Work Order related to request {selected_row["REQID"][0]}'
         
         @st.dialog(popup_title, width="large")
         def dialog_content():
@@ -1203,7 +1203,7 @@ def manage_request():
             # Display request details
 #            st.text_input(label="Product family", value=selected_row['PR_FAMILY'][0], disabled=True)
 #            st.text_input(label="Category", value=selected_row['CATEGORY'][0], disabled=True)
-            st.text_input(label="Request Id", value=reqid, disabled=True)
+            #st.text_input(label="Request Id", value=reqid, disabled=True)
             st.text_input(label="Request title", value=selected_row['TITLE'][0], disabled=True)
             st.text_input(label="Request description", value=selected_row['DESCRIPTION'][0], disabled=True)
             #st.text_area(label="Detail", value=selected_row['DETAIL'][0], disabled=True)

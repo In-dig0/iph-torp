@@ -253,7 +253,6 @@ def load_workorders_data():
     ORDER BY REQID
     """, conn)
 
-
     df_woassignedto = pd.read_sql_query("""
     SELECT 
         A.userid AS USERID, 
@@ -261,8 +260,8 @@ def load_workorders_data():
         A.status AS STATUS, 
         B.name AS USERNAME 
     FROM TORP_WOASSIGNEDTO A
+    INNER JOIN TORP_USERS B ON B.code = A.userid    
     WHERE A.status = 'ACTIVE'
-    INNER JOIN TORP_USERS B ON B.code = A.userid
     ORDER BY WOID
     """, conn)
 

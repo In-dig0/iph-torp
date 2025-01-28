@@ -1250,7 +1250,7 @@ def manage_request():
             df_tdusers = df_users[df_users["DEPTCODE"] == default_dept_code]
             wo_tdtm_options = df_reqassignedto[df_reqassignedto["REQID"]==reqid]["USERNAME"]
             wo_tdtm_name = st.selectbox(label="Tech Department Team Leader(:red[*])", options=wo_tdtm_options, index=None, disabled=False)
-            wo_tdtm_code = df_tdusers[df_tdusers["NAME"]==wo_tdtm_name]["CODE"].value[0]        
+            wo_tdtm_code = df_tdusers[df_tdusers["NAME"]==wo_tdtm_name]["CODE"].values[0]       
             wo_type = st.selectbox(label="Type(:red[*])", options=wo_type_options, index=wo_type_index, disabled=False)
             wo_time_qty = st.number_input(label="Time estimated(:red[*]):", min_value=wo_timeqty_default, step=0.5)
             wo_time_um = "H" 

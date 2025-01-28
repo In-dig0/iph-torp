@@ -240,13 +240,13 @@ def load_workorders_data():
     df_workorders = pd.read_sql_query("""
     SELECT 
         A.woid AS WOID,
-        A.tdtl AS TDTL, 
+        A.tdtlid AS TDTLID, 
         A.type AS TYPE, 
+        A.status AS STATUS,        
         A.title AS TITLE,
         A.description AS DESCRIPTION,
         A.time_qty AS TIME_QTY,
         A.time_um AS TIME_UM,                                                                
-        A.status AS STATUS,
         A.startdate AS STARTDATE, 
         A.enddate AS ENDDATE,                                       
         A.reqid AS REQID
@@ -265,6 +265,7 @@ def load_workorders_data():
     WHERE A.status = 'ACTIVE'
     ORDER BY WOID
     """, conn)
+
 #######################################################################################################
 def check_password():
     """Returns `True` if the user had a correct password."""

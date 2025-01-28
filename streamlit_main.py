@@ -1158,7 +1158,7 @@ def manage_request():
         
         Args:
             selected_row: The currently selected grid row
-            df_woassegnedto: DataFrame of request assignments
+            df_woassignedto: DataFrame of request assignments
             df_users: DataFrame of users
             req_status_options: List of available status options
             default_dept_code: Default department code
@@ -1252,9 +1252,9 @@ def manage_request():
             
 
             # Tech Dept (TD) user assignment selection
-            filtered_woassignedto = df_woassegnedto[
-                (df_woassegnedto["WOID"] == woid) & 
-                (df_woassegnedto["STATUS"] == active_status)
+            filtered_woassignedto = df_woassignedto[
+                (df_woassignedto["WOID"] == woid) & 
+                (df_woassignedto["STATUS"] == active_status)
             ]
 
             wo_assignedto_default = list(filtered_woassignedto["USERNAME"])
@@ -1286,7 +1286,7 @@ def manage_request():
 #                 wo_idrow, success = save_workorder(wo)
 #                 if success:
 # #                    st.success(f"Work order W{str(wo_idrow).zfill(4)} created successfully!")
-#                     success = save_workorder_assignments(wo_idrow, wo_assignedto, df_users, df_woassegnedto)
+#                     success = save_workorder_assignments(wo_idrow, wo_assignedto, df_users, df_woassignedto)
 #                     success = update_request(reqidrow, "ASSIGNED", selected_row['NOTES'][0], wo_idrow, "")
 #                     if success:
 #                         st.session_state.grid_refresh = True
@@ -1381,7 +1381,7 @@ def manage_request():
             return 0, False
 
         
-    def save_workorder_assignments(wo_idrow, assigned_users, df_users, df_woassegnedto):
+    def save_workorder_assignments(wo_idrow, assigned_users, df_users, df_woassignedto):
         try:
             # Disable existing assignments
             cursor.execute(
@@ -1392,9 +1392,9 @@ def manage_request():
             # Add new assignments
             for user_name in assigned_users:
                 user_code = df_users[df_users["NAME"] == user_name]["CODE"].iloc[0]
-                existing_assignment = df_woassegnedto[
-                    (df_woassegnedto['WOIDROW'] == wo_idrow) & 
-                    (df_woassegnedto['USERCODE'] == user_code)
+                existing_assignment = df_woassignedto[
+                    (df_woassignedto['WOIDROW'] == wo_idrow) & 
+                    (df_woassignedto['USERCODE'] == user_code)
                 ]
                 
                 if existing_assignment.empty:
@@ -1725,7 +1725,7 @@ def manage_wi():
         
     df_users = fetch_users()    
     df_workorders = fetch_workorders()    
-    df_woassegnedto = fetch_assigned_wo()
+    df_woassignedto = fetch_assigned_wo()
 
     # Inzialize sessione state
     if 'selected_username' not in st.session_state:
@@ -1737,20 +1737,20 @@ def manage_wi():
     st.sidebar.divider()
     st.sidebar.header("Work order filters")
     
-    unique_usernames = df_woassegnedto['USERNAME'].unique()
+    unique_usernames = df_woassignedto['USERNAME'].unique()
     sorted_usernames = sorted(unique_usernames)
     wo_username_options = list(sorted_usernames)
     
     selected_username = st.sidebar.selectbox(label="TD user:", options=wo_username_options, index=None)
     
-    df_wi_usercode = df_woassegnedto[df_woassegnedto['USERNAME'] == selected_username]["USERCODE"].unique()
+    df_wi_usercode = df_woassignedto[df_woassignedto['USERNAME'] == selected_username]["USERCODE"].unique()
     wi_usercode = list(df_wi_usercode)
 
     if selected_username:
         st.session_state.selected_username = True
 
 
-    wo_idrow = df_woassegnedto[df_woassegnedto['USERNAME'] == selected_username]['WOIDROW'].apply(convert_woidrow_to_str)
+    wo_idrow = df_woassignedto[df_woassignedto['USERNAME'] == selected_username]['WOIDROW'].apply(convert_woidrow_to_str)
     unique_wo_idrow = wo_idrow.unique()
     sorted_wo_idrow = sorted(wo_idrow)
     wo_idrow_options = list(sorted_wo_idrow)

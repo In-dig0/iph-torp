@@ -181,8 +181,10 @@ def load_initial_data() -> None:
     df_lk_pline_tdtl= pd.read_sql_query("""
         SELECT 
             A.plinecode AS PLINE_CODE, 
-            A.usercode AS USER_CODE
+            A.usercode AS USER_CODE,
+            B.name AS USER_NAME
         FROM TORP_LINK_PLINE_TDTL A
+        INNER JOIN TORP_USERS B ON B.code = A.usercode
         ORDER by A.plinecode 
         """, conn)
 
@@ -219,9 +221,11 @@ def load_requests_data():
     SELECT 
         A.userid as USERID, 
         A.reqid as REQID,
-        A.status as STATUS 
+        A.status as STATUS,
+        B.name as USERNAME 
     FROM TORP_REQASSIGNEDTO A
     WHERE A.status = "ACTIVE"
+    INNER JOIN TORP_USERS B ON B.code = A.userid
     ORDER by USERID desc
     """, conn)
 
@@ -256,6 +260,7 @@ def load_workorders_data():
         A.status as STATUS, 
         B.name as USERNAME 
     FROM TORP_WOASSIGNEDTO A
+    WHERE A.status = "ACTIVE"
     INNER JOIN TORP_USERS B ON B.code = A.userid
     ORDER BY WOID
     """, conn)
@@ -1213,6 +1218,7 @@ def manage_request():
             else:
                 req_description_default = ""
             st.text_input(label="Request description", value=req_description_default, disabled=True)
+
             #st.text_input(label="Request description", value=selected_row['DESCRIPTION'][0], disabled=True)
             #st.text_area(label="Detail", value=selected_row['DETAIL'][0], disabled=True)
             # if selected_rows['NOTES'][0]:
@@ -1249,7 +1255,9 @@ def manage_request():
                 wo_timeqty_default = None  # O un valore di default appropriato                    
                  
             
-            #wo_woid = st.text_input(label="Work Order", value=wo_nr, disabled=True)        
+            #wo_woid = st.text_input(label="Work Order", value=wo_nr, disabled=True)
+            wo_tdtm_options = df_reqassignedto[df_reqassignedto["REQID"]==reqid]["USERNAME"]
+            wo_tdtm = st.selectbox(label="Team Leader(:red[*])", options=wo_tdtm_options, index=None, disabled=False)        
             wo_type = st.selectbox(label="Type(:red[*])", options=wo_type_options, index=wo_type_index, disabled=False)
             wo_time_qty = st.number_input(label="Time estimated(:red[*]):", min_value=wo_timeqty_default, step=0.5)
             wo_time_um = "H" 
@@ -1536,10 +1544,18 @@ def manage_request():
     
     req_pline_options = df_requests_grid['PRLINE_NAME'].drop_duplicates().sort_values()
     pline_filter = st.sidebar.selectbox(
-        "Select a Product Line value:", 
+        "Select a Product Line:", 
         req_pline_options, 
         index=None,
         key='Pline_value'
+    )
+
+    req_tdtl_options = df_lk_pline_tdtl['USER_NAME'].drop_duplicates().sort_values()
+    tdtl_filter = st.sidebar.selectbox(
+        "Select a Tech Dep. Team Leader:", 
+        req_tdtl_options, 
+        index=None,
+        key='Tdtl_value'
     )
 
     # Apply filters 

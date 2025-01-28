@@ -226,7 +226,7 @@ def load_requests_data():
     FROM TORP_REQASSIGNEDTO A
     INNER JOIN TORP_USERS B ON B.code = A.userid
     WHERE A.status = 'ACTIVE'
-    ORDER by USERID desc
+    ORDER BY USERID desc
     """, conn)
 
 
@@ -239,7 +239,8 @@ def load_workorders_data():
 
     df_workorders = pd.read_sql_query("""
     SELECT 
-        A.woid AS WOID, 
+        A.woid AS WOID,
+        A.tdtl AS TDTL, 
         A.type AS TYPE, 
         A.title AS TITLE,
         A.description AS DESCRIPTION,

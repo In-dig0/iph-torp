@@ -195,7 +195,6 @@ def load_requests_data():
     global df_requests
     global df_reqassignedto
     
-    
     df_requests = pd.read_sql_query("""
     SELECT 
         A.reqid AS REQID, 
@@ -225,8 +224,8 @@ def load_requests_data():
         A.status AS STATUS,
         B.name AS USERNAME 
     FROM TORP_REQASSIGNEDTO A
-    WHERE A.status = 'ACTIVE'
     INNER JOIN TORP_USERS B ON B.code = A.userid
+    WHERE A.status = 'ACTIVE'
     ORDER by USERID desc
     """, conn)
 

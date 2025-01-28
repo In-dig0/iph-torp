@@ -1246,7 +1246,7 @@ def manage_request():
             
             #wo_woid = st.text_input(label="Work Order", value=wo_nr, disabled=True)        
             wo_type = st.selectbox(label="Type(:red[*])", options=wo_type_options, index=wo_type_index, disabled=False)
-            wo_time_qty = st.number_input(label="Time estimated(:red[*]):", value=wo_timeqty_default, min_value=0.0, step=0.5)
+            wo_time_qty = st.number_input(label="Time estimated(:red[*]):", min_value=wo_timeqty_default, step=0.5)
             wo_time_um = "H" 
 
             # Tech Dept (TD) user assignment selection

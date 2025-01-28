@@ -1286,9 +1286,11 @@ def manage_request():
                 max_selections=3,
                 disabled=False
             )
-
-            wo_startdate = st.date_input(label="Start date", format="DD/MM/YYYY", value=wo_startdate_default, disabled=False)
-            wo_enddate = st.date_input(label="End date", format="DD/MM/YYYY", value=wo_enddate_default, disabled=False)
+            
+            wo_startdate = None
+            wo_enddate = None
+            #wo_startdate = st.date_input(label="Start date", format="DD/MM/YYYY", value=wo_startdate_default, disabled=False)
+            #wo_enddate = st.date_input(label="End date", format="DD/MM/YYYY", value=wo_enddate_default, disabled=False)
        
 
             if not wo_nr.empty:

@@ -1381,7 +1381,7 @@ def manage_request():
                     INSERT INTO TORP_WORKORDERS (
                         woid, tdtlid, type, title, description, time_qty, time_um,
                         status, startdate, enddate, reqid
-                    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                 """
 
             values = (

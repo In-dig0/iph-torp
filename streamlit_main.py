@@ -1227,7 +1227,7 @@ def manage_request():
                 wo_type_default = wo_type_filtered.values[0]
                 wo_type_index = wo_type_options.index(wo_type_default)
             else:
-                wo_type_index = None  # O un valore di default appropriato
+                wo_type_index = 0  
 
             wo_startdate_filtered = df_workorders[df_workorders["WOID"] == woid]["STARTDATE"]
             if not wo_startdate_filtered.empty:
@@ -1248,8 +1248,12 @@ def manage_request():
                 wo_timeqty_default = None  # O un valore di default appropriato                    
                  
             df_tdusers = df_users[df_users["DEPTCODE"] == default_dept_code]
-            wo_tdtm_options = df_reqassignedto[df_reqassignedto["REQID"]==reqid]["USERNAME"]
-            wo_tdtm_name = st.selectbox(label="Tech Department Team Leader(:red[*])", options=wo_tdtm_options, index=None, disabled=False)
+            wo_tdtl_options = df_reqassignedto[df_reqassignedto["REQID"]==reqid]["USERNAME"]
+            if len(wo_tdtl_options) == 1:
+                idx_tdtl = df_tdusers.index(wo_tdtl_options)
+            else:
+                idx_tdtl = None    
+            wo_tdtm_name = st.selectbox(label="Tech Department Team Leader(:red[*])", options=wo_tdtl_options, index=idx_tdtl, disabled=False)
             
             # Filtra i risultati
             filtered_df_tdtm_name = df_tdusers[df_tdusers["NAME"] == wo_tdtm_name]

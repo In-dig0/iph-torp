@@ -1213,7 +1213,6 @@ def manage_request():
             wo_nr = woid
             wo_type_options=["Standard", "APQP Project"]  #APQP -> ADVANCED PRODUCT QUALITY PLANNING"  
             wo_type_filtered = df_workorders[df_workorders["WOID"] == woid]["TYPE"]
-    
             if not wo_type_filtered.empty:
                 wo_type_default = wo_type_filtered.values[0]
                 wo_type_index = wo_type_options.index(wo_type_default)
@@ -1221,23 +1220,21 @@ def manage_request():
                 wo_type_index = None  # O un valore di default appropriato
 
 
-            wo_startdate_default = list(df_workorders[df_workorders["WOID"] == woid]["STARTDATE"])[0]
-            wo_enddate_default = list(df_workorders[df_workorders["WOID"] == woid]["ENDDATE"])[0]
-            wo_title_default = list(df_workorders[df_workorders["WOID"] == woid]["TITLE"])[0]        
-            wo_description_default = list(df_workorders[df_workorders["WOID"] == woid]["DESCRIPTION"])[0]
-            wo_time_qty_default = list(df_workorders[df_workorders["WOID"] == woid]["TIME_QTY"])[0]        
-            wo_time_um_default = list(df_workorders[df_workorders["WOID"] == woid]["TIME_UM"])[0]                         
-            # else:
-            #     wo_nr = ""
-            #     wo_type_index = 0
-            #     wo_startdate_default = None
-            #     wo_enddate_default = None
-            #     wo_notes_default = None                    
+            # wo_startdate_default = list(df_workorders[df_workorders["WOID"] == woid]["STARTDATE"])[0]
+            # wo_enddate_default = list(df_workorders[df_workorders["WOID"] == woid]["ENDDATE"])[0]
+            # wo_title_default = list(df_workorders[df_workorders["WOID"] == woid]["TITLE"])[0]        
+            # wo_description_default = list(df_workorders[df_workorders["WOID"] == woid]["DESCRIPTION"])[0]
+            # wo_time_qty_default = list(df_workorders[df_workorders["WOID"] == woid]["TIME_QTY"])[0]        
+            # wo_time_um_default = list(df_workorders[df_workorders["WOID"] == woid]["TIME_UM"])[0]                         
+                 
             
-            wo_woid = st.text_input(label="Work Order", value=wo_nr, disabled=True)        
-            wo_type = st.selectbox(label="Type(:red[*])", options=wo_type_options, index=wo_type_index, disabled=False)            
-            wo_startdate = st.date_input(label="Start date(:red[*])", format="DD/MM/YYYY", value=wo_startdate_default, disabled=False)
-            wo_enddate = st.date_input(label="End date(:red[*])", format="DD/MM/YYYY", value=wo_enddate_default, disabled=False)
+            #wo_woid = st.text_input(label="Work Order", value=wo_nr, disabled=True)        
+            wo_type = st.selectbox(label="Type(:red[*])", options=wo_type_options, index=wo_type_index, disabled=False)
+            wo_time_qty = st.number_input(label="Time estimated (in hours):", min_value=0.0, step=0.5)
+            wo_time_um = "H"    
+               
+            #wo_startdate = st.date_input(label="Start date(:red[*])", format="DD/MM/YYYY", value=wo_startdate_default, disabled=False)
+            #wo_enddate = st.date_input(label="End date(:red[*])", format="DD/MM/YYYY", value=wo_enddate_default, disabled=False)
 
             
 

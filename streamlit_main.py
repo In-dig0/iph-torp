@@ -1250,7 +1250,7 @@ def manage_request():
             df_tdusers = df_users[df_users["DEPTCODE"] == default_dept_code]
             wo_tdtl_options = df_reqassignedto[df_reqassignedto["REQID"]==reqid]["USERNAME"]
             if len(wo_tdtl_options) == 1:
-                idx_tdtl = df_tdusers.index(wo_tdtl_options)
+                idx_tdtl = df_tdusers.index(wo_tdtl_options.values[0])
             else:
                 idx_tdtl = None    
             wo_tdtm_name = st.selectbox(label="Tech Department Team Leader(:red[*])", options=wo_tdtl_options, index=idx_tdtl, disabled=False)

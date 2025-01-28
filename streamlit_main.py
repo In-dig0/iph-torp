@@ -1306,7 +1306,7 @@ def manage_request():
 
             # Handle save action
             if st.button("Save", type="primary", disabled=disable_save_button, key="wo_save_button"):
-                wo = {"woid":woid, "tdtlmid": wo_tdtm_code, "type": wo_type, "title": selected_row["TITLE"][0], "description": req_description_default, "time_qty": wo_time_qty, "time_um": wo_time_um, "status": ACTIVE_STATUS, "startdate": wo_startdate, "enddate": wo_enddate, "reqid": reqid}
+                wo = {"woid":woid, "tdtlid": wo_tdtm_code, "type": wo_type, "title": selected_row["TITLE"][0], "description": req_description_default, "time_qty": wo_time_qty, "time_um": wo_time_um, "status": ACTIVE_STATUS, "startdate": wo_startdate, "enddate": wo_enddate, "reqid": reqid}
                 wo_idrow, success = save_workorder(wo)
 #                 if success:
 # #                    st.success(f"Work order W{str(wo_idrow).zfill(4)} created successfully!")
@@ -1379,13 +1379,13 @@ def manage_request():
         try:     
             sql = """
                     INSERT INTO TORP_WORKORDERS (
-                        woid, tdtlmid, type, title, description, time_qty, time_um,
+                        woid, tdtlid, type, title, description, time_qty, time_um,
                         status, startdate, enddate, reqid
                     ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                 """
 
             values = (
-                    wo["woid"], wo["tdtlmid"], wo["type"], wo["title"], wo["description"], wo["time_qty"],wo["time_um"],
+                    wo["woid"], wo["tdtlid"], wo["type"], wo["title"], wo["description"], wo["time_qty"],wo["time_um"],
                     wo["status"], wo["startdate"], wo["enddate"], wo["reqid"]
                 )
                 

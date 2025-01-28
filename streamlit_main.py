@@ -1207,9 +1207,6 @@ def manage_request():
 
             # Display request details
             st.text_input(label="Product Line", value=selected_row['PRLINE_NAME'][0], disabled=True)
-#            st.text_input(label="Category", value=selected_row['CATEGORY'][0], disabled=True)
-            #st.text_input(label="Request Id", value=reqid, disabled=True)
-
             st.text_input(label="Request title", value=selected_row['TITLE'][0], disabled=True)
             
             req_description = df_requests[df_requests["REQID"]==reqid]["DESCRIPTION"]
@@ -1219,10 +1216,6 @@ def manage_request():
                 req_description_default = ""
             st.text_input(label="Request description", value=req_description_default, disabled=True)
 
-            #st.text_input(label="Request description", value=selected_row['DESCRIPTION'][0], disabled=True)
-            #st.text_area(label="Detail", value=selected_row['DETAIL'][0], disabled=True)
-            # if selected_rows['NOTES'][0]:
-            #     st.text_area(label="Notes", value=selected_row['NOTES'][0], disabled=True)
             st.divider()
             st.subheader(f"Work Order {woid}")
 
@@ -1254,10 +1247,10 @@ def manage_request():
             else:
                 wo_timeqty_default = None  # O un valore di default appropriato                    
                  
-            
-            #wo_woid = st.text_input(label="Work Order", value=wo_nr, disabled=True)
+            df_tdusers = df_users[df_users["DEPTCODE"] == default_dept_code]
             wo_tdtm_options = df_reqassignedto[df_reqassignedto["REQID"]==reqid]["USERNAME"]
-            wo_tdtm = st.selectbox(label="Team Leader(:red[*])", options=wo_tdtm_options, index=None, disabled=False)        
+            wo_tdtm_name = st.selectbox(label="Tech Department Team Leader(:red[*])", options=wo_tdtm_options, index=None, disabled=False)
+            wo_tdtm_code = df_tdusers[df_tdusers["NAME"]==wo_tdtm_name]["CODE"].value[0]        
             wo_type = st.selectbox(label="Type(:red[*])", options=wo_type_options, index=wo_type_index, disabled=False)
             wo_time_qty = st.number_input(label="Time estimated(:red[*]):", min_value=wo_timeqty_default, step=0.5)
             wo_time_um = "H" 
@@ -1268,9 +1261,8 @@ def manage_request():
                 (df_woassignedto["STATUS"] == active_status)
             ]
             wo_assignedto_default = list(filtered_woassignedto["USERNAME"])
-            df_tdusers = df_users[df_users["DEPTCODE"] == default_dept_code]
             wo_assignedto_option = list(df_tdusers["NAME"])
-            wo_assignedto_title = "Assigned to (:red[*]):"
+            wo_assignedto_title = "Tech Department Specialists assigned to (:red[*]):"
             wo_assignedto = st.multiselect(
                 label=wo_assignedto_title, 
                 options=wo_assignedto_option, 
@@ -1296,9 +1288,8 @@ def manage_request():
 
             # Handle save action
             if st.button("Save", type="primary", disabled=disable_save_button, key="wo_save_button"):
-                pass
-#                 wo = {"woid":woid, "type": wo_type, "startdate": wo_startdate, "endate": wo_enddate, "title": selected_row["TITLE"][0], "status": ACTIVE_STATUS, "reqidrow": reqid}
-#                 wo_idrow, success = save_workorder(wo)
+                wo = {"woid":woid, "tdtmid": wo_tdtm_code, "type": wo_type, "title": selected_row["TITLE"][0], "description": req_description_default, "time_qty": wo_time_qty, "time_um": wo_time_um, "status": ACTIVE_STATUS, "startdate": wo_startdate, "endate": wo_enddate, "reqid": reqid}
+                wo_idrow, success = save_workorder(wo)
 #                 if success:
 # #                    st.success(f"Work order W{str(wo_idrow).zfill(4)} created successfully!")
 #                     success = save_workorder_assignments(wo_idrow, wo_assignedto, df_users, df_woassignedto)
@@ -1367,29 +1358,22 @@ def manage_request():
 
     def save_workorder(wo: dict):
         # Get next available row ID
-        try:
-            cursor.execute('SELECT MAX(idrow) FROM TORP_WORKORDERS')
-            max_idrow = cursor.fetchone()[0]
-            if max_idrow is not None:
-                next_rownr = max_idrow + 1
-            else:
-                next_rownr = 1    
-                
+        try:     
             sql = """
                     INSERT INTO TORP_WORKORDERS (
-                        idrow, type, startdate, enddate, 
-                        title, notes, status, reqidrow
-                    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+                        woid, type, title, description, time_qty, time_um,
+                        status, startdate, enddate, reqid
+                    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                 """
-                
+
             values = (
-                    next_rownr, wo["type"], wo["startdate"],wo["endate"],
-                    wo["title"], wo["notes"], wo["status"], wo["reqidrow"]
+                    wo["woid"], wo["type"], wo["title"], wo["description"], wo["time_qty"],wo["time_um"],
+                    wo["status"], wo["startdate"], wo["enddate"], wo["reqid"]
                 )
                 
             cursor.execute(sql, values)
             conn.commit()
-            return next_rownr, True
+            return wo["woid"], True
                 
         except Exception as e:
             st.error(f"**ERROR inserting request in TORP_WORKORDERS: \n{e}", icon="🚨")

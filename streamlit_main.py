@@ -1259,7 +1259,7 @@ def manage_request():
                 # Utilizza .get_loc per ottenere l'indice dell'elemento
                 idx_tdtl = df_tdusers.index.get_loc(df_tdusers[df_tdusers["NAME"] == wo_tdtl_options.values[0]].index[0])
             else:
-                idx_tdtl = None  
+                idx_tdtl = 0  
             wo_tdtm_name = st.selectbox(label="Tech Department Team Leader(:red[*])", options=wo_tdtl_options, index=idx_tdtl, disabled=False)
             
             # Filtra i risultati

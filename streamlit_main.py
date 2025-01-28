@@ -1534,13 +1534,13 @@ def manage_request():
         key='Pline_value'
     )
 
-    req_tdtl_options = df_lk_pline_tdtl['USER_NAME'].drop_duplicates().sort_values()
-    tdtl_filter = st.sidebar.selectbox(
-        "Select a Tech Dep. Team Leader:", 
-        req_tdtl_options, 
-        index=None,
-        key='Tdtl_value'
-    )
+    # req_tdtl_options = df_lk_pline_tdtl['USER_NAME'].drop_duplicates().sort_values()
+    # tdtl_filter = st.sidebar.selectbox(
+    #     "Select a Tech Dep. Team Leader:", 
+    #     req_tdtl_options, 
+    #     index=None,
+    #     key='Tdtl_value'
+    # )
 
     # Apply filters 
     filtered_data = df_requests_grid.copy() 

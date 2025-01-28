@@ -232,11 +232,11 @@ def load_requests_data():
 
 #######################################################################################################
 def load_workorders_data():
-    """ """
+    """ Load work orders from database to df """
     
     global df_workorders
     global df_woassignedto
-
+    
     df_workorders = pd.read_sql_query("""
     SELECT 
         A.woid AS WOID,
@@ -265,8 +265,6 @@ def load_workorders_data():
     WHERE A.status = 'ACTIVE'
     ORDER BY WOID
     """, conn)
-
-
 #######################################################################################################
 def check_password():
     """Returns `True` if the user had a correct password."""

@@ -1255,16 +1255,25 @@ def manage_request():
                  
             df_tdusers = df_users[df_users["DEPTCODE"] == default_dept_code]
             wo_tdtl_options = df_reqassignedto[df_reqassignedto["REQID"]==reqid]["USERNAME"]
-            if len(wo_tdtl_options) == 1:
-                # Utilizza .get_loc per ottenere l'indice dell'elemento
-                try:
-                    idx_tdtl = df_tdusers.index.get_loc(df_tdusers[df_tdusers["NAME"] == wo_tdtl_options.values[0]].index[0])
-                except IndexError:
-                    idx_tdtl = 0  # Imposta un valore predefinito se l'indice non viene trovato
+            # Controlla se ci sono opzioni disponibili
+            if not wo_tdtl_options.empty:
+                if len(wo_tdtl_options) == 1:
+                    # Trova l'indice dell'elemento
+                    wo_tdtl_name = wo_tdtl_options.values[0]
+                    filtered_df = df_tdusers[df_tdusers["NAME"] == wo_tdtl_name]
+                    
+                    if not filtered_df.empty:
+                        idx_tdtl = df_tdusers.index.get_loc(filtered_df.index[0])
+                    else:
+                        idx_tdtl = 0  # Imposta un valore predefinito se l'indice non viene trovato
+                else:
+                    idx_tdtl = 0  # Imposta un valore predefinito se ci sono più opzioni
             else:
-                idx_tdtl = 0  # Imposta un valore predefinito se ci sono più opzioni
+                idx_tdtl = 0  # Imposta un valore predefinito se non ci sono opzioni
 
             wo_tdtm_name = st.selectbox(label="Tech Department Team Leader(:red[*])", options=wo_tdtl_options, index=idx_tdtl, disabled=False)
+
+
             
             # Filtra i risultati
             filtered_df_tdtm_name = df_tdusers[df_tdusers["NAME"] == wo_tdtm_name]

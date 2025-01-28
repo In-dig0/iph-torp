@@ -1200,16 +1200,19 @@ def manage_request():
             # Extract request and work order ID
             reqid = selected_row["REQID"][0]
             woid = "W" + selected_row["REQID"][0][1:]
+            req_description_default = df_requests[df_requests["REID"]==reqid]["DESCRIPTION"][0]
+
             # Display request details
 #            st.text_input(label="Product family", value=selected_row['PR_FAMILY'][0], disabled=True)
 #            st.text_input(label="Category", value=selected_row['CATEGORY'][0], disabled=True)
             #st.text_input(label="Request Id", value=reqid, disabled=True)
             st.text_input(label="Request title", value=selected_row['TITLE'][0], disabled=True)
+            st.text_input(label="Request description", value=req_description_default, disabled=True)
             #st.text_input(label="Request description", value=selected_row['DESCRIPTION'][0], disabled=True)
             #st.text_area(label="Detail", value=selected_row['DETAIL'][0], disabled=True)
             # if selected_rows['NOTES'][0]:
             #     st.text_area(label="Notes", value=selected_row['NOTES'][0], disabled=True)
-            #st.divider()
+            st.divider()
             wo_nr = woid
             wo_type_options=["Standard", "APQP Project"]  #APQP -> ADVANCED PRODUCT QUALITY PLANNING"  
             wo_type_filtered = df_workorders[df_workorders["WOID"] == woid]["TYPE"]
@@ -1232,7 +1235,7 @@ def manage_request():
             wo_type = st.selectbox(label="Type(:red[*])", options=wo_type_options, index=wo_type_index, disabled=False)
             wo_time_qty = st.number_input(label="Time estimated (in hours):", min_value=0.0, step=0.5)
             wo_time_um = "H"    
-               
+
             #wo_startdate = st.date_input(label="Start date(:red[*])", format="DD/MM/YYYY", value=wo_startdate_default, disabled=False)
             #wo_enddate = st.date_input(label="End date(:red[*])", format="DD/MM/YYYY", value=wo_enddate_default, disabled=False)
 

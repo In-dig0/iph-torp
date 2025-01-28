@@ -1214,7 +1214,9 @@ def manage_request():
             #     st.text_area(label="Notes", value=selected_row['NOTES'][0], disabled=True)
             st.divider()
             st.subheader(f"Work Order {woid}")
-            wo_nr = woid
+
+            wo_nr = df_workorders[df_workorders["REQID"] == reqid]["WOID"]
+
             wo_type_options=["Standard", "APQP Project"]  #APQP -> ADVANCED PRODUCT QUALITY PLANNING"  
             wo_type_filtered = df_workorders[df_workorders["WOID"] == woid]["TYPE"]
             if not wo_type_filtered.empty:
@@ -1239,12 +1241,12 @@ def manage_request():
             if not wo_timeqty_filtered.empty:
                 wo_timeqty_default = wo_timeqty_filtered.values[0]
             else:
-                wo_timeqty_default = None  # O un valore di default appropriato                    
+                wo_timeqty_default = 0  # O un valore di default appropriato                    
                  
             
             #wo_woid = st.text_input(label="Work Order", value=wo_nr, disabled=True)        
             wo_type = st.selectbox(label="Type(:red[*])", options=wo_type_options, index=wo_type_index, disabled=False)
-            wo_time_qty = st.number_input(label="Time estimated(:red[*]):", min_value=0.0, step=0.5)
+            wo_time_qty = st.number_input(label="Time estimated(:red[*]):", value=wo_timeqty_default, min_value=0.0, step=0.5)
             wo_time_um = "H"    
             wo_startdate = st.date_input(label="Start date", format="DD/MM/YYYY", value=wo_startdate_default, disabled=False)
             wo_enddate = st.date_input(label="End date", format="DD/MM/YYYY", value=wo_enddate_default, disabled=False)
@@ -1270,19 +1272,21 @@ def manage_request():
             )
 
 
-#             if woidrow > 0:
-#                 if (wo_type == wo_type_default and wo_startdate == wo_startdate_default and wo_enddate == wo_enddate_default and wo_assignedto == wo_assignedto_default):
-#                     disable_save_button = True
-#                 else:
-#                     disable_save_button = False    
-#             else:
-#                 if not (wo_type and wo_startdate and wo_enddate and wo_assignedto):
-#                     disable_save_button = True
-#                 else:
-#                     disable_save_button = False    
-#             # Handle save action
-#             if st.button("Save", type="primary", disabled=disable_save_button, key="wo_save_button"):
-#                 wo = {"woid":"", "type": wo_type, "startdate": wo_startdate, "endate": wo_enddate, "title": selected_row["TITLE"][0], "notes": wo_notes, "status": ACTIVE_STATUS, "reqidrow": reqidrow}
+            if not wo_nr.empty:
+                if (wo_type == wo_type_default and wo_startdate == wo_startdate_default and wo_enddate == wo_enddate_default and wo_assignedto == wo_assignedto_default and wo_time_qty == wo_timeqty_default):
+                    disable_save_button = True
+                else:
+                    disable_save_button = False    
+            else:
+                if not (wo_type and wo_assignedto and wo_time_qty):
+                    disable_save_button = True
+                else:
+                    disable_save_button = False
+
+            # Handle save action
+            if st.button("Save", type="primary", disabled=disable_save_button, key="wo_save_button"):
+                pass
+#                 wo = {"woid":woid, "type": wo_type, "startdate": wo_startdate, "endate": wo_enddate, "title": selected_row["TITLE"][0], "status": ACTIVE_STATUS, "reqidrow": reqid}
 #                 wo_idrow, success = save_workorder(wo)
 #                 if success:
 # #                    st.success(f"Work order W{str(wo_idrow).zfill(4)} created successfully!")
@@ -1298,7 +1302,7 @@ def manage_request():
 #                     reset_application_state()
 #                     st.rerun()
 
-#             return False
+            return False
 
         return dialog_content()
    

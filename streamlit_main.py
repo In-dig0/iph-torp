@@ -146,7 +146,7 @@ def load_initial_data() -> None:
         ORDER by A.name
         """, conn)
 
-    df_category= pd.read_sql_query("""
+    df_category = pd.read_sql_query("""
         SELECT 
             A.code AS CODE, 
             A.name AS NAME
@@ -154,7 +154,7 @@ def load_initial_data() -> None:
         ORDER by A.name
         """, conn)
 
-    df_detail= pd.read_sql_query("""
+    df_detail = pd.read_sql_query("""
         SELECT 
             A.code AS CODE,                                    
             A.name AS NAME
@@ -162,7 +162,7 @@ def load_initial_data() -> None:
         ORDER by A.name
         """, conn)
 
-    df_lk_type_category= pd.read_sql_query("""
+    df_lk_type_category = pd.read_sql_query("""
         SELECT 
             A.typecode AS TYPE_CODE, 
             A.categorycode AS CATEGORY_CODE
@@ -170,7 +170,7 @@ def load_initial_data() -> None:
         ORDER by A.typecode 
         """, conn)
 
-    df_lk_category_detail= pd.read_sql_query("""
+    df_lk_category_detail = pd.read_sql_query("""
         SELECT 
             A.categorycode AS CATEGORY_CODE, 
             A.detailcode AS DETAIL_CODE
@@ -178,7 +178,7 @@ def load_initial_data() -> None:
         ORDER by A.categorycode 
         """, conn)
 
-    df_lk_pline_tdtl= pd.read_sql_query("""
+    df_lk_pline_tdtl = pd.read_sql_query("""
         SELECT 
             A.plinecode AS PLINE_CODE, 
             A.usercode AS USER_CODE,
@@ -191,38 +191,39 @@ def load_initial_data() -> None:
 #######################################################################################################
 def load_requests_data():
     """ Load requests from database to df """
+    
     global df_requests
     global df_reqassignedto
     
     
     df_requests = pd.read_sql_query("""
     SELECT 
-        A.reqid as REQID, 
-        A.status as STATUS, 
-        A.insdate as INSDATE, 
-        A.dept as DEPT, 
-        A.requester as REQUESTER, 
-        A.user as USER, 
-        A.priority as PRIORITY, 
-        A.pline as PR_LINE, 
-        A.pfamily as PR_FAMILY, 
-        A.type as TYPE, 
-        A.category as CATEGORY, 
+        A.reqid AS REQID, 
+        A.status AS STATUS, 
+        A.insdate AS INSDATE, 
+        A.dept AS DEPT, 
+        A.requester AS REQUESTER, 
+        A.user AS USER, 
+        A.priority AS PRIORITY, 
+        A.pline AS PR_LINE, 
+        A.pfamily AS PR_FAMILY, 
+        A.type AS TYPE, 
+        A.category AS CATEGORY, 
         A.detail AS DETAIL, 
-        A.title as TITLE, 
-        A.description as DESCRIPTION, 
-        A.note_td as NOTE_TD, 
-        A.woid as WOID  
+        A.title AS TITLE, 
+        A.description AS DESCRIPTION, 
+        A.note_td AS NOTE_TD, 
+        A.woid AS WOID  
     FROM TORP_REQUESTS A
     ORDER by REQID desc
     """, conn)
 
     df_reqassignedto = pd.read_sql_query("""
     SELECT 
-        A.userid as USERID, 
-        A.reqid as REQID,
-        A.status as STATUS,
-        B.name as USERNAME 
+        A.userid AS USERID, 
+        A.reqid AS REQID,
+        A.status AS STATUS,
+        B.name AS USERNAME 
     FROM TORP_REQASSIGNEDTO A
     WHERE A.status = "ACTIVE"
     INNER JOIN TORP_USERS B ON B.code = A.userid
@@ -233,21 +234,22 @@ def load_requests_data():
 #######################################################################################################
 def load_workorders_data():
     """ """
+    
     global df_workorders
     global df_woassignedto
 
     df_workorders = pd.read_sql_query("""
     SELECT 
-        A.woid as WOID, 
-        A.type as TYPE, 
-        A.title as TITLE,
-        A.description as DESCRIPTION,
+        A.woid AS WOID, 
+        A.type AS TYPE, 
+        A.title AS TITLE,
+        A.description AS DESCRIPTION,
         A.time_qty AS TIME_QTY,
         A.time_um AS TIME_UM,                                                                
-        A.status as STATUS,
-        A.startdate as STARTDATE, 
-        A.enddate as ENDDATE,                                       
-        A.reqid as REQID
+        A.status AS STATUS,
+        A.startdate AS STARTDATE, 
+        A.enddate AS ENDDATE,                                       
+        A.reqid AS REQID
     FROM TORP_WORKORDERS A
     ORDER BY REQID
     """, conn)
@@ -255,10 +257,10 @@ def load_workorders_data():
 
     df_woassignedto = pd.read_sql_query("""
     SELECT 
-        A.userid as USERID, 
-        A.woid as WOID, 
-        A.status as STATUS, 
-        B.name as USERNAME 
+        A.userid AS USERID, 
+        A.woid AS WOID, 
+        A.status AS STATUS, 
+        B.name AS USERNAME 
     FROM TORP_WOASSIGNEDTO A
     WHERE A.status = "ACTIVE"
     INNER JOIN TORP_USERS B ON B.code = A.userid

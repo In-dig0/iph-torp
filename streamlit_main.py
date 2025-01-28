@@ -25,6 +25,10 @@ import numpy as np
 APPNAME = "TORP" #IPH Technical Office Request POC (Proof Of Concept)
 APPCODE = "TORP"
 APPVERSION = "0.2"
+ACTIVE_STATUS = "ACTIVE"
+DISABLED_STATUS = "DISABLED"
+DEFAULT_DEPT_CODE = "DTD"
+REQ_STATUS_OPTIONS = ['NEW', 'PENDING', 'ASSIGNED', 'WIP', 'COMPLETED', 'DELETED']
 
 #######################################################################################################
 def open_sqlitecloud_db():
@@ -466,7 +470,7 @@ def insert_request() -> None:
                     ) VALUES (?, ?, ?)
                 """
                 values = (
-                    request.tdtl[0], next_reqid, "ACTIVE"
+                    request.tdtl[0], next_reqid, ACTIVE_STATUS
 
                 )
                 
@@ -1000,11 +1004,6 @@ def manage_request():
     Handle request assignments and management through a Streamlit interface.
     Includes request filtering, display, and assignment management functionality.
     """
-    # Constants
-    ACTIVE_STATUS = "ACTIVE"
-    DISABLED_STATUS = "DISABLED"
-    DEFAULT_DEPT_CODE = "DTD"
-    REQ_STATUS_OPTIONS = ['NEW', 'PENDING', 'ASSIGNED', 'WIP', 'COMPLETED', 'DELETED']
     
     def reset_application_state():
         """Reset all session state variables and cached data"""
@@ -1203,9 +1202,10 @@ def manage_request():
             req_description_default = df_requests[df_requests["REQID"]==reqid]["DESCRIPTION"][0]
 
             # Display request details
-#            st.text_input(label="Product family", value=selected_row['PR_FAMILY'][0], disabled=True)
+            st.text_input(label="Product Line", value=selected_row['PRLINE_NAME'][0], disabled=True)
 #            st.text_input(label="Category", value=selected_row['CATEGORY'][0], disabled=True)
             #st.text_input(label="Request Id", value=reqid, disabled=True)
+
             st.text_input(label="Request title", value=selected_row['TITLE'][0], disabled=True)
             st.text_input(label="Request description", value=req_description_default, disabled=True)
             #st.text_input(label="Request description", value=selected_row['DESCRIPTION'][0], disabled=True)
@@ -1780,7 +1780,7 @@ def manage_wi():
         wi_date = st.date_input("Date of execution", format="DD/MM/YYYY", disabled=False)
         wi_notes = st.text_area("Notes")
         wo_nr = convert_woidrow_to_int(selected_wo)
-        work_item = {"wi_ucode": wi_usercode[0], "wi_tskgroup": "standard", "wi_tskdate": wi_date,"wi_qty": wi_duration, "wi_um": "H", "wi_desc": wi_description, "wi_notes": wi_notes, "wi_status": "ACTIVE", "wi_woidrow": wo_nr}
+        work_item = {"wi_ucode": wi_usercode[0], "wi_tskgroup": "standard", "wi_tskdate": wi_date,"wi_qty": wi_duration, "wi_um": "H", "wi_desc": wi_description, "wi_notes": wi_notes, "wi_status": ACTIVE_STATUS, "wi_woidrow": wo_nr}
         # Bottone per aggiungere il task
         if st.button("Save Work Item", type="primary"):
             if wi_description and wi_duration > 0:

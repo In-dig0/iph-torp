@@ -1213,6 +1213,7 @@ def manage_request():
             # if selected_rows['NOTES'][0]:
             #     st.text_area(label="Notes", value=selected_row['NOTES'][0], disabled=True)
             st.divider()
+            st.subheader(f"Work Order {woid}")
             wo_nr = woid
             wo_type_options=["Standard", "APQP Project"]  #APQP -> ADVANCED PRODUCT QUALITY PLANNING"  
             wo_type_filtered = df_workorders[df_workorders["WOID"] == woid]["TYPE"]
@@ -1233,19 +1234,18 @@ def manage_request():
                 wo_enddate_default = wo_enddate_filtered.values[0]
             else:
                 wo_enddate_default = None  # O un valore di default appropriato
-            # wo_startdate_default = list(df_workorders[df_workorders["WOID"] == woid]["STARTDATE"])[0]
-            # wo_enddate_default = list(df_workorders[df_workorders["WOID"] == woid]["ENDDATE"])[0]
-            # wo_title_default = list(df_workorders[df_workorders["WOID"] == woid]["TITLE"])[0]        
-            # wo_description_default = list(df_workorders[df_workorders["WOID"] == woid]["DESCRIPTION"])[0]
-            # wo_time_qty_default = list(df_workorders[df_workorders["WOID"] == woid]["TIME_QTY"])[0]        
-            # wo_time_um_default = list(df_workorders[df_workorders["WOID"] == woid]["TIME_UM"])[0]                         
+
+            wo_timeqty_filtered = df_workorders[df_workorders["WOID"] == woid]["TIME_QTY"]
+            if not wo_timeqty_filtered.empty:
+                wo_timeqty_default = wo_timeqty_filtered.values[0]
+            else:
+                wo_timeqty_default = None  # O un valore di default appropriato                    
                  
             
             #wo_woid = st.text_input(label="Work Order", value=wo_nr, disabled=True)        
             wo_type = st.selectbox(label="Type(:red[*])", options=wo_type_options, index=wo_type_index, disabled=False)
             wo_time_qty = st.number_input(label="Time estimated(:red[*]):", min_value=0.0, step=0.5)
             wo_time_um = "H"    
-
             wo_startdate = st.date_input(label="Start date", format="DD/MM/YYYY", value=wo_startdate_default, disabled=False)
             wo_enddate = st.date_input(label="End date", format="DD/MM/YYYY", value=wo_enddate_default, disabled=False)
 

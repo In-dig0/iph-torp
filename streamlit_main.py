@@ -1239,7 +1239,7 @@ def manage_request():
 
             wo_timeqty_filtered = df_workorders[df_workorders["WOID"] == woid]["TIME_QTY"]
             if not wo_timeqty_filtered.empty:
-                wo_timeqty_default = wo_timeqty_filtered.values[0]
+                wo_timeqty_default = int(wo_timeqty_filtered.values[0])
             else:
                 wo_timeqty_default = 0  # O un valore di default appropriato                    
                  

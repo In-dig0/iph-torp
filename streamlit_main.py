@@ -1216,6 +1216,12 @@ def manage_request():
                 req_description_default = ""
             st.text_input(label="Request description", value=req_description_default, disabled=True)
 
+            req_note_td = df_requests[df_requests["REQID"]==reqid]["NOTE_TD"]
+            if not req_note_td.empty:
+                req_note_td_default = req_note_td.values[0]
+            else:
+                req_note_td_default = ""
+
             st.divider()
             st.subheader(f"Work Order {woid}")
 
@@ -1308,19 +1314,19 @@ def manage_request():
             if st.button("Save", type="primary", disabled=disable_save_button, key="wo_save_button"):
                 wo = {"woid":woid, "tdtlid": wo_tdtm_code, "type": wo_type, "title": selected_row["TITLE"][0], "description": req_description_default, "time_qty": wo_time_qty, "time_um": wo_time_um, "status": ACTIVE_STATUS, "startdate": wo_startdate, "enddate": wo_enddate, "reqid": reqid}
                 wo_idrow, success = save_workorder(wo)
-#                 if success:
-# #                    st.success(f"Work order W{str(wo_idrow).zfill(4)} created successfully!")
-#                     success = save_workorder_assignments(wo_idrow, wo_assignedto, df_users, df_woassignedto)
-#                     success = update_request(reqidrow, "ASSIGNED", selected_row['NOTES'][0], wo_idrow, "")
-#                     if success:
-#                         st.session_state.grid_refresh = True
-#                         st.session_state.grid_response = None
-#                         st.success(f"Work order W{str(wo_idrow).zfill(4)} assigned successfully!")
+                if success:
+#                    st.success(f"Work order W{str(wo_idrow).zfill(4)} created successfully!")
+                    success = save_workorder_assignments(woid, wo_assignedto, df_users, df_woassignedto)
+                    success = update_request(reqid, "ASSIGNED", req_note_td, woid, "")
+                    if success:
+                        st.session_state.grid_refresh = True
+                        st.session_state.grid_response = None
+                        st.success(f"Work order {woid} created successfully!")
                     
-#                     st.session_state.need_refresh = True
-#                     time.sleep(3)
-#                     reset_application_state()
-#                     st.rerun()
+                    st.session_state.need_refresh = True
+                    time.sleep(3)
+                    reset_application_state()
+                    st.rerun()
 
             return False
 
@@ -1398,37 +1404,37 @@ def manage_request():
             return 0, False
 
         
-    def save_workorder_assignments(wo_idrow, assigned_users, df_users, df_woassignedto):
+    def save_workorder_assignments(woid, assigned_users, df_users, df_woassignedto):
         try:
             # Disable existing assignments
             cursor.execute(
-                "UPDATE TORP_WOASSIGNEDTO SET status = ? WHERE woidrow = ?",
-                (DISABLED_STATUS, wo_idrow)
+                "UPDATE TORP_WOASSIGNEDTO SET status = ? WHERE woid = ?",
+                (DISABLED_STATUS, woid)
             )
             
             # Add new assignments
             for user_name in assigned_users:
                 user_code = df_users[df_users["NAME"] == user_name]["CODE"].iloc[0]
                 existing_assignment = df_woassignedto[
-                    (df_woassignedto['WOIDROW'] == wo_idrow) & 
-                    (df_woassignedto['USERCODE'] == user_code)
+                    (df_woassignedto['WOID'] == woid) & 
+                    (df_woassignedto['USERID'] == user_code)
                 ]
                 
                 if existing_assignment.empty:
                     cursor.execute(
-                        "INSERT INTO TORP_WOASSIGNEDTO (usercode, woidrow, status) VALUES (?, ?, ?)",
-                        (user_code, wo_idrow, ACTIVE_STATUS)
+                        "INSERT INTO TORP_WOASSIGNEDTO (userid, woid, status) VALUES (?, ?, ?)",
+                        (user_code, woid, ACTIVE_STATUS)
                     )
                 else:
                     cursor.execute(
-                        "UPDATE TORP_WOASSIGNEDTO SET status = ? WHERE woidrow = ? AND usercode = ?",
-                        (ACTIVE_STATUS, wo_idrow, user_code)
+                        "UPDATE TORP_WOASSIGNEDTO SET status = ? WHERE woid = ? AND userid = ?",
+                        (ACTIVE_STATUS, woid, user_code)
                     )
             
             conn.commit()
             return True
         except Exception as e:
-            st.error(f"Error updating workorder assignments: {str(e)}", icon="🚨")
+            st.error(f"Error updating TORP_WOASSIGNEDTO: {str(e)}", icon="🚨")
             conn.rollback()
             return False
 

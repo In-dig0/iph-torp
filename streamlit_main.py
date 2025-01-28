@@ -225,7 +225,7 @@ def load_requests_data():
         A.status AS STATUS,
         B.name AS USERNAME 
     FROM TORP_REQASSIGNEDTO A
-    WHERE A.status = "ACTIVE"
+    WHERE A.status = 'ACTIVE'
     INNER JOIN TORP_USERS B ON B.code = A.userid
     ORDER by USERID desc
     """, conn)
@@ -262,7 +262,7 @@ def load_workorders_data():
         A.status AS STATUS, 
         B.name AS USERNAME 
     FROM TORP_WOASSIGNEDTO A
-    WHERE A.status = "ACTIVE"
+    WHERE A.status = 'ACTIVE'
     INNER JOIN TORP_USERS B ON B.code = A.userid
     ORDER BY WOID
     """, conn)

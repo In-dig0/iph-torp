@@ -1152,7 +1152,7 @@ def manage_request():
         return dialog_content()
 
 #######################################
-    def show_workorder_dialog(selected_row, df_workorders, df_woassegnedto, df_users, active_status, default_dept_code, req_status_options, save_workorder_fn, save_woassignments_fn):
+    def show_workorder_dialog(selected_row, df_workorders, df_woassignedto, df_users, active_status, default_dept_code, req_status_options, save_workorder_fn, save_woassignments_fn):
         """
         Display and handle the request modification dialog.
         
@@ -1198,84 +1198,90 @@ def manage_request():
             )
 
             # Extract request and work order ID
-            reqidrow = int(selected_row["IDROW"][0][1:])
-            woidrow = int(selected_row["WOIDROW"][0])
+            reqid = selected_row["REQID"][0]
+            woid = "W" + selected_row["REQID"][0][1:]
             # Display request details
 #            st.text_input(label="Product family", value=selected_row['PR_FAMILY'][0], disabled=True)
 #            st.text_input(label="Category", value=selected_row['CATEGORY'][0], disabled=True)
-            st.text_input(label="Title", value=selected_row['TITLE'][0], disabled=True)
-            st.text_area(label="Detail", value=selected_row['DETAIL'][0], disabled=True)
+            st.text_input(label="Request Id", value=reqid, disabled=True)
+            st.text_input(label="Request title", value=selected_row['TITLE'][0], disabled=True)
+            st.text_input(label="Request description", value=selected_row['DESCRIPTION'][0], disabled=True)
+            #st.text_area(label="Detail", value=selected_row['DETAIL'][0], disabled=True)
             # if selected_rows['NOTES'][0]:
             #     st.text_area(label="Notes", value=selected_row['NOTES'][0], disabled=True)
             #st.divider()
+            wo_nr = woid
             wo_type_options=["Standard", "APQP Project"]  #APQP -> ADVANCED PRODUCT QUALITY PLANNING"  
-            if woidrow > 0:
-                wo_nr = "W" + str(woidrow).zfill(4)
-                wo_type_default = list(df_workorders[df_workorders["IDROW"] == woidrow]["TYPE"])[0]
-                wo_type_index = wo_type_options.index(wo_type_default)
-                wo_startdate_default = list(df_workorders[df_workorders["IDROW"] == woidrow]["STARTDATE"])[0]
-                wo_enddate_default = list(df_workorders[df_workorders["IDROW"] == woidrow]["ENDDATE"])[0]
-                wo_notes_default = list(df_workorders[df_workorders["IDROW"] == woidrow]["NOTES"])[0]                
-            else:
-                wo_nr = ""
-                wo_type_index = 0
-                wo_startdate_default = None
-                wo_enddate_default = None
-                wo_notes_default = None                    
+            wo_type_default = list(df_workorders[df_workorders["WOID"] == woid]["TYPE"])[0]
+            wo_type_index = wo_type_options.index(wo_type_default)
+            wo_startdate_default = list(df_workorders[df_workorders["WOID"] == woid]["STARTDATE"])[0]
+            wo_enddate_default = list(df_workorders[df_workorders["WOID"] == woid]["ENDDATE"])[0]
+            wo_title_default = list(df_workorders[df_workorders["WOID"] == woid]["TITLE"])[0]        
+            wo_description_default = list(df_workorders[df_workorders["WOID"] == woid]["DESCRIPTION"])[0]
+            wo_time_qty_default = list(df_workorders[df_workorders["WOID"] == woid]["TIME_QTY"])[0]        
+            wo_time_um_default = list(df_workorders[df_workorders["WOID"] == woid]["TIME_UM"])[0]                         
+            # else:
+            #     wo_nr = ""
+            #     wo_type_index = 0
+            #     wo_startdate_default = None
+            #     wo_enddate_default = None
+            #     wo_notes_default = None                    
             
-            wo_idrow = st.text_input(label="Work Order", value=wo_nr, disabled=True)        
+            wo_woid = st.text_input(label="Work Order", value=wo_nr, disabled=True)        
             wo_type = st.selectbox(label="Type(:red[*])", options=wo_type_options, index=wo_type_index, disabled=False)            
             wo_startdate = st.date_input(label="Start date(:red[*])", format="DD/MM/YYYY", value=wo_startdate_default, disabled=False)
             wo_enddate = st.date_input(label="End date(:red[*])", format="DD/MM/YYYY", value=wo_enddate_default, disabled=False)
-            wo_notes = st.text_area(label="TechDept notes", value=wo_notes_default, disabled=False)
-            # Tech Dept (TD) user assignment selection
-            filtered_woassignedto = df_woassegnedto[
-                (df_woassegnedto["WOIDROW"] == woidrow) & 
-                (df_woassegnedto["STATUS"] == active_status)
-            ]
 
-            wo_assignedto_default = list(filtered_woassignedto["USERNAME"])
-            df_tdusers = df_users[df_users["DEPTCODE"] == default_dept_code]
-            wo_assignedto_option = list(df_tdusers["NAME"])
-            wo_assignedto_title = "Assigned to (:red[*]):"
-            wo_assignedto = st.multiselect(
-                label=wo_assignedto_title, 
-                options=wo_assignedto_option, 
-                default=wo_assignedto_default, 
-                max_selections=3,
-                disabled=False
-            )
+            
+
+#             # Tech Dept (TD) user assignment selection
+#             filtered_woassignedto = df_woassegnedto[
+#                 (df_woassegnedto["WOID"] == wo_nr) & 
+#                 (df_woassegnedto["STATUS"] == active_status)
+#             ]
+
+#             wo_assignedto_default = list(filtered_woassignedto["USERNAME"])
+#             df_tdusers = df_users[df_users["DEPTCODE"] == default_dept_code]
+#             wo_assignedto_option = list(df_tdusers["NAME"])
+#             wo_assignedto_title = "Assigned to (:red[*]):"
+#             wo_assignedto = st.multiselect(
+#                 label=wo_assignedto_title, 
+#                 options=wo_assignedto_option, 
+#                 default=wo_assignedto_default, 
+#                 max_selections=3,
+#                 disabled=False
+#             )
 
 
-            if woidrow > 0:
-                if (wo_type == wo_type_default and wo_startdate == wo_startdate_default and wo_enddate == wo_enddate_default and wo_assignedto == wo_assignedto_default):
-                    disable_save_button = True
-                else:
-                    disable_save_button = False    
-            else:
-                if not (wo_type and wo_startdate and wo_enddate and wo_assignedto):
-                    disable_save_button = True
-                else:
-                    disable_save_button = False    
-            # Handle save action
-            if st.button("Save", type="primary", disabled=disable_save_button, key="wo_save_button"):
-                wo = {"idrow":0, "type": wo_type, "startdate": wo_startdate, "endate": wo_enddate, "title": selected_row["TITLE"][0], "notes": wo_notes, "status": ACTIVE_STATUS, "reqidrow": reqidrow}
-                wo_idrow, success = save_workorder(wo)
-                if success:
-#                    st.success(f"Work order W{str(wo_idrow).zfill(4)} created successfully!")
-                    success = save_workorder_assignments(wo_idrow, wo_assignedto, df_users, df_woassegnedto)
-                    success = update_request(reqidrow, "ASSIGNED", selected_row['NOTES'][0], wo_idrow, "")
-                    if success:
-                        st.session_state.grid_refresh = True
-                        st.session_state.grid_response = None
-                        st.success(f"Work order W{str(wo_idrow).zfill(4)} assigned successfully!")
+#             if woidrow > 0:
+#                 if (wo_type == wo_type_default and wo_startdate == wo_startdate_default and wo_enddate == wo_enddate_default and wo_assignedto == wo_assignedto_default):
+#                     disable_save_button = True
+#                 else:
+#                     disable_save_button = False    
+#             else:
+#                 if not (wo_type and wo_startdate and wo_enddate and wo_assignedto):
+#                     disable_save_button = True
+#                 else:
+#                     disable_save_button = False    
+#             # Handle save action
+#             if st.button("Save", type="primary", disabled=disable_save_button, key="wo_save_button"):
+#                 wo = {"woid":"", "type": wo_type, "startdate": wo_startdate, "endate": wo_enddate, "title": selected_row["TITLE"][0], "notes": wo_notes, "status": ACTIVE_STATUS, "reqidrow": reqidrow}
+#                 wo_idrow, success = save_workorder(wo)
+#                 if success:
+# #                    st.success(f"Work order W{str(wo_idrow).zfill(4)} created successfully!")
+#                     success = save_workorder_assignments(wo_idrow, wo_assignedto, df_users, df_woassegnedto)
+#                     success = update_request(reqidrow, "ASSIGNED", selected_row['NOTES'][0], wo_idrow, "")
+#                     if success:
+#                         st.session_state.grid_refresh = True
+#                         st.session_state.grid_response = None
+#                         st.success(f"Work order W{str(wo_idrow).zfill(4)} assigned successfully!")
                     
-                    st.session_state.need_refresh = True
-                    time.sleep(3)
-                    reset_application_state()
-                    st.rerun()
+#                     st.session_state.need_refresh = True
+#                     time.sleep(3)
+#                     reset_application_state()
+#                     st.rerun()
 
-            return False
+#             return False
 
         return dialog_content()
    
@@ -1600,7 +1606,7 @@ def manage_request():
                         show_workorder_dialog(
                             selected_rows,
                             df_workorders, 
-                            df_woassegnedto, 
+                            df_woassignedto, 
                             df_users,
                             ACTIVE_STATUS, 
                             DEFAULT_DEPT_CODE,

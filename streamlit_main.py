@@ -1199,7 +1199,6 @@ def manage_request():
             # Extract request and work order ID
             reqid = selected_row["REQID"][0]
             woid = "W" + selected_row["REQID"][0][1:]
-            req_description_default = df_requests[df_requests["REQID"]==reqid]["DESCRIPTION"][0]
 
             # Display request details
             st.text_input(label="Product Line", value=selected_row['PRLINE_NAME'][0], disabled=True)
@@ -1207,6 +1206,12 @@ def manage_request():
             #st.text_input(label="Request Id", value=reqid, disabled=True)
 
             st.text_input(label="Request title", value=selected_row['TITLE'][0], disabled=True)
+            
+            req_description = df_requests[df_requests["REQID"]==reqid]["DESCRIPTION"]
+            if not req_description.empty:
+                req_description_default = req_description.values[0]
+            else:
+                req_description_default = ""
             st.text_input(label="Request description", value=req_description_default, disabled=True)
             #st.text_input(label="Request description", value=selected_row['DESCRIPTION'][0], disabled=True)
             #st.text_area(label="Detail", value=selected_row['DETAIL'][0], disabled=True)

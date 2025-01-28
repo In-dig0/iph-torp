@@ -1250,6 +1250,17 @@ def manage_request():
             df_tdusers = df_users[df_users["DEPTCODE"] == default_dept_code]
             wo_tdtm_options = df_reqassignedto[df_reqassignedto["REQID"]==reqid]["USERNAME"]
             wo_tdtm_name = st.selectbox(label="Tech Department Team Leader(:red[*])", options=wo_tdtm_options, index=None, disabled=False)
+            
+            # Filtra i risultati
+            filtered_df_tdtm_name = df_tdusers[df_tdusers["NAME"] == wo_tdtm_name]
+
+            # Controlla se il filtro ha restituito risultati
+            if not filtered_df_tdtm_name.empty:
+                wo_tdtm_code = filtered_df_tdtm_name["CODE"].values[0]
+            else:
+                wo_tdtm_code = None  # O un valore predefinito che preferisci
+            
+            
             #wo_tdtm_code = df_tdusers[df_tdusers["NAME"]==wo_tdtm_name]["CODE"].values[0]       
             wo_type = st.selectbox(label="Type(:red[*])", options=wo_type_options, index=wo_type_index, disabled=False)
             wo_time_qty = st.number_input(label="Time estimated(:red[*]):", min_value=wo_timeqty_default, step=0.5)
@@ -1288,7 +1299,7 @@ def manage_request():
 
             # Handle save action
             if st.button("Save", type="primary", disabled=disable_save_button, key="wo_save_button"):
-                wo = {"woid":woid, "tdtmid": wo_tdtm_wo_tdtm_name, "type": wo_type, "title": selected_row["TITLE"][0], "description": req_description_default, "time_qty": wo_time_qty, "time_um": wo_time_um, "status": ACTIVE_STATUS, "startdate": wo_startdate, "endate": wo_enddate, "reqid": reqid}
+                wo = {"woid":woid, "tdtmid": wo_tdtm_code, "type": wo_type, "title": selected_row["TITLE"][0], "description": req_description_default, "time_qty": wo_time_qty, "time_um": wo_time_um, "status": ACTIVE_STATUS, "startdate": wo_startdate, "endate": wo_enddate, "reqid": reqid}
                 wo_idrow, success = save_workorder(wo)
 #                 if success:
 # #                    st.success(f"Work order W{str(wo_idrow).zfill(4)} created successfully!")

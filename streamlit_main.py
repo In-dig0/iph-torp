@@ -1200,7 +1200,7 @@ def manage_request():
             # Extract request and work order ID
             reqid = selected_row["REQID"][0]
             woid = "W" + selected_row["REQID"][0][1:]
-            req_description_default = df_requests[df_requests["REID"]==reqid]["DESCRIPTION"][0]
+            req_description_default = df_requests[df_requests["REQID"]==reqid]["DESCRIPTION"][0]
 
             # Display request details
 #            st.text_input(label="Product family", value=selected_row['PR_FAMILY'][0], disabled=True)

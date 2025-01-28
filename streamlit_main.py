@@ -1212,7 +1212,7 @@ def manage_request():
             #st.divider()
             wo_nr = woid
             wo_type_options=["Standard", "APQP Project"]  #APQP -> ADVANCED PRODUCT QUALITY PLANNING"  
-            wo_type_default = list(df_workorders[df_workorders["WOID"] == woid]["TYPE"])[0]
+            wo_type_default = df_workorders[df_workorders["WOID"] == woid]["TYPE"].values[0]
             wo_type_index = wo_type_options.index(wo_type_default)
             wo_startdate_default = list(df_workorders[df_workorders["WOID"] == woid]["STARTDATE"])[0]
             wo_enddate_default = list(df_workorders[df_workorders["WOID"] == woid]["ENDDATE"])[0]

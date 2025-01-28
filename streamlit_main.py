@@ -1257,9 +1257,13 @@ def manage_request():
             wo_tdtl_options = df_reqassignedto[df_reqassignedto["REQID"]==reqid]["USERNAME"]
             if len(wo_tdtl_options) == 1:
                 # Utilizza .get_loc per ottenere l'indice dell'elemento
-                idx_tdtl = df_tdusers.index.get_loc(df_tdusers[df_tdusers["NAME"] == wo_tdtl_options.values[0]].index[0])
+                try:
+                    idx_tdtl = df_tdusers.index.get_loc(df_tdusers[df_tdusers["NAME"] == wo_tdtl_options.values[0]].index[0])
+                except IndexError:
+                    idx_tdtl = 0  # Imposta un valore predefinito se l'indice non viene trovato
             else:
-                idx_tdtl = 0  
+                idx_tdtl = 0  # Imposta un valore predefinito se ci sono più opzioni
+
             wo_tdtm_name = st.selectbox(label="Tech Department Team Leader(:red[*])", options=wo_tdtl_options, index=idx_tdtl, disabled=False)
             
             # Filtra i risultati

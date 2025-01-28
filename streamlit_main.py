@@ -1205,7 +1205,7 @@ def manage_request():
 #            st.text_input(label="Category", value=selected_row['CATEGORY'][0], disabled=True)
             #st.text_input(label="Request Id", value=reqid, disabled=True)
             st.text_input(label="Request title", value=selected_row['TITLE'][0], disabled=True)
-            st.text_input(label="Request description", value=selected_row['DESCRIPTION'][0], disabled=True)
+            #st.text_input(label="Request description", value=selected_row['DESCRIPTION'][0], disabled=True)
             #st.text_area(label="Detail", value=selected_row['DETAIL'][0], disabled=True)
             # if selected_rows['NOTES'][0]:
             #     st.text_area(label="Notes", value=selected_row['NOTES'][0], disabled=True)

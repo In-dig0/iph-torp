@@ -1294,7 +1294,7 @@ def manage_request():
        
 
             if not wo_nr.empty:
-                if (wo_type == wo_type_default and wo_startdate == wo_startdate_default and wo_enddate == wo_enddate_default and wo_assignedto == wo_assignedto_default and wo_time_qty == wo_timeqty_default):
+                if (wo_type == wo_type_default and wo_assignedto == wo_assignedto_default and wo_time_qty == wo_timeqty_default):
                     disable_save_button = True
                 else:
                     disable_save_button = False    
@@ -1379,13 +1379,13 @@ def manage_request():
         try:     
             sql = """
                     INSERT INTO TORP_WORKORDERS (
-                        woid, type, title, description, time_qty, time_um,
+                        woid, tdtmid, type, title, description, time_qty, time_um,
                         status, startdate, enddate, reqid
                     ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                 """
 
             values = (
-                    wo["woid"], wo["type"], wo["title"], wo["description"], wo["time_qty"],wo["time_um"],
+                    wo["woid"], wo["tdtmid"], wo["type"], wo["title"], wo["description"], wo["time_qty"],wo["time_um"],
                     wo["status"], wo["startdate"], wo["enddate"], wo["reqid"]
                 )
                 

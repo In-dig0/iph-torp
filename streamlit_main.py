@@ -236,7 +236,7 @@ def load_workorders_data():
     global df_workorders
     global df_woassignedto
 
-    df_workorders = pd.read_sql_query ("""
+    df_workorders = pd.read_sql_query("""
     SELECT 
         A.woid as WOID, 
         A.type as TYPE, 

@@ -1270,6 +1270,7 @@ def manage_request():
             # wo_tdtl_options_list = df_reqassignedto[df_reqassignedto["REQID"] == reqid]["USERNAME"].unique().tolist()
             tdtl_name = df_lk_pline_tdtl[df_lk_pline_tdtl["PLINE_CODE"] == selected_pline_code]
             tdtl_name_list = tdtl_name["USER_NAME"].tolist()
+            tdtl_code_list = tdtl_name["USER_NAME"].tolist()
            
             st.write(f"POINT_C: {tdtl_name_list}")
 
@@ -1286,7 +1287,11 @@ def manage_request():
                 index=default_index,
                 disabled=False
             )
-  
+            if wo_tdtl_name:  # Se un team leader è stato selezionato
+                filtered_df_tdtl_name = df_tdusers[df_tdusers["NAME"] == wo_tdtl_name]
+                wo_tdtl_code = filtered_df_tdtl_name["CODE"].iloc[0] if not filtered_df_tdtl_name.empty else None
+            else:
+                wo_tdtl_code = None
             
             wo_type = st.selectbox(label="Type(:red[*])", options=wo_type_options, index=wo_type_index, disabled=False)
 #            wo_time_qty = st.number_input(label="Time estimated(:red[*]):", min_value=wo_timeqty_default, step=0.5)
@@ -1333,7 +1338,7 @@ def manage_request():
 
             # Handle save action
             if st.button("Save", type="primary", disabled=disable_save_button, key="wo_save_button"):
-                wo = {"woid":woid, "tdtlid": wo_tdtm_code, "type": wo_type, "title": selected_row["TITLE"][0], "description": req_description_default, "time_qty": wo_time_qty, "time_um": wo_time_um, "status": ACTIVE_STATUS, "startdate": wo_startdate, "enddate": wo_enddate, "reqid": reqid}
+                wo = {"woid":woid, "tdtlid": wo_tdtl_code, "type": wo_type, "title": selected_row["TITLE"][0], "description": req_description_default, "time_qty": wo_time_qty, "time_um": wo_time_um, "status": ACTIVE_STATUS, "startdate": wo_startdate, "enddate": wo_enddate, "reqid": reqid}
                 wo_idrow, success = save_workorder(wo)
                 if success:
 #                    st.success(f"Work order W{str(wo_idrow).zfill(4)} created successfully!")

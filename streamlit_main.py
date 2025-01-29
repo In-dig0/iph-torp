@@ -1127,7 +1127,7 @@ def manage_request():
             req_status = st.selectbox(label=":blue[Status]", options=req_status_options, index=idx_status, disabled=False, key="status_selectbox")
             
             # Display Tech Dept Note
-            default_note_td = df_requests[df_requests["REQID"] == reqid]["NOTE_TD"].values[0]
+            default_note_td = str(df_requests[df_requests["REQID"] == reqid]["NOTE_TD"].values[0])
             req_note_td = st.text_area(label=":blue[Tech Department Notes]", value=default_note_td, disabled=False)
 
 
@@ -1137,8 +1137,8 @@ def manage_request():
                 disable_save_button = False    
             # Handle save action
             if st.button("Save", type="primary", disabled=disable_save_button, key="req_save_button"):
-                st.write(req_tdtl_name)
-                success = update_request_fn(reqid, req_status, req_note_td, 0, req_tdtl_name_list)               
+                #st.write(req_tdtl_name)
+                success = update_request_fn(reqid, req_status[0], req_note_td, 0, req_tdtl_name_list)               
                 if success:
                     st.session_state.grid_refresh = True
                     st.session_state.grid_response = None

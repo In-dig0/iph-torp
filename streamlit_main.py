@@ -1430,7 +1430,7 @@ def manage_request():
                         conn.commit()
                     except Exception as e:
                         conn.rollback()
-                        st.error(f"Error inserting/updating REQASSIGNEDTO for {tdl}: {str(e)}", icon="🚨")
+                        st.error(f"Error inserting/updating REQASSIGNEDTO for {tdtl}: {str(e)}", icon="🚨")
                         return False
             else:
                 st.warning("Nessun Team Leader fornito per l'aggiornamento di REQASSIGNEDTO", icon="⚠️")

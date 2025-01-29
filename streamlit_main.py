@@ -1138,7 +1138,7 @@ def manage_request():
             # Handle save action
             if st.button("Save", type="primary", disabled=disable_save_button, key="req_save_button"):
                 st.write(req_tdtl_name)
-                success = update_request_fn(reqid, req_status.values[0], req_note_td.values[0], 0, req_tdtl_name_list)               
+                success = update_request_fn(reqid, req_status, req_note_td, 0, req_tdtl_name_list)               
                 if success:
                     st.session_state.grid_refresh = True
                     st.session_state.grid_response = None
@@ -1586,7 +1586,7 @@ def manage_request():
 
     # Sidebar controls - Filters
     st.sidebar.header("Filters")
-    req_status_options = df_requests_grid['STATUS'].drop_duplicates().sort_values()
+    req_status_options = list(df_requests_grid['STATUS'].drop_duplicates().sort_values())
     status_filter = st.sidebar.selectbox(
         "Select a Status value:", 
         req_status_options, 

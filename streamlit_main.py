@@ -1265,14 +1265,17 @@ def manage_request():
             
             # Lista dei possibili nomi dei Team Leader
             selected_pline_name = selected_row['PRLINE_NAME'][0]
+            st.write(f"POINT_C0: {selected_pline_name}")
             selected_pline_code = df_pline[df_pline["NAME"] == selected_pline_name]["CODE"].values[0]
+            st.write(f"POINT_C1: {selected_pline_code}")
             
             # wo_tdtl_options_list = df_reqassignedto[df_reqassignedto["REQID"] == reqid]["USERNAME"].unique().tolist()
             tdtl_name = df_lk_pline_tdtl[df_lk_pline_tdtl["PLINE_CODE"] == selected_pline_code]
+            st.write(f"POINT_C2: {tdtl_name}")
             tdtl_name_list = tdtl_name["USER_NAME"].tolist()
-            tdtl_code_list = tdtl_name["USER_NAME"].tolist()
-           
-            st.write(f"POINT_C: {tdtl_name_list}")
+            st.write(f"POINT_C3: {tdtl_name_list}")
+            tdtl_code_list = tdtl_name["USER_CODE"].tolist()
+            st.write(f"POINT_C4: {tdtl_name_list}")
 
             if len(tdtl_name_list) == 1:
                 # Request assigned to only one Team Leader

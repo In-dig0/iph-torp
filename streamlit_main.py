@@ -1275,7 +1275,7 @@ def manage_request():
             tdtl_name_list = tdtl_name["USER_NAME"].tolist()
             st.write(f"POINT_C3: {tdtl_name_list}")
             tdtl_code_list = tdtl_name["USER_CODE"].tolist()
-            st.write(f"POINT_C4: {tdtl_name_list}")
+            st.write(f"POINT_C4: {tdtl_code_list}")
 
             if len(tdtl_name_list) == 1:
                 # Request assigned to only one Team Leader

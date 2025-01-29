@@ -1295,7 +1295,7 @@ def manage_request():
             else:
                 default_tdtl_name = []
 
-            req_tdtl_name = st.multiselect(
+            req_tdtl_name = st.selectbox(
                 label=":blue[Tech Department Team Leader](:red[*])",
                 options=tdtl_username_list,
                 default=default_tdtl_name,

@@ -1387,7 +1387,7 @@ def manage_request():
     # Database update functions
     def update_request(reqid: str, new_status: str, new_note_td: str, new_woid: str = "", new_tdtl: list=[]):
         
-        st.write(f"POINT_U0: reqid = {new_tdtl} - new_status = {new_status} - new_tdtl = {new_tdtl}")
+        st.write(f"POINT_U0: reqid = {reqid} - new_status = {new_status} - new_note_td = {new_note_td} - new_tdtl = {new_tdtl}")
 
         if isinstance(new_status, pd.Series):  # Check if it's a Series
             new_status = new_status.iloc[0]
@@ -1407,42 +1407,43 @@ def manage_request():
             conn.rollback()
             st.error(f"Error updating TORP_REQUESTS: {str(e)}", icon="🚨")
             return False
+
         # Update TORP_REQASSIGNEDTO
         try:
-            # Disable existing assignments
+            # 1. Disable existing assignments (important to do this *before* inserting new ones)
             cursor.execute("UPDATE TORP_REQASSIGNEDTO SET status = ? WHERE reqid = ?", (DISABLED_STATUS, reqid))
-
-            # Add new assignments
-            for user_name in new_tdtl:
-                user_filter = df_users["NAME"] == user_name  # Store filter for reuse
-                user_code_series = df_users.loc[user_filter, "CODE"] # Use .loc
-                if not user_code_series.empty:  # Check if any rows matched
-                    user_code = user_code_series.iloc[0] # Access the value only if exists
-                    existing_assignment = df_reqassignedto[
-                        (df_reqassignedto['REQID'] == reqid) &
-                        (df_reqassignedto['USERID'] == user_code)
-                    ]
-
-                    if existing_assignment.empty:
-                        cursor.execute(
-                            "INSERT INTO TORP_REQASSIGNEDTO (userid, reqid, status) VALUES (?, ?, ?)",
-                            (user_code, reqid, ACTIVE_STATUS)
-                        )
-                    else:
-                        cursor.execute(
-                            "UPDATE TORP_REQASSIGNEDTO SET status = ? WHERE userid = ? AND reqid = ?",
-                            (ACTIVE_STATUS, user_code, reqid)
-                        )
-                else:
-                    st.warning(f"User '{user_name}' not found in the user database.") # Inform the user
-
             conn.commit()
-            return True
+
+            # 2. Insert new assignments
+            if new_tdtl: # Check if the list is not empty
+                for tdtl in new_tdtl:
+                    try:
+                        # Check if the record already exists in the table
+                        cursor.execute("SELECT 1 FROM TORP_REQASSIGNEDTO WHERE reqid = ? AND username = ?", (reqid, tdtl))
+                        existing_record = cursor.fetchone()
+                        if existing_record:
+                            # Update the existing record
+                            cursor.execute("UPDATE TORP_REQASSIGNEDTO SET status = ? WHERE reqid = ? AND username = ?", (ACTIVE_STATUS, reqid, tdtl))
+                        else:
+                            # Insert a new record
+                            cursor.execute("INSERT INTO TORP_REQASSIGNEDTO (reqid, username, status) VALUES (?, ?, ?)", (reqid, tdtl, ACTIVE_STATUS))
+                        conn.commit()
+                    except Exception as e:
+                        conn.rollback()
+                        st.error(f"Error inserting/updating REQASSIGNEDTO for {tdl}: {str(e)}", icon="🚨")
+                        return False
+            else:
+                st.warning("Nessun Team Leader fornito per l'aggiornamento di REQASSIGNEDTO", icon="⚠️")
 
         except Exception as e:
             conn.rollback()
-            st.error(f"Error updating REQASSIGNEDTO: {str(e)}", icon="🚨")
+            st.error(f"Error updating REQASSIGNEDTO (disabling): {str(e)}", icon="🚨")
             return False
+
+
+
+
+
 
     def save_workorder(wo: dict): # Pass connection and cursor
         try:

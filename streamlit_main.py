@@ -1165,7 +1165,7 @@ def manage_request():
                 disable_save_button = False    
             # Handle save action
             if st.button("Save", type="primary", disabled=disable_save_button, key="req_save_button"):
-                st.write(f"POINT_A10 {req_tdtl_code}")
+                #st.write(f"POINT_A10 {req_tdtl_code}")
                 success = update_request_fn(reqid, req_status, req_note_td, 0, req_tdtl_code)               
                 if success:
                     st.session_state.grid_refresh = True
@@ -1325,14 +1325,13 @@ def manage_request():
 
             if req_tdtl_name: #se è stato selezionato un TL
                 req_tdtl_code = df_users[df_users["NAME"] == req_tdtl_name]["CODE"].iloc[0] #Recupero il codice del TL
-                st.write(f"Team Leader selezionato (nome): {req_tdtl_name}")
-                st.write(f"Team Leader selezionato (codice): {req_tdtl_code}")
+                #st.write(f"Team Leader selezionato (nome): {req_tdtl_name}")
+                #st.write(f"Team Leader selezionato (codice): {req_tdtl_code}")
             else:
-                st.write("Nessun Team Leader selezionato.")
+                #st.write("Nessun Team Leader selezionato.")
                 req_tdtl_code = None # o un valore di default che preferisci            
 
             wo_type = st.selectbox(label="Type(:red[*])", options=wo_type_options, index=wo_type_index, disabled=False)
-#            wo_time_qty = st.number_input(label="Time estimated(:red[*]):", min_value=wo_timeqty_default, step=0.5)
             wo_time_qty = st.number_input(
                 label="Time estimated(:red[*]):",
                 min_value=min_value, # Usa il valore minimo predefinito
@@ -1400,7 +1399,7 @@ def manage_request():
     # Database update functions
     def update_request(reqid: str, new_status: str, new_note_td: str, new_woid: str = "", new_tdtl: list=[]):
         
-        st.write(f"POINT_U0: reqid = {reqid} - new_status = {new_status} - new_note_td = {new_note_td} - new_tdtl = {new_tdtl}")
+        #st.write(f"POINT_U0: reqid = {reqid} - new_status = {new_status} - new_note_td = {new_note_td} - new_tdtl = {new_tdtl}")
 
         if isinstance(new_status, pd.Series):  # Check if it's a Series
             new_status = new_status.iloc[0]

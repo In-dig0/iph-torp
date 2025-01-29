@@ -1122,6 +1122,7 @@ def manage_request():
             default_tdtl_name = tdtl_option["NAME"].tolist()
             req_tdtl_name = st.multiselect(label=":blue[Tech Department Team Leader]", options=tdtl_username_list, default=default_tdtl_name, key="sb_tdtl_reqmanage", disabled=False)
             req_tdtl_name_list = list(req_tdtl_name)
+            st.write(req_tdtl_name_list)
             # Display Status 
             idx_status = req_status_options.index(selected_row['STATUS'][0])
             req_status = st.selectbox(label=":blue[Status]", options=req_status_options, index=idx_status, disabled=False, key="status_selectbox")
@@ -1351,13 +1352,15 @@ def manage_request():
     # Database update functions
     def update_request(reqid: str, new_status: str, new_note_td: str, new_woid: str = "", new_tdtl: list=[]):
         
+        st.write(new_tdtl)
+
         if isinstance(new_status, pd.Series):  # Check if it's a Series
             new_status = new_status.iloc[0]
         if isinstance(new_note_td, pd.Series):
             new_note_td = new_note_td.iloc[0]
         if isinstance(new_woid, pd.Series):
             new_woid = new_woid.iloc[0]
-            
+
         # Update TORP_REQUESTS
         try:
             cursor.execute(

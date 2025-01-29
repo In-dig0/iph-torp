@@ -1323,10 +1323,13 @@ def manage_request():
                 disabled=False
             )
 
-            if req_tdtl_name:
-                req_tdtl_code = df_users[df_users["NAME"].isin(req_tdtl_name)]["CODE"].tolist()
+            if req_tdtl_name: #se è stato selezionato un TL
+                req_tdtl_code = df_users[df_users["NAME"] == req_tdtl_name]["CODE"].iloc[0] #Recupero il codice del TL
+                st.write(f"Team Leader selezionato (nome): {req_tdtl_name}")
+                st.write(f"Team Leader selezionato (codice): {req_tdtl_code}")
             else:
-                req_tdtl_code = []            
+                st.write("Nessun Team Leader selezionato.")
+                req_tdtl_code = None # o un valore di default che preferisci            
 
             wo_type = st.selectbox(label="Type(:red[*])", options=wo_type_options, index=wo_type_index, disabled=False)
 #            wo_time_qty = st.number_input(label="Time estimated(:red[*]):", min_value=wo_timeqty_default, step=0.5)

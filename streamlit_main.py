@@ -1454,7 +1454,7 @@ def manage_request():
                 for tdtl in new_tdtl:
                     try:
                         # Check if the record already exists in the table
-                        cursor.execute("SELECT 1 FROM TORP_REQASSIGNEDTO WHERE reqid = ? AND username = ?", (reqid, tdtl))
+                        cursor.execute("SELECT 1 FROM TORP_REQASSIGNEDTO WHERE reqid = ? AND userid = ?", (reqid, tdtl))
                         existing_record = cursor.fetchone()
                         if existing_record:
                             # Update the existing record

@@ -1125,7 +1125,7 @@ def manage_request():
             st.write(f"POINT_A4: {tdtl_option}")           
             default_tdtl_name = tdtl_option["NAME"].tolist()
             st.write(f"POINT_A5: {tdtl_option}")         
-            req_tdtl_name = st.multiselect(label=":blue[Tech Department Team Leader]", options=tdtl_username_list, default=default_tdtl_name, key="sb_tdtl_reqmanage", disabled=False)          
+            req_tdtl_name = st.multiselect(label=":blue[Tech Department Team Leader](:red[*])", options=tdtl_username_list, default=default_tdtl_name, key="sb_tdtl_reqmanage", disabled=False)          
             st.write(f"POINT_A6: {tdtl_option}")   
 # #############################
 #             # Lista dei possibili nomi dei Team Leader
@@ -1154,7 +1154,7 @@ def manage_request():
             
             # Display Status 
             idx_status = req_status_options.index(selected_row['STATUS'][0])
-            req_status = st.selectbox(label=":blue[Status]", options=req_status_options, index=idx_status, disabled=False, key="status_selectbox")
+            req_status = st.selectbox(label=":blue[Status](:red[*])", options=req_status_options, index=idx_status, disabled=False, key="status_selectbox")
             
             # Display Tech Dept Note
             default_note_td = str(df_requests[df_requests["REQID"] == reqid]["NOTE_TD"].values[0])

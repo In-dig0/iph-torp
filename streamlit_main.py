@@ -1263,12 +1263,18 @@ def manage_request():
                  
             df_tdusers = df_users[df_users["DEPTCODE"] == default_dept_code]
             
-            wo_tdtl_options_list = df_reqassignedto[df_reqassignedto["REQID"]==reqid]["USERNAME"].unique().tolist()
-            st.write(f"POINT_C: {wo_tdtl_options_list}")
+            # Lista dei possibili nomi dei Team Leader
+            selected_pline_name = selected_row['PRLINE_NAME'][0]
+            selected_pline_code = df_pline[df_pline["NAME"] == selected_pline_name]["CODE"].values[0]
+            
+            # wo_tdtl_options_list = df_reqassignedto[df_reqassignedto["REQID"] == reqid]["USERNAME"].unique().tolist()
+            tdtl_name = df_lk_pline_tdtl[df_lk_pline_tdtl["PLINE_CODE"] == selected_pline_code]
+            tdtl_name_list = tdtl_name["USER_NAME"].tolist()
+           
+            st.write(f"POINT_C: {tdtl_name_list}")
 
-            if len(wo_tdtl_options_list) == 1:
+            if len(tdtl_name_list) == 1:
                 # Request assigned to only one Team Leader
-                wo_tdtl_name = wo_tdtl_options_list[0]
                 default_index = 0
             else:
                 # Request assigned to many Team Leader
@@ -1276,7 +1282,7 @@ def manage_request():
 
             wo_tdtl_name = st.selectbox(
                 label="Tech Department Team Leader(:red[*])",
-                options=wo_tdtl_options_list,
+                options=tdtl_name_list,
                 index=default_index,
                 disabled=False
             )

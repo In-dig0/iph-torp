@@ -1422,12 +1422,11 @@ def manage_request():
 
         # Update TORP_REQASSIGNEDTO
         try:
-            # 1. Disable existing assignments (important to do this *before* inserting new ones)
-            cursor.execute("UPDATE TORP_REQASSIGNEDTO SET status = ? WHERE reqid = ?", (DISABLED_STATUS, reqid))
-            conn.commit()
-
-            # 2. Insert new assignments
             if new_tdtl: # Check if the list is not empty
+            # 1. Disable existing assignments (important to do this *before* inserting new ones)
+                cursor.execute("UPDATE TORP_REQASSIGNEDTO SET status = ? WHERE reqid = ?", (DISABLED_STATUS, reqid))
+                conn.commit()
+                # 2. Insert new assignments
                 for tdtl in new_tdtl:
                     try:
                         # Check if the record already exists in the table
@@ -1444,8 +1443,8 @@ def manage_request():
                         conn.rollback()
                         st.error(f"Error inserting/updating REQASSIGNEDTO for {tdtl}: {str(e)}", icon="🚨")
                         return False
-            else:
-                st.warning("Nessun Team Leader fornito per l'aggiornamento di REQASSIGNEDTO", icon="⚠️")
+            # else:
+            #     st.warning("Nessun Team Leader fornito per l'aggiornamento di REQASSIGNEDTO", icon="⚠️")
 
         except Exception as e:
             conn.rollback()

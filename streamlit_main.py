@@ -1113,22 +1113,21 @@ def manage_request():
             st.text_area(label="Description", value=description, disabled=True)
 
             st.divider()
-
-            # Display TD Team Leader            
-            tdtl_usercode = df_lk_pline_tdtl["USER_CODE"].drop_duplicates().sort_values()
-            #st.write(f"POINT_A1: {tdtl_usercode}")
-            tdtl_username_list = df_users[df_users["CODE"].isin(tdtl_usercode)]["NAME"]    
-            #st.write(f"POINT_A2: {tdtl_username_list}")                                
-            tdtl_default_codes = df_reqassignedto[df_reqassignedto["REQID"] == reqid]["USERID"]
-            #st.write(f"POINT_A3: {tdtl_default_codes}")   
-            tdtl_option = df_users[df_users["CODE"].isin(tdtl_default_codes)]   
-            #st.write(f"POINT_A4: {tdtl_option}")           
-            default_tdtl_name = tdtl_option["NAME"].tolist()
-            #st.write(f"POINT_A5: {default_tdtl_name}")         
-            req_tdtl_name = st.multiselect(label=":blue[Tech Department Team Leader](:red[*])", options=tdtl_username_list, default=default_tdtl_name, key="sb_tdtl_reqmanage", disabled=False)          
-            st.write(f"POINT_A6: {req_tdtl_name}")   
-            req_tdtl_code = df_users[df_users["NAME"] == req_tdtl_name]["CODE"]
-            st.write(f"POINT_A7: {req_tdtl_code}")   
+           # # Display TD Team Leader            
+            # tdtl_usercode = df_lk_pline_tdtl["USER_CODE"].drop_duplicates().sort_values()
+            # #st.write(f"POINT_A1: {tdtl_usercode}")
+            # tdtl_username_list = df_users[df_users["CODE"].isin(tdtl_usercode)]["NAME"]    
+            # #st.write(f"POINT_A2: {tdtl_username_list}")                                
+            # tdtl_default_codes = df_reqassignedto[df_reqassignedto["REQID"] == reqid]["USERID"]
+            # #st.write(f"POINT_A3: {tdtl_default_codes}")   
+            # tdtl_option = df_users[df_users["CODE"].isin(tdtl_default_codes)]   
+            # #st.write(f"POINT_A4: {tdtl_option}")           
+            # default_tdtl_name = tdtl_option["NAME"].tolist()
+            # #st.write(f"POINT_A5: {default_tdtl_name}")         
+            # req_tdtl_name = st.multiselect(label=":blue[Tech Department Team Leader](:red[*])", options=tdtl_username_list, default=default_tdtl_name, key="sb_tdtl_reqmanage", disabled=False)          
+            # st.write(f"POINT_A6: {req_tdtl_name}")   
+            # req_tdtl_code = df_users[df_users["NAME"] == req_tdtl_name]["CODE"]
+            # st.write(f"POINT_A7: {req_tdtl_code}")   
 # #############################
 #             # Lista dei possibili nomi dei Team Leader
 #             selected_pline_name = selected_row['PRLINE_NAME'][0]
@@ -1145,14 +1144,42 @@ def manage_request():
 #             st.write(f"POINT_C4: {tdtl_code_list}")
 # #############################
 
+            tdtl_usercode = df_lk_pline_tdtl["USER_CODE"].drop_duplicates().sort_values().tolist() #conversione in lista
+            tdtl_username_list = df_users[df_users["CODE"].isin(tdtl_usercode)]["NAME"].tolist()
 
-            req_tdtl_name_list = list(req_tdtl_name)
-            st.write(f"POINT_A8: {req_tdtl_name_list}")
+            tdtl_default_codes = df_reqassignedto[df_reqassignedto["REQID"] == reqid]["USERID"].tolist()
+
+            if tdtl_default_codes:
+                tdtl_option = df_users[df_users["CODE"].isin(tdtl_default_codes)]
+                default_tdtl_name = tdtl_option["NAME"].tolist()
+            else:
+                default_tdtl_name = []
+
+            req_tdtl_name = st.multiselect(
+                label=":blue[Tech Department Team Leader](:red[*])",
+                options=tdtl_username_list,
+                default=default_tdtl_name,
+                key="sb_tdtl_reqmanage",
+                disabled=False
+            )
+
+            if req_tdtl_name:
+                req_tdtl_code = df_users[df_users["NAME"].isin(req_tdtl_name)]["CODE"].tolist()
+            else:
+                req_tdtl_code = []
+
+            st.write(f"POINT_A6: {req_tdtl_name}")
+            st.write(f"POINT_A7: {req_tdtl_code}")
+
+
+
+            # req_tdtl_name_list = list(req_tdtl_name)
+            # st.write(f"POINT_A8: {req_tdtl_name_list}")
             
-            if len(req_tdtl_name_list) == 0:
-                req_tdtl_name_list = default_tdtl_name
+            # if len(req_tdtl_name_list) == 0:
+            #     req_tdtl_name_list = default_tdtl_name
 
-            st.write(f"POINT_A9: {req_tdtl_name_list}")
+            # st.write(f"POINT_A9: {req_tdtl_name_list}")
             
             # Display Status 
             idx_status = req_status_options.index(selected_row['STATUS'][0])
@@ -1170,7 +1197,7 @@ def manage_request():
             # Handle save action
             if st.button("Save", type="primary", disabled=disable_save_button, key="req_save_button"):
                 st.write(f"POINT_A10 {req_tdtl_name_list}")
-                success = update_request_fn(reqid, req_status, req_note_td, 0, req_tdtl_name_list)               
+                success = update_request_fn(reqid, req_status, req_note_td, 0, req_tdtl_code)               
                 if success:
                     st.session_state.grid_refresh = True
                     st.session_state.grid_response = None

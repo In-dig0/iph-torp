@@ -1196,7 +1196,7 @@ def manage_request():
                 disable_save_button = False    
             # Handle save action
             if st.button("Save", type="primary", disabled=disable_save_button, key="req_save_button"):
-                st.write(f"POINT_A10 {req_tdtl_name_list}")
+                st.write(f"POINT_A10 {req_tdtl_code}")
                 success = update_request_fn(reqid, req_status, req_note_td, 0, req_tdtl_code)               
                 if success:
                     st.session_state.grid_refresh = True

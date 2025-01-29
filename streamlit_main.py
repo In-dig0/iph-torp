@@ -1122,7 +1122,10 @@ def manage_request():
             default_tdtl_name = tdtl_option["NAME"].tolist()
             req_tdtl_name = st.multiselect(label=":blue[Tech Department Team Leader]", options=tdtl_username_list, default=default_tdtl_name, key="sb_tdtl_reqmanage", disabled=False)
             req_tdtl_name_list = list(req_tdtl_name)
-            st.write(req_tdtl_name_list)
+            if len(req_tdtl_name_list) == 0:
+                req_tdtl_name_list = default_tdtl_name
+
+            st.write(f"POINT_A: {req_tdtl_name_list}")
             # Display Status 
             idx_status = req_status_options.index(selected_row['STATUS'][0])
             req_status = st.selectbox(label=":blue[Status]", options=req_status_options, index=idx_status, disabled=False, key="status_selectbox")

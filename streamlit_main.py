@@ -1387,7 +1387,7 @@ def manage_request():
     # Database update functions
     def update_request(reqid: str, new_status: str, new_note_td: str, new_woid: str = "", new_tdtl: list=[]):
         
-        st.write(new_tdtl)
+        st.write(f"POINT_U0: reqid = {new_tdtl} - new_status = {new_status} - new_tdtl = {new_tdtl}")
 
         if isinstance(new_status, pd.Series):  # Check if it's a Series
             new_status = new_status.iloc[0]

@@ -1116,19 +1116,41 @@ def manage_request():
 
             # Display TD Team Leader            
             tdtl_usercode = df_lk_pline_tdtl["USER_CODE"].drop_duplicates().sort_values()
-            tdtl_username_list = df_users[df_users["CODE"].isin(tdtl_usercode)]["NAME"]                        
+            st.write(f"POINT_A1: {tdtl_usercode}")
+            tdtl_username_list = df_users[df_users["CODE"].isin(tdtl_usercode)]["NAME"]    
+            st.write(f"POINT_A2: {tdtl_username_list}")                                
             tdtl_default_codes = df_reqassignedto[df_reqassignedto["REQID"] == reqid]["USERID"]
-            tdtl_option = df_users[df_users["CODE"].isin(tdtl_default_codes)]    
+            st.write(f"POINT_A3: {tdtl_default_codes}")   
+            tdtl_option = df_users[df_users["CODE"].isin(tdtl_default_codes)]   
+            st.write(f"POINT_A4: {tdtl_option}")           
             default_tdtl_name = tdtl_option["NAME"].tolist()
+            st.write(f"POINT_A5: {tdtl_option}")         
             req_tdtl_name = st.multiselect(label=":blue[Tech Department Team Leader]", options=tdtl_username_list, default=default_tdtl_name, key="sb_tdtl_reqmanage", disabled=False)          
+            st.write(f"POINT_A6: {tdtl_option}")   
+# #############################
+#             # Lista dei possibili nomi dei Team Leader
+#             selected_pline_name = selected_row['PRLINE_NAME'][0]
+#             st.write(f"POINT_C0: {selected_pline_name}")
+#             selected_pline_code = df_pline[df_pline["NAME"] == selected_pline_name]["CODE"].values[0]
+#             st.write(f"POINT_C1: {selected_pline_code}")
+            
+#             # wo_tdtl_options_list = df_reqassignedto[df_reqassignedto["REQID"] == reqid]["USERNAME"].unique().tolist()
+#             tdtl_name = df_lk_pline_tdtl[df_lk_pline_tdtl["PLINE_CODE"] == selected_pline_code]
+#             st.write(f"POINT_C2: {tdtl_name}")
+#             tdtl_name_list = tdtl_name["USER_NAME"].tolist()
+#             st.write(f"POINT_C3: {tdtl_name_list}")
+#             tdtl_code_list = tdtl_name["USER_CODE"].tolist()
+#             st.write(f"POINT_C4: {tdtl_code_list}")
+# #############################
+
 
             req_tdtl_name_list = list(req_tdtl_name)
-            st.write(f"POINT_A: {req_tdtl_name_list}")
+            st.write(f"POINT_A7: {req_tdtl_name_list}")
             
             if len(req_tdtl_name_list) == 0:
                 req_tdtl_name_list = default_tdtl_name
 
-            st.write(f"POINT_B: {req_tdtl_name_list}")
+            st.write(f"POINT_A8: {req_tdtl_name_list}")
             
             # Display Status 
             idx_status = req_status_options.index(selected_row['STATUS'][0])

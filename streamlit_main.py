@@ -1124,10 +1124,11 @@ def manage_request():
             tdtl_option = df_users[df_users["CODE"].isin(tdtl_default_codes)]   
             #st.write(f"POINT_A4: {tdtl_option}")           
             default_tdtl_name = tdtl_option["NAME"].tolist()
-            #st.write(f"POINT_A5: {tdtl_option}")         
+            #st.write(f"POINT_A5: {default_tdtl_name}")         
             req_tdtl_name = st.multiselect(label=":blue[Tech Department Team Leader](:red[*])", options=tdtl_username_list, default=default_tdtl_name, key="sb_tdtl_reqmanage", disabled=False)          
-            req_tdtl_code = df_requests[df_requests[""] == req_tdtl_name]
-            #st.write(f"POINT_A6: {tdtl_option}")   
+            st.write(f"POINT_A6: {req_tdtl_name}")   
+            req_tdtl_code = df_users[df_users["NAME"] == req_tdtl_name]
+            st.write(f"POINT_A7: {req_tdtl_code}")   
 # #############################
 #             # Lista dei possibili nomi dei Team Leader
 #             selected_pline_name = selected_row['PRLINE_NAME'][0]
@@ -1146,12 +1147,12 @@ def manage_request():
 
 
             req_tdtl_name_list = list(req_tdtl_name)
-            #st.write(f"POINT_A7: {req_tdtl_name_list}")
+            st.write(f"POINT_A8: {req_tdtl_name_list}")
             
             if len(req_tdtl_name_list) == 0:
                 req_tdtl_name_list = default_tdtl_name
 
-            #st.write(f"POINT_A8: {req_tdtl_name_list}")
+            st.write(f"POINT_A9: {req_tdtl_name_list}")
             
             # Display Status 
             idx_status = req_status_options.index(selected_row['STATUS'][0])

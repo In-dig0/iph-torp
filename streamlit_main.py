@@ -1116,17 +1116,17 @@ def manage_request():
 
             # Display TD Team Leader            
             tdtl_usercode = df_lk_pline_tdtl["USER_CODE"].drop_duplicates().sort_values()
-            st.write(f"POINT_A1: {tdtl_usercode}")
+            #st.write(f"POINT_A1: {tdtl_usercode}")
             tdtl_username_list = df_users[df_users["CODE"].isin(tdtl_usercode)]["NAME"]    
-            st.write(f"POINT_A2: {tdtl_username_list}")                                
+            #st.write(f"POINT_A2: {tdtl_username_list}")                                
             tdtl_default_codes = df_reqassignedto[df_reqassignedto["REQID"] == reqid]["USERID"]
-            st.write(f"POINT_A3: {tdtl_default_codes}")   
+            #st.write(f"POINT_A3: {tdtl_default_codes}")   
             tdtl_option = df_users[df_users["CODE"].isin(tdtl_default_codes)]   
-            st.write(f"POINT_A4: {tdtl_option}")           
+            #st.write(f"POINT_A4: {tdtl_option}")           
             default_tdtl_name = tdtl_option["NAME"].tolist()
-            st.write(f"POINT_A5: {tdtl_option}")         
+            #st.write(f"POINT_A5: {tdtl_option}")         
             req_tdtl_name = st.multiselect(label=":blue[Tech Department Team Leader](:red[*])", options=tdtl_username_list, default=default_tdtl_name, key="sb_tdtl_reqmanage", disabled=False)          
-            st.write(f"POINT_A6: {tdtl_option}")   
+            #st.write(f"POINT_A6: {tdtl_option}")   
 # #############################
 #             # Lista dei possibili nomi dei Team Leader
 #             selected_pline_name = selected_row['PRLINE_NAME'][0]
@@ -1167,7 +1167,7 @@ def manage_request():
                 disable_save_button = False    
             # Handle save action
             if st.button("Save", type="primary", disabled=disable_save_button, key="req_save_button"):
-                #st.write(req_tdtl_name)
+                st.write(f"POINT_A10 {req_tdtl_name_list}")
                 success = update_request_fn(reqid, req_status, req_note_td, 0, req_tdtl_name_list)               
                 if success:
                     st.session_state.grid_refresh = True

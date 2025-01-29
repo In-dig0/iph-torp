@@ -9,9 +9,6 @@ from dataclasses import dataclass
 from typing import Optional, Tuple, Dict, List
 
 # 3th party packages
-import mytest
-import module_display_app_info
-import module_insert_request
 import streamlit as st
 import pandas as pd
 import sqlitecloud
@@ -1123,8 +1120,8 @@ def manage_request():
             tdtl_default_codes = df_reqassignedto[df_reqassignedto["REQID"] == reqid]["USERID"]
             tdtl_option = df_users[df_users["CODE"].isin(tdtl_default_codes)]    
             default_tdtl_name = tdtl_option["NAME"].tolist()
-            req_tdtl = st.multiselect(label=":blue[Tech Department Team Leader]", options=tdtl_username_list, default=default_tdtl_name, key="sb_tdtl_reqmanage", disabled=False)
-            
+            req_tdtl_name = st.multiselect(label=":blue[Tech Department Team Leader]", options=tdtl_username_list, default=default_tdtl_name, key="sb_tdtl_reqmanage", disabled=False)
+            req_tdtl_name_list = list(req_tdtl_name)
             # Display Status 
             idx_status = req_status_options.index(selected_row['STATUS'][0])
             req_status = st.selectbox(label=":blue[Status]", options=req_status_options, index=idx_status, disabled=False, key="status_selectbox")
@@ -1134,13 +1131,14 @@ def manage_request():
             req_note_td = st.text_area(label=":blue[Tech Department Notes]", value=default_note_td, disabled=False)
 
 
-            if (req_note_td == default_note_td) and (selected_row['STATUS'][0] == req_status) and (req_tdtl == default_tdtl_name):
+            if (req_note_td == default_note_td) and (selected_row['STATUS'][0] == req_status) and (req_tdtl_name == default_tdtl_name):
                 disable_save_button = True
             else:
                 disable_save_button = False    
             # Handle save action
             if st.button("Save", type="primary", disabled=disable_save_button, key="req_save_button"):
-                success = update_request_fn(reqid, req_status, req_note_td, 0, req_tdtl)               
+                st.write(req_tdtl_name)
+                success = update_request_fn(reqid, req_status, req_note_td, 0, req_tdtl_name_list)               
                 if success:
                     st.session_state.grid_refresh = True
                     st.session_state.grid_response = None
@@ -1249,45 +1247,49 @@ def manage_request():
 
             wo_timeqty_filtered = df_workorders[df_workorders["WOID"] == woid]["TIME_QTY"]
             if not wo_timeqty_filtered.empty:
-                wo_timeqty_default = int(wo_timeqty_filtered.values[0])
+                wo_timeqty_default = float(wo_timeqty_filtered.iloc[0])  # Converti a float!
+                min_value = 0.0 # Valore minimo predefinito come float
             else:
-                wo_timeqty_default = None  # O un valore di default appropriato                    
+                wo_timeqty_default = 0.0  # Valore di default come float
+                min_value = 0.0 # Valore minimo predefinito come float             
                  
             df_tdusers = df_users[df_users["DEPTCODE"] == default_dept_code]
             wo_tdtl_options = df_reqassignedto[df_reqassignedto["REQID"]==reqid]["USERNAME"]
-            # Controlla se ci sono opzioni disponibili
-            if not wo_tdtl_options.empty:
-                if len(wo_tdtl_options) == 1:
-                    # Trova l'indice dell'elemento
-                    wo_tdtl_name = wo_tdtl_options.values[0]
-                    filtered_df = df_tdusers[df_tdusers["NAME"] == wo_tdtl_name]
-                    
-                    if not filtered_df.empty:
-                        idx_tdtl = df_tdusers.index.get_loc(filtered_df.index[0])
-                    else:
-                        idx_tdtl = 0  # Imposta un valore predefinito se l'indice non viene trovato
-                else:
-                    idx_tdtl = 0  # Imposta un valore predefinito se ci sono più opzioni
+###############
+            # Gestione delle opzioni e dell'indice predefinito
+            if wo_tdtl_options.empty:
+                wo_tdtl_name = None
+                default_index = None
+            elif len(wo_tdtl_options) == 1:
+                wo_tdtl_name = wo_tdtl_options.iloc[0]
+                default_index = 0
             else:
-                idx_tdtl = 0  # Imposta un valore predefinito se non ci sono opzioni
+                wo_tdtl_name = None
+                default_index = None
 
-            wo_tdtm_name = st.selectbox(label="Tech Department Team Leader(:red[*])", options=wo_tdtl_options, index=idx_tdtl, disabled=False)
-
-
-            
-            # Filtra i risultati
-            filtered_df_tdtm_name = df_tdusers[df_tdusers["NAME"] == wo_tdtm_name]
-
-            # Controlla se il filtro ha restituito risultati
-            if not filtered_df_tdtm_name.empty:
-                wo_tdtm_code = filtered_df_tdtm_name["CODE"].values[0]
+            # Selezione del team leader
+            wo_tdtl_name = st.selectbox(
+                label="Tech Department Team Leader(:red[*])",
+                options=wo_tdtl_options,
+                index=default_index,
+                disabled=False
+            )
+            # Filtro e codice del team leader
+            if wo_tdtl_name:  # Se un team leader è stato selezionato
+                filtered_df_tdtl_name = df_tdusers[df_tdusers["NAME"] == wo_tdtl_name]
+                wo_tdtm_code = filtered_df_tdtl_name["CODE"].iloc[0] if not filtered_df_tdtl_name.empty else None
             else:
-                wo_tdtm_code = None  # O un valore predefinito che preferisci
+                wo_tdtm_code = None
+   
             
-            
-            #wo_tdtm_code = df_tdusers[df_tdusers["NAME"]==wo_tdtm_name]["CODE"].values[0]       
             wo_type = st.selectbox(label="Type(:red[*])", options=wo_type_options, index=wo_type_index, disabled=False)
-            wo_time_qty = st.number_input(label="Time estimated(:red[*]):", min_value=wo_timeqty_default, step=0.5)
+#            wo_time_qty = st.number_input(label="Time estimated(:red[*]):", min_value=wo_timeqty_default, step=0.5)
+            wo_time_qty = st.number_input(
+                label="Time estimated(:red[*]):",
+                min_value=min_value, # Usa il valore minimo predefinito
+                value=wo_timeqty_default if wo_timeqty_default is not None else 0, # Valore iniziale
+                step=0.5
+            )  
             wo_time_um = "H" 
 
             # Tech Dept (TD) user assignment selection
@@ -1330,7 +1332,7 @@ def manage_request():
                 if success:
 #                    st.success(f"Work order W{str(wo_idrow).zfill(4)} created successfully!")
                     success = save_workorder_assignments(woid, wo_assignedto, df_users, df_woassignedto)
-                    success = update_request(reqid, "ASSIGNED", req_note_td, woid, "")
+                    success = update_request(reqid, "ASSIGNED", req_note_td)
                     if success:
                         st.session_state.grid_refresh = True
                         st.session_state.grid_response = None
@@ -1347,76 +1349,105 @@ def manage_request():
    
 
     # Database update functions
-    def update_request(reqid, new_status, new_note_td, new_woid=0, new_tdtl=""):
+    def update_request(reqid: str, new_status: str, new_note_td: str, new_woid: str = "", new_tdtl: list=[]):
+        
+        # Update TORP_REQUESTS
         try:
             cursor.execute(
                 "UPDATE TORP_REQUESTS SET status = ?, note_td = ?, woid = ? WHERE reqid = ?",
                 (new_status, new_note_td, new_woid, reqid)
             )
-            
+            conn.commit()
         except Exception as e:
+            conn.rollback()
             st.error(f"Error updating TORP_REQUESTS: {str(e)}", icon="🚨")
             return False
-
+        # Update TORP_REQASSIGNEDTO
         try:
             # Disable existing assignments
-            cursor.execute(
-                "UPDATE TORP_REQASSIGNEDTO SET status = ? WHERE reqid = ?",
-                (DISABLED_STATUS, reqid)
-            )
-            
+            cursor.execute("UPDATE TORP_REQASSIGNEDTO SET status = ? WHERE reqid = ?", (DISABLED_STATUS, reqid))
+
             # Add new assignments
             for user_name in new_tdtl:
-                user_code = df_users[df_users["NAME"] == user_name]["CODE"].iloc[0]
-                existing_assignment = df_reqassignedto[
-                    (df_reqassignedto['REQID'] == reqid) & 
-                    (df_reqassignedto['USERID'] == user_code)
-                ]
-                
-                if existing_assignment.empty:
-                    cursor.execute(
-                        "INSERT INTO TORP_REQASSIGNEDTO (userid, reqid, status) VALUES (?, ?, ?)",
-                        (user_code, reqid, ACTIVE_STATUS)
-                    )
+                user_filter = df_users["NAME"] == user_name  # Store filter for reuse
+                user_code_series = df_users.loc[user_filter, "CODE"] # Use .loc
+                if not user_code_series.empty:  # Check if any rows matched
+                    user_code = user_code_series.iloc[0] # Access the value only if exists
+                    existing_assignment = df_reqassignedto[
+                        (df_reqassignedto['REQID'] == reqid) &
+                        (df_reqassignedto['USERID'] == user_code)
+                    ]
+
+                    if existing_assignment.empty:
+                        cursor.execute(
+                            "INSERT INTO TORP_REQASSIGNEDTO (userid, reqid, status) VALUES (?, ?, ?)",
+                            (user_code, reqid, ACTIVE_STATUS)
+                        )
+                    else:
+                        cursor.execute(
+                            "UPDATE TORP_REQASSIGNEDTO SET status = ? WHERE userid = ? AND reqid = ?",
+                            (ACTIVE_STATUS, user_code, reqid)
+                        )
                 else:
-                    cursor.execute(
-                        "UPDATE TORP_REQASSIGNEDTO SET status = ? WHERE userid = ? AND reqid = ?",
-                        (ACTIVE_STATUS, user_code, reqid)
-                    )
-            
+                    st.warning(f"User '{user_name}' not found in the user database.") # Inform the user
+
             conn.commit()
             return True
+
         except Exception as e:
-            st.error(f"Error updating REQASSIGNEDTO: {str(e)}", icon="🚨")
             conn.rollback()
+            st.error(f"Error updating REQASSIGNEDTO: {str(e)}", icon="🚨")
             return False
 
+    def save_workorder(wo: dict): # Pass connection and cursor
+        try:
+            # Check if a workorder with the given woid already exists
+            cursor.execute("SELECT 1 FROM TORP_WORKORDERS WHERE woid = ? AND tdtlid = ?", (wo["woid"],wo["tdtlid"]))
+            existing_workorder = cursor.fetchone()
 
+            if existing_workorder:
+                # UPDATE
+                sql = """
+                    UPDATE TORP_WORKORDERS SET
+                        type = ?, title = ?, description = ?,
+                        time_qty = ?, time_um = ?, status = ?, startdate = ?,
+                        enddate = ?, reqid = ?
+                    WHERE woid = ?
+                    AND tdtlid = ?
+                """
+                values = (
+                    wo["type"], wo["title"], wo["description"],
+                    wo["time_qty"], wo["time_um"], wo["status"], wo["startdate"],
+                    wo["enddate"], wo["reqid"], wo["woid"], wo["tdtlid"]  # Include woid in WHERE clause
+                )
+                cursor.execute(sql, values)
+                conn.commit()
+                #st.success(f"Workorder {wo['woid']} updated successfully.") # feedback for the user
+                return wo["woid"], True
 
-    def save_workorder(wo: dict):
-        # Get next available row ID
-        try:     
-            sql = """
+            else:
+                # INSERT
+                sql = """
                     INSERT INTO TORP_WORKORDERS (
                         woid, tdtlid, type, title, description, time_qty, time_um,
                         status, startdate, enddate, reqid
                     ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                 """
-
-            values = (
-                    wo["woid"], wo["tdtlid"], wo["type"], wo["title"], wo["description"], wo["time_qty"],wo["time_um"],
-                    wo["status"], wo["startdate"], wo["enddate"], wo["reqid"]
+                values = (
+                    wo["woid"], wo["tdtlid"], wo["type"], wo["title"], wo["description"],
+                    wo["time_qty"], wo["time_um"], wo["status"], wo["startdate"],
+                    wo["enddate"], wo["reqid"]
                 )
-                
-            cursor.execute(sql, values)
-            conn.commit()
-            return wo["woid"], True
-                
-        except Exception as e:
-            st.error(f"**ERROR inserting request in TORP_WORKORDERS: \n{e}", icon="🚨")
-            return 0, False
+                cursor.execute(sql, values)
+                conn.commit()
+                #st.success(f"Workorder {wo['woid']} created successfully.") # feedback for the user
+                return wo["woid"], True
 
-        
+        except Exception as e:
+            conn.rollback() # important to rollback in case of error!
+            st.error(f"**ERROR saving workorder: \n{e}", icon="🚨")
+            return "", False
+
     def save_workorder_assignments(woid, assigned_users, df_users, df_woassignedto):
         try:
             # Disable existing assignments
@@ -1860,7 +1891,7 @@ def main():
     "📌 Manage Work Orders": manage_wo,
     "🛠️ Manage Work Items": manage_wi,
     "🔐 Close db": close_sqlitecloud_db,
-    "--> TEST": mytest.my_module_test
+    "--> TEST": my_test
 }    
   # Aggiungi l'immagine alla sidebar 
   st.sidebar.image("https://iph.it/wp-content/uploads/2020/02/logo-scritta.png", width=150)

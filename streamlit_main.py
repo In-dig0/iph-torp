@@ -1127,7 +1127,7 @@ def manage_request():
             #st.write(f"POINT_A5: {default_tdtl_name}")         
             req_tdtl_name = st.multiselect(label=":blue[Tech Department Team Leader](:red[*])", options=tdtl_username_list, default=default_tdtl_name, key="sb_tdtl_reqmanage", disabled=False)          
             st.write(f"POINT_A6: {req_tdtl_name}")   
-            req_tdtl_code = df_users[df_users["NAME"] == req_tdtl_name]
+            req_tdtl_code = df_users[df_users["NAME"] == req_tdtl_name]["CODE"]
             st.write(f"POINT_A7: {req_tdtl_code}")   
 # #############################
 #             # Lista dei possibili nomi dei Team Leader

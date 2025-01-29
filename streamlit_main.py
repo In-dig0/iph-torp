@@ -1295,19 +1295,38 @@ def manage_request():
             else:
                 default_tdtl_name = []
 
+
+            if default_tdtl_name:
+                # Trova gli indici dei Team Leader predefiniti nella lista di opzioni
+                default_indices = []
+                for name in default_tdtl_name:
+                    try:
+                        index = tdtl_username_list.index(name)
+                        default_indices.append(index)
+                    except ValueError:
+                        # Gestisci il caso in cui il nome predefinito non è presente nelle opzioni
+                        st.warning(f"Il Team Leader '{name}' non trovato nella lista di opzioni.", icon="⚠️")
+                        # Puoi scegliere di ignorare questo nome o di usare un valore di default.
+                        # Per esempio, per usare il primo elemento come default in questo caso:
+                        # default_indices.append(0) #Aggiungi 0 solo se vuoi che in questo caso prenda il primo elemento della lista.
+                # Se default_indices è vuota, vuol dire che nessuno dei nomi di default è presente nella lista.
+                # In questo caso, puoi lasciare che Streamlit mostri il primo elemento di default, oppure puoi settare un valore di default esplicito, come fatto nei precedenti esempi.
+            else:
+                default_indices = []
+
+
             req_tdtl_name = st.selectbox(
                 label=":blue[Tech Department Team Leader](:red[*])",
                 options=tdtl_username_list,
-                value=default_tdtl_name, #Uso 'value' al posto di 'default'
-                key="sb_tdtl_reqmanage",
-                disabled=False #Disabilitazione gestita con if più avanti.
+                index=default_indices[0] if default_indices else None,  # Usa il primo indice se presente, altrimenti None
+                key="sb_tdtl_reqmanage2",
+                disabled=False
             )
 
             if req_tdtl_name:
                 req_tdtl_code = df_users[df_users["NAME"].isin(req_tdtl_name)]["CODE"].tolist()
             else:
                 req_tdtl_code = []            
-
 
             wo_type = st.selectbox(label="Type(:red[*])", options=wo_type_options, index=wo_type_index, disabled=False)
 #            wo_time_qty = st.number_input(label="Time estimated(:red[*]):", min_value=wo_timeqty_default, step=0.5)

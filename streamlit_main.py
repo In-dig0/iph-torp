@@ -1262,33 +1262,25 @@ def manage_request():
                 min_value = 0.0 # Valore minimo predefinito come float             
                  
             df_tdusers = df_users[df_users["DEPTCODE"] == default_dept_code]
-            wo_tdtl_options = df_reqassignedto[df_reqassignedto["REQID"]==reqid]["USERNAME"]
-###############
-            # Gestione delle opzioni e dell'indice predefinito
-            if wo_tdtl_options.empty:
-                wo_tdtl_name = None
-                default_index = None
-            elif len(wo_tdtl_options) == 1:
-                wo_tdtl_name = wo_tdtl_options.iloc[0]
+            
+            wo_tdtl_options_list = df_reqassignedto[df_reqassignedto["REQID"]==reqid]["USERNAME"].unique().tolist()
+            st.write(f"POINT_C: {wo_tdtl_options_list}")
+
+            if len(wo_tdtl_options_list) == 1:
+                # Request assigned to only one Team Leader
+                wo_tdtl_name = wo_tdtl_options_list[0]
                 default_index = 0
             else:
-                wo_tdtl_name = None
+                # Request assigned to many Team Leader
                 default_index = None
 
-            # Selezione del team leader
             wo_tdtl_name = st.selectbox(
                 label="Tech Department Team Leader(:red[*])",
-                options=wo_tdtl_options,
+                options=wo_tdtl_options_list,
                 index=default_index,
                 disabled=False
             )
-            # Filtro e codice del team leader
-            if wo_tdtl_name:  # Se un team leader è stato selezionato
-                filtered_df_tdtl_name = df_tdusers[df_tdusers["NAME"] == wo_tdtl_name]
-                wo_tdtm_code = filtered_df_tdtl_name["CODE"].iloc[0] if not filtered_df_tdtl_name.empty else None
-            else:
-                wo_tdtm_code = None
-   
+  
             
             wo_type = st.selectbox(label="Type(:red[*])", options=wo_type_options, index=wo_type_index, disabled=False)
 #            wo_time_qty = st.number_input(label="Time estimated(:red[*]):", min_value=wo_timeqty_default, step=0.5)
@@ -1340,7 +1332,7 @@ def manage_request():
                 if success:
 #                    st.success(f"Work order W{str(wo_idrow).zfill(4)} created successfully!")
                     success = save_workorder_assignments(woid, wo_assignedto, df_users, df_woassignedto)
-                    success = update_request(reqid, "ASSIGNED", req_note_td)
+                    success = update_request(reqid, "ASSIGNED", req_note_td, )
                     if success:
                         st.session_state.grid_refresh = True
                         st.session_state.grid_response = None

@@ -1126,6 +1126,7 @@ def manage_request():
             default_tdtl_name = tdtl_option["NAME"].tolist()
             #st.write(f"POINT_A5: {tdtl_option}")         
             req_tdtl_name = st.multiselect(label=":blue[Tech Department Team Leader](:red[*])", options=tdtl_username_list, default=default_tdtl_name, key="sb_tdtl_reqmanage", disabled=False)          
+            req_tdtl_code = df_requests[df_requests[""] == req_tdtl_name]
             #st.write(f"POINT_A6: {tdtl_option}")   
 # #############################
 #             # Lista dei possibili nomi dei Team Leader
@@ -1145,12 +1146,12 @@ def manage_request():
 
 
             req_tdtl_name_list = list(req_tdtl_name)
-            st.write(f"POINT_A7: {req_tdtl_name_list}")
+            #st.write(f"POINT_A7: {req_tdtl_name_list}")
             
             if len(req_tdtl_name_list) == 0:
                 req_tdtl_name_list = default_tdtl_name
 
-            st.write(f"POINT_A8: {req_tdtl_name_list}")
+            #st.write(f"POINT_A8: {req_tdtl_name_list}")
             
             # Display Status 
             idx_status = req_status_options.index(selected_row['STATUS'][0])
@@ -1292,11 +1293,11 @@ def manage_request():
             st.write(f"POINT_C1: {selected_pline_code}")
             
             # wo_tdtl_options_list = df_reqassignedto[df_reqassignedto["REQID"] == reqid]["USERNAME"].unique().tolist()
-            tdtl_name = df_lk_pline_tdtl[df_lk_pline_tdtl["PLINE_CODE"] == selected_pline_code]
-            st.write(f"POINT_C2: {tdtl_name}")
-            tdtl_name_list = tdtl_name["USER_NAME"].tolist()
+            df_tdtl = df_lk_pline_tdtl[df_lk_pline_tdtl["PLINE_CODE"] == selected_pline_code]
+            st.write(f"POINT_C2: {df_tdtl}")
+            tdtl_name_list = df_tdtl["USER_NAME"].tolist()
             st.write(f"POINT_C3: {tdtl_name_list}")
-            tdtl_code_list = tdtl_name["USER_CODE"].tolist()
+            tdtl_code_list = df_tdtl["USER_CODE"].tolist()
             st.write(f"POINT_C4: {tdtl_code_list}")
 
             if len(tdtl_name_list) == 1:
@@ -1312,12 +1313,18 @@ def manage_request():
                 index=default_index,
                 disabled=False
             )
+            st.write(f"POINT_C5: {wo_tdtl_name}")
+
             if wo_tdtl_name:  # Se un team leader è stato selezionato
-                filtered_df_tdtl_name = df_tdusers[df_tdusers["NAME"] == wo_tdtl_name]
-                wo_tdtl_code = filtered_df_tdtl_name["CODE"].iloc[0] if not filtered_df_tdtl_name.empty else None
+                filtered_df_tdtl_name = df_tdtl[df_tdtl["USER_NAME"] == wo_tdtl_name]
+                st.write(f"POINT_C5: {filtered_df_tdtl_name}")
+                wo_tdtl_code = filtered_df_tdtl_name["USER_CODE"].iloc[0] if not filtered_df_tdtl_name.empty else None
+                st.write(f"POINT_C6: {wo_tdtl_code}")
             else:
                 wo_tdtl_code = None
             
+
+
             wo_type = st.selectbox(label="Type(:red[*])", options=wo_type_options, index=wo_type_index, disabled=False)
 #            wo_time_qty = st.number_input(label="Time estimated(:red[*]):", min_value=wo_timeqty_default, step=0.5)
             wo_time_qty = st.number_input(
@@ -1368,7 +1375,7 @@ def manage_request():
                 if success:
 #                    st.success(f"Work order W{str(wo_idrow).zfill(4)} created successfully!")
                     success = save_workorder_assignments(woid, wo_assignedto, df_users, df_woassignedto)
-                    success = update_request(reqid, "ASSIGNED", req_note_td, )
+                    success = update_request(reqid, "ASSIGNED", req_note_td, "", )
                     if success:
                         st.session_state.grid_refresh = True
                         st.session_state.grid_response = None
@@ -1423,10 +1430,10 @@ def manage_request():
                         existing_record = cursor.fetchone()
                         if existing_record:
                             # Update the existing record
-                            cursor.execute("UPDATE TORP_REQASSIGNEDTO SET status = ? WHERE reqid = ? AND username = ?", (ACTIVE_STATUS, reqid, tdtl))
+                            cursor.execute("UPDATE TORP_REQASSIGNEDTO SET status = ? WHERE reqid = ? AND userid = ?", (ACTIVE_STATUS, reqid, tdtl))
                         else:
                             # Insert a new record
-                            cursor.execute("INSERT INTO TORP_REQASSIGNEDTO (reqid, username, status) VALUES (?, ?, ?)", (reqid, tdtl, ACTIVE_STATUS))
+                            cursor.execute("INSERT INTO TORP_REQASSIGNEDTO (reqid, userid, status) VALUES (?, ?, ?)", (reqid, tdtl, ACTIVE_STATUS))
                         conn.commit()
                     except Exception as e:
                         conn.rollback()

@@ -1138,7 +1138,7 @@ def manage_request():
             # Handle save action
             if st.button("Save", type="primary", disabled=disable_save_button, key="req_save_button"):
                 #st.write(req_tdtl_name)
-                success = update_request_fn(reqid, req_status[0], req_note_td, 0, req_tdtl_name_list)               
+                success = update_request_fn(reqid, req_status, req_note_td, 0, req_tdtl_name_list)               
                 if success:
                     st.session_state.grid_refresh = True
                     st.session_state.grid_response = None
@@ -1332,7 +1332,7 @@ def manage_request():
                 if success:
 #                    st.success(f"Work order W{str(wo_idrow).zfill(4)} created successfully!")
                     success = save_workorder_assignments(woid, wo_assignedto, df_users, df_woassignedto)
-                    success = update_request(reqid, "ASSIGNED", req_note_td.values[0])
+                    success = update_request(reqid, "ASSIGNED", req_note_td)
                     if success:
                         st.session_state.grid_refresh = True
                         st.session_state.grid_response = None

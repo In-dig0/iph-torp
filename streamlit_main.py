@@ -1298,9 +1298,9 @@ def manage_request():
             req_tdtl_name = st.selectbox(
                 label=":blue[Tech Department Team Leader](:red[*])",
                 options=tdtl_username_list,
-                default=default_tdtl_name,
+                value=default_tdtl_name, #Uso 'value' al posto di 'default'
                 key="sb_tdtl_reqmanage",
-                disabled=False
+                disabled=False #Disabilitazione gestita con if più avanti.
             )
 
             if req_tdtl_name:

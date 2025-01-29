@@ -1475,10 +1475,7 @@ def manage_request():
             st.error(f"Error updating REQASSIGNEDTO (disabling): {str(e)}", icon="🚨")
             return False
 
-
-
-
-
+        return True
 
     def save_workorder(wo: dict): # Pass connection and cursor
         try:

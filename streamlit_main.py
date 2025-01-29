@@ -1113,37 +1113,6 @@ def manage_request():
             st.text_area(label="Description", value=description, disabled=True)
 
             st.divider()
-           # # Display TD Team Leader            
-            # tdtl_usercode = df_lk_pline_tdtl["USER_CODE"].drop_duplicates().sort_values()
-            # #st.write(f"POINT_A1: {tdtl_usercode}")
-            # tdtl_username_list = df_users[df_users["CODE"].isin(tdtl_usercode)]["NAME"]    
-            # #st.write(f"POINT_A2: {tdtl_username_list}")                                
-            # tdtl_default_codes = df_reqassignedto[df_reqassignedto["REQID"] == reqid]["USERID"]
-            # #st.write(f"POINT_A3: {tdtl_default_codes}")   
-            # tdtl_option = df_users[df_users["CODE"].isin(tdtl_default_codes)]   
-            # #st.write(f"POINT_A4: {tdtl_option}")           
-            # default_tdtl_name = tdtl_option["NAME"].tolist()
-            # #st.write(f"POINT_A5: {default_tdtl_name}")         
-            # req_tdtl_name = st.multiselect(label=":blue[Tech Department Team Leader](:red[*])", options=tdtl_username_list, default=default_tdtl_name, key="sb_tdtl_reqmanage", disabled=False)          
-            # st.write(f"POINT_A6: {req_tdtl_name}")   
-            # req_tdtl_code = df_users[df_users["NAME"] == req_tdtl_name]["CODE"]
-            # st.write(f"POINT_A7: {req_tdtl_code}")   
-# #############################
-#             # Lista dei possibili nomi dei Team Leader
-#             selected_pline_name = selected_row['PRLINE_NAME'][0]
-#             st.write(f"POINT_C0: {selected_pline_name}")
-#             selected_pline_code = df_pline[df_pline["NAME"] == selected_pline_name]["CODE"].values[0]
-#             st.write(f"POINT_C1: {selected_pline_code}")
-            
-#             # wo_tdtl_options_list = df_reqassignedto[df_reqassignedto["REQID"] == reqid]["USERNAME"].unique().tolist()
-#             tdtl_name = df_lk_pline_tdtl[df_lk_pline_tdtl["PLINE_CODE"] == selected_pline_code]
-#             st.write(f"POINT_C2: {tdtl_name}")
-#             tdtl_name_list = tdtl_name["USER_NAME"].tolist()
-#             st.write(f"POINT_C3: {tdtl_name_list}")
-#             tdtl_code_list = tdtl_name["USER_CODE"].tolist()
-#             st.write(f"POINT_C4: {tdtl_code_list}")
-# #############################
-
             tdtl_usercode = df_lk_pline_tdtl["USER_CODE"].drop_duplicates().sort_values().tolist() #conversione in lista
             tdtl_username_list = df_users[df_users["CODE"].isin(tdtl_usercode)]["NAME"].tolist()
 
@@ -1168,8 +1137,8 @@ def manage_request():
             else:
                 req_tdtl_code = []
 
-            st.write(f"POINT_A6: {req_tdtl_name}")
-            st.write(f"POINT_A7: {req_tdtl_code}")
+            #st.write(f"POINT_A6: {req_tdtl_name}")
+            #st.write(f"POINT_A7: {req_tdtl_code}")
 
 
 
@@ -1315,42 +1284,29 @@ def manage_request():
             df_tdusers = df_users[df_users["DEPTCODE"] == default_dept_code]
             
             # Lista dei possibili nomi dei Team Leader
-            selected_pline_name = selected_row['PRLINE_NAME'][0]
-            st.write(f"POINT_C0: {selected_pline_name}")
-            selected_pline_code = df_pline[df_pline["NAME"] == selected_pline_name]["CODE"].values[0]
-            st.write(f"POINT_C1: {selected_pline_code}")
-            
-            # wo_tdtl_options_list = df_reqassignedto[df_reqassignedto["REQID"] == reqid]["USERNAME"].unique().tolist()
-            df_tdtl = df_lk_pline_tdtl[df_lk_pline_tdtl["PLINE_CODE"] == selected_pline_code]
-            st.write(f"POINT_C2: {df_tdtl}")
-            tdtl_name_list = df_tdtl["USER_NAME"].tolist()
-            st.write(f"POINT_C3: {tdtl_name_list}")
-            tdtl_code_list = df_tdtl["USER_CODE"].tolist()
-            st.write(f"POINT_C4: {tdtl_code_list}")
+            tdtl_usercode = df_lk_pline_tdtl["USER_CODE"].drop_duplicates().sort_values().tolist() #conversione in lista
+            tdtl_username_list = df_users[df_users["CODE"].isin(tdtl_usercode)]["NAME"].tolist()
 
-            if len(tdtl_name_list) == 1:
-                # Request assigned to only one Team Leader
-                default_index = 0
+            tdtl_default_codes = df_reqassignedto[df_reqassignedto["REQID"] == reqid]["USERID"].tolist()
+
+            if tdtl_default_codes:
+                tdtl_option = df_users[df_users["CODE"].isin(tdtl_default_codes)]
+                default_tdtl_name = tdtl_option["NAME"].tolist()
             else:
-                # Request assigned to many Team Leader
-                default_index = None
+                default_tdtl_name = []
 
-            wo_tdtl_name = st.selectbox(
-                label="Tech Department Team Leader(:red[*])",
-                options=tdtl_name_list,
-                index=default_index,
+            req_tdtl_name = st.multiselect(
+                label=":blue[Tech Department Team Leader](:red[*])",
+                options=tdtl_username_list,
+                default=default_tdtl_name,
+                key="sb_tdtl_reqmanage",
                 disabled=False
             )
-            st.write(f"POINT_C5: {wo_tdtl_name}")
 
-            if wo_tdtl_name:  # Se un team leader è stato selezionato
-                filtered_df_tdtl_name = df_tdtl[df_tdtl["USER_NAME"] == wo_tdtl_name]
-                st.write(f"POINT_C5: {filtered_df_tdtl_name}")
-                wo_tdtl_code = filtered_df_tdtl_name["USER_CODE"].iloc[0] if not filtered_df_tdtl_name.empty else None
-                st.write(f"POINT_C6: {wo_tdtl_code}")
+            if req_tdtl_name:
+                req_tdtl_code = df_users[df_users["NAME"].isin(req_tdtl_name)]["CODE"].tolist()
             else:
-                wo_tdtl_code = None
-            
+                req_tdtl_code = []            
 
 
             wo_type = st.selectbox(label="Type(:red[*])", options=wo_type_options, index=wo_type_index, disabled=False)
@@ -1363,7 +1319,7 @@ def manage_request():
             )  
             wo_time_um = "H" 
 
-            # Tech Dept (TD) user assignment selection
+            # Tech Dept Specialist assignment selection
             filtered_woassignedto = df_woassignedto[
                 (df_woassignedto["WOID"] == woid) & 
                 (df_woassignedto["STATUS"] == active_status)
@@ -1403,7 +1359,7 @@ def manage_request():
                 if success:
 #                    st.success(f"Work order W{str(wo_idrow).zfill(4)} created successfully!")
                     success = save_workorder_assignments(woid, wo_assignedto, df_users, df_woassignedto)
-                    success = update_request(reqid, "ASSIGNED", req_note_td, "", )
+                    success = update_request(reqid, "ASSIGNED", req_note_td, "", [])
                     if success:
                         st.session_state.grid_refresh = True
                         st.session_state.grid_response = None

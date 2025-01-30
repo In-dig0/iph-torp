@@ -84,7 +84,6 @@ def display_app_info() -> None:
     st.markdown("Powered with Streamlit :streamlit:")
     
 #######################################################################################################
-@st.cache_data
 def load_initial_data() -> None:
     """Load initial data from database"""
     global df_depts
@@ -239,12 +238,10 @@ def load_requests_data():
 
 
 #######################################################################################################
-@st.cache_data
 def load_workorders_data():
-    """ Load work orders from database to df """
+    """ Load TORP_WORKORDERS records into df """
     
     global df_workorders
-    global df_woassignedto
     
     df_workorders = pd.read_sql_query("""
     SELECT 
@@ -263,6 +260,11 @@ def load_workorders_data():
     ORDER BY REQID
     """, conn)
 
+def load_woassignedto_data():
+    """ Load TORP_WOASSIGNEDTO records into df """
+    
+    global df_woassignedto
+    
     df_woassignedto = pd.read_sql_query("""
     SELECT 
         A.userid AS USERID, 
@@ -273,7 +275,42 @@ def load_workorders_data():
     INNER JOIN TORP_USERS B ON B.code = A.userid    
     WHERE A.status = 'ACTIVE'
     ORDER BY WOID
-    """, conn)
+    """, conn)    
+
+# def load_workorders_data():
+#     """ Load work orders from database to df """
+    
+#     global df_workorders
+#     global df_woassignedto
+    
+#     df_workorders = pd.read_sql_query("""
+#     SELECT 
+#         A.woid AS WOID,
+#         A.tdtlid AS TDTLID, 
+#         A.type AS TYPE, 
+#         A.status AS STATUS,        
+#         A.title AS TITLE,
+#         A.description AS DESCRIPTION,
+#         A.time_qty AS TIME_QTY,
+#         A.time_um AS TIME_UM,                                                                
+#         A.startdate AS STARTDATE, 
+#         A.enddate AS ENDDATE,                                       
+#         A.reqid AS REQID
+#     FROM TORP_WORKORDERS A
+#     ORDER BY REQID
+#     """, conn)
+
+#     df_woassignedto = pd.read_sql_query("""
+#     SELECT 
+#         A.userid AS USERID, 
+#         A.woid AS WOID, 
+#         A.status AS STATUS, 
+#         B.name AS USERNAME 
+#     FROM TORP_WOASSIGNEDTO A
+#     INNER JOIN TORP_USERS B ON B.code = A.userid    
+#     WHERE A.status = 'ACTIVE'
+#     ORDER BY WOID
+#     """, conn)
 
 #######################################################################################################
 def check_password():
@@ -1589,6 +1626,7 @@ def manage_request():
     load_initial_data()
     load_requests_data()
     load_workorders_data()
+    load_woassignedto_data()
 
     # Initialize session state
     if "grid_data" not in st.session_state:
@@ -1777,8 +1815,6 @@ def manage_request():
 
 #######################################################################################################
 def manage_wo():
-    global df_woassignedto
-    global df_workorders
 
     def save_work_item(witem: dict) -> Tuple[str, bool]:
         """Save request to database and return request number and status"""
@@ -1811,11 +1847,19 @@ def manage_wo():
             st.error(f"**ERROR inserting data in table TORP_WORKITEM: \n{e}", icon="🚨")
             return "", False
 
-        
-    load_requests_data()    
-    st.success(f"Requests df loaded!")
-    load_workorders_data()   
-    st.success(f"Work Order df loaded!")
+    if 'df_woassignedto' not in st.session_state: # Check if it exists
+        st.session_state.df_woassignedto = load_woassignedto_data()  # Load only once
+
+    if 'df_workorders' not in st.session_state: # Check if it exists
+        st.session_state.df_workorders = load_workorders_data()  # Load only once
+
+    df_woassignedto = st.session_state.df_woassignedto # Access from session state
+    df_workorders = st.session_state.df_workorders # Access from session state    
+
+    #load_requests_data()    
+    #st.success(f"Requests df loaded!")
+    #load_workorders_data()   
+    #st.success(f"Work Order df loaded!")
 
     # Inzialize sessione state
     if 'selected_username' not in st.session_state:

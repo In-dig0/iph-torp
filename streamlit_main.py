@@ -1918,11 +1918,11 @@ def manage_wo():
         st.subheader(f":orange[Work Item]")
         taskl1_options = df_taskl1["NAME"].tolist()
         wi_task_l1 = st.selectbox(label=":blue[L1 Task](:red[*])", options=taskl1_options, key="sb_taskl1")
-        wi_description = st.text_input(label="Work item description:", value="")
-        wi_time_qty = st.number_input(label="Time spent (in hours)(:red[*]):", min_value=0.0, step=0.5)
+        wi_description = st.text_input(label=":blue[Work item description]", value="")
+        wi_time_qty = st.number_input(label=":blue[Time spent (in hours)(:red[*])]:", min_value=0.0, step=0.5)
         wi_time_um = "H"
-        wi_date = st.date_input("Date of execution(:red[*])", format="DD/MM/YYYY", disabled=False)
-        wi_note = st.text_area("Note")
+        wi_date = st.date_input(":blue[Date of execution(:red[*])]", format="DD/MM/YYYY", disabled=False)
+        wi_note = st.text_area(":blue[Note]")
         wo_nr = selected_wo
         work_item = {"wi_ucode": wo_usercode[0], "wi_tskgroup": "standard", "wi_tskdate": wi_date,"wi_time_qty": wi_time_qty, "wi_time_um": wi_time_um, "wi_desc": wi_description, "wi_note": wi_note, "wi_status": ACTIVE_STATUS, "wi_woid": wo_nr}
         # Bottone per aggiungere il task

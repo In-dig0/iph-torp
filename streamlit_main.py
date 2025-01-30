@@ -1915,31 +1915,26 @@ def manage_wo():
             df_wo_out['REQID'] = df_wo['REQID']
             st.dataframe(df_wo_out, use_container_width=True, hide_index=True)
         
-        st.subheader(f"Insert a Work Item")
+        st.subheader(f":orange[Work Item]")
         taskl1_options = df_taskl1["NAME"].tolist()
-        wi_task_l1 = st.selectbox(label="L1 Task", options=taskl1_options, key="sb_taskl1")
+        wi_task_l1 = st.selectbox(label=":blue[L1 Task](:red[*])", options=taskl1_options, key="sb_taskl1")
         wi_description = st.text_input(label="Work item description:", value="")
-        wi_time_qty = st.number_input(label="Time spent (in hours):", min_value=0.0, step=0.5)
+        wi_time_qty = st.number_input(label="Time spent (in hours)(:red[*]):", min_value=0.0, step=0.5)
         wi_time_um = "H"
-        wi_date = st.date_input("Date of execution", format="DD/MM/YYYY", disabled=False)
+        wi_date = st.date_input("Date of execution(:red[*])", format="DD/MM/YYYY", disabled=False)
         wi_note = st.text_area("Note")
         wo_nr = selected_wo
-        work_item = {"wi_ucode": wi_usercode[0], "wi_tskgroup": "standard", "wi_tskdate": wi_date,"wi_time_qty": wi_time_qty, "wi_time_um": wi_time_um, "wi_desc": wi_description, "wi_note": wi_note, "wi_status": ACTIVE_STATUS, "wi_woid": wo_nr}
+        work_item = {"wi_ucode": wo_usercode[0], "wi_tskgroup": "standard", "wi_tskdate": wi_date,"wi_time_qty": wi_time_qty, "wi_time_um": wi_time_um, "wi_desc": wi_description, "wi_note": wi_note, "wi_status": ACTIVE_STATUS, "wi_woid": wo_nr}
         # Bottone per aggiungere il task
-        if st.button("Save Work Item", type="primary"):
-            if wi_description and wi_time_qty > 0:
-                wi_nr, rc = save_work_item(work_item)
-                #st.success(f"Task '{wi_description}' di durata {wi_duration} ore aggiunto per {selected_wo} il {wi_date}.")
-                if rc == True:
-                    st.success(f"Task {wi_nr} saved successfully!")
-
-            else:
-                st.error("Per favore, inserisci una descrizione valida e una durata maggiore di zero.")
+        wi_save_botton_disable = not (taskl1_options and wi_description and wi_time_qty)
+        if st.button("Save Work Item", type="primary", disable=wi_save_botton_disable):           
+            wi_nr, rc = save_work_item(work_item)
+            #st.success(f"Task '{wi_description}' di durata {wi_duration} ore aggiunto per {selected_wo} il {wi_date}.")
+            if rc == True:
+                st.success(f"Task {wo_nr}/{wi_nr} saved successfully!")
     else:
         st.header(f"Please select a work order first!")
 
-        # Visualizzazione dei task (per esempio, da salvare in un dataframe)
-        # Qui potresti implementare la logica per memorizzare e mostrare i task inseriti
 
 #######################################################################################################
 def my_test():

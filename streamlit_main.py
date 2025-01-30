@@ -1872,19 +1872,19 @@ def manage_wo():
     
     selected_username = st.sidebar.selectbox(label="TD user:", options=wo_username_options, index=None)
     
-    df_wi_usercode = df_woassignedto[df_woassignedto['USERNAME'] == selected_username]["USERCODE"].unique()
-    wi_usercode = list(df_wi_usercode)
+    df_wo_usercode = df_woassignedto[df_woassignedto['USERNAME'] == selected_username]["USERID"].unique()
+    wo_usercode = list(df_wo_usercode)
 
     if selected_username:
         st.session_state.selected_username = True
 
 
-    wo_idrow = df_woassignedto[df_woassignedto['USERNAME'] == selected_username]['WOIDROW'].apply(convert_woidrow_to_str)
-    unique_wo_idrow = wo_idrow.unique()
-    sorted_wo_idrow = sorted(wo_idrow)
-    wo_idrow_options = list(sorted_wo_idrow)
+    wo_woid = df_woassignedto[df_woassignedto['USERNAME'] == selected_username]['WOID']
+    unique_woid = wo_woid.unique()
+    sorted_woid = sorted(unique_woid)
+    wo_woid_options = list(sorted_woid)
   
-    selected_wo = st.sidebar.selectbox(label="Work-Order:", options=wo_idrow_options, index=None)
+    selected_wo = st.sidebar.selectbox(label="Work-Order:", options=wo_woid_options, index=None)
     if selected_wo:
         st.session_state.selected_wo = True
 
@@ -1893,26 +1893,30 @@ def manage_wo():
         st.header(f"Work Order {selected_wo}")
         with st.expander("WO details"):
             df_wo_out = pd.DataFrame()
-            df_wo = df_workorders[df_workorders["IDROW"].apply(convert_woidrow_to_str) == selected_wo]
-            df_wo_out['IDROW'] = df_wo['IDROW'].apply(convert_woidrow_to_str)
+            df_wo = df_workorders[df_workorders["WOID"] == selected_wo]
+            df_wo_out['WOID'] = df_wo['WOID']
             df_wo_out['TYPE'] = df_wo['TYPE']
-            df_wo_out['STARTDATE'] = df_wo['STARTDATE']
-            df_wo_out['ENDDATE'] = df_wo['ENDDATE']
+            df_wo_out['ACTIVE'] = df_wo['ACTIVE']
+            #df_wo_out['STARTDATE'] = df_wo['STARTDATE']
+            #df_wo_out['ENDDATE'] = df_wo['ENDDATE']
             df_wo_out['TITLE'] = df_wo['TITLE']
-            df_wo_out['NOTES'] = df_wo['NOTES']  
-            df_wo_out['REQIDROW'] = df_wo['REQIDROW'].apply(convert_reqidrow_to_str)
+            df_wo_out['DESCRIPTION'] = df_wo['DESCRIPTION']  
+            df_wo_out['TIME_QTY'] = df_wo['TIME_QTY']  
+            df_wo_out['TIME_UM'] = df_wo['TIME_UM']                          
+            df_wo_out['REQIDROW'] = df_wo['REQIDROW']
             st.dataframe(df_wo_out, use_container_width=True, hide_index=True)
         
         st.subheader(f"Insert a Work Item")
         wi_description = st.text_input(label="Work item description:", value="")
-        wi_duration = st.number_input(label="Time spent (in hours):", min_value=0.0, step=0.5)
+        wi_time_qty = st.number_input(label="Time spent (in hours):", min_value=0.0, step=0.5)
+        wi_time_um = "H"
         wi_date = st.date_input("Date of execution", format="DD/MM/YYYY", disabled=False)
-        wi_notes = st.text_area("Notes")
-        wo_nr = convert_woidrow_to_int(selected_wo)
-        work_item = {"wi_ucode": wi_usercode[0], "wi_tskgroup": "standard", "wi_tskdate": wi_date,"wi_qty": wi_duration, "wi_um": "H", "wi_desc": wi_description, "wi_notes": wi_notes, "wi_status": ACTIVE_STATUS, "wi_woidrow": wo_nr}
+        wi_note = st.text_area("Note")
+        wo_nr = selected_wo
+        work_item = {"wi_ucode": wi_usercode[0], "wi_tskgroup": "standard", "wi_tskdate": wi_date,"wi_time_qty": wi_time_qty, "wi_time_um": wi_time_um, "wi_desc": wi_description, "wi_note": wi_note, "wi_status": ACTIVE_STATUS, "wi_woid": wo_nr}
         # Bottone per aggiungere il task
         if st.button("Save Work Item", type="primary"):
-            if wi_description and wi_duration > 0:
+            if wi_description and wi_time_qty > 0:
                 wi_nr, rc = save_work_item(work_item)
                 #st.success(f"Task '{wi_description}' di durata {wi_duration} ore aggiunto per {selected_wo} il {wi_date}.")
                 if rc == True:

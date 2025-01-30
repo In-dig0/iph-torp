@@ -1938,7 +1938,7 @@ def manage_wo():
         wi_description = st.text_input(label=":blue[Work item description]", value="")
         wi_time_qty = st.number_input(label=":blue[Time spent (in hours)(:red[*])]:", min_value=0.0, step=0.5)
         wi_time_um = "H"
-        wi_date = st.date_input(":blue[Date of execution(:red[*])]", format="DD/MM/YYYY", value=None, dedisabled=False, key="sd_wi_date")
+        wi_date = st.date_input(label=":blue[Date of execution(:red[*])]", value=None, format="DD/MM/YYYY", dedisabled=False, key="sd_wi_date")
         wi_note = st.text_area(":blue[Note]")
         wo_nr = selected_wo
         #wi_insdate=datetime.datetime.now().strftime("%Y-%m-%d")

@@ -1893,7 +1893,7 @@ def manage_wo():
     sorted_woid = sorted(unique_woid)
     wo_woid_options = list(sorted_woid)
   
-    selected_wo = st.sidebar.selectbox(label="Work-Order:", options=wo_woid_options, index=None)
+    selected_wo = st.sidebar.selectbox(label=":blue[Work-Order]", options=wo_woid_options, index=None)
     if selected_wo:
         st.session_state.selected_wo = True
 
@@ -1901,11 +1901,11 @@ def manage_wo():
     if st.session_state.selected_wo:
         st.header(f"Work Order {selected_wo}")
         with st.expander("WO details"):
-            df_wo_out = pd.DataFrame()
             df_wo = df_workorders[df_workorders["WOID"] == selected_wo]
+            df_wo_out = pd.DataFrame()
             df_wo_out['WOID'] = df_wo['WOID']
             df_wo_out['TYPE'] = df_wo['TYPE']
-            df_wo_out['ACTIVE'] = df_wo['ACTIVE']
+            df_wo_out['STATUS'] = df_wo['STATUS']
             #df_wo_out['STARTDATE'] = df_wo['STARTDATE']
             #df_wo_out['ENDDATE'] = df_wo['ENDDATE']
             df_wo_out['TITLE'] = df_wo['TITLE']

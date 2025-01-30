@@ -1912,7 +1912,7 @@ def manage_wo():
             df_wo_out['DESCRIPTION'] = df_wo['DESCRIPTION']  
             df_wo_out['TIME_QTY'] = df_wo['TIME_QTY']  
             df_wo_out['TIME_UM'] = df_wo['TIME_UM']                          
-            df_wo_out['REQIDROW'] = df_wo['REQIDROW']
+            df_wo_out['REQID'] = df_wo['REQID']
             st.dataframe(df_wo_out, use_container_width=True, hide_index=True)
         
         st.subheader(f"Insert a Work Item")

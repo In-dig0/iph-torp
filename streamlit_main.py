@@ -1873,10 +1873,13 @@ def manage_wo():
     # Aggiungi un divisore nella sidebar
     st.sidebar.divider()
     st.sidebar.header(f":orange[Work order filters]")
-    
-    unique_usernames = df_woassignedto['USERNAME'].unique()
-    sorted_usernames = sorted(unique_usernames)
-    wo_username_options = list(sorted_usernames)
+    if df_woassignedto is None or df_woassignedto.empty:
+        st.warning("No work order assignment data available. Please check your data source")
+        st.stop() # Stop execution of the script
+    else:    
+        unique_usernames = df_woassignedto['USERNAME'].unique()
+        sorted_usernames = sorted(unique_usernames)
+        wo_username_options = list(sorted_usernames)
     
     selected_username = st.sidebar.selectbox(label=":blue[Tech Deparment Specialist]", options=wo_username_options, index=None)
     st.write(selected_username)

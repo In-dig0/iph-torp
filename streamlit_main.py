@@ -1869,17 +1869,17 @@ def manage_wo():
 
     if 'df_tskgr1' not in st.session_state: # Check if it exists
         st.write(f"Start loading df_tskgr1...")
-        st.session_state.df_tskgr1 = load_df_tskgr1_data()  # Load only once
+        st.session_state.df_tskgr1 = load_tskgr1_data()  # Load only once
 
     if 'df_tskgr2' not in st.session_state: # Check if it exists
         st.write(f"Start loading df_tskgr2...")
-        st.session_state.df_tskgr2 = load_df_tskgr2_data()  # Load only once
+        st.session_state.df_tskgr2 = load_tskgr2_data()  # Load only once
 
     # Access from session state
     df_woassignedto = st.session_state.df_woassignedto 
     df_workorders = st.session_state.df_workorders 
-    df_tskgr1 = st.session_state.stdf_tskgr1
-    df_tskgr2 = st.session_state.stdf_tskgr2
+    df_tskgr1 = st.session_state.df_tskgr1
+    df_tskgr2 = st.session_state.df_tskgr2
 
 
     # Inzialize sessione state

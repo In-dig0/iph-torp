@@ -1916,8 +1916,8 @@ def manage_wo():
             st.dataframe(df_wo_out, use_container_width=True, hide_index=True)
         
         st.subheader(f"Insert a Work Item")
-        taskl1_options = df_taskl1["NAME"]
-        wi_task_l1 = st.selectbox("L1 Task", option=taskl1_options, key="sb_taskl1")
+        taskl1_options = df_taskl1["NAME"].tolist()
+        wi_task_l1 = st.selectbox(label="L1 Task", option=taskl1_options, key="sb_taskl1")
         wi_description = st.text_input(label="Work item description:", value="")
         wi_time_qty = st.number_input(label="Time spent (in hours):", min_value=0.0, step=0.5)
         wi_time_um = "H"

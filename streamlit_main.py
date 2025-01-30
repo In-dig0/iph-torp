@@ -1848,9 +1848,11 @@ def manage_wo():
             return "", False
 
     if 'df_woassignedto' not in st.session_state: # Check if it exists
+        st.write(f"Start loading df_woassignedto...")
         st.session_state.df_woassignedto = load_woassignedto_data()  # Load only once
 
     if 'df_workorders' not in st.session_state: # Check if it exists
+        st.write(f"Start loading df_workorders...")
         st.session_state.df_workorders = load_workorders_data()  # Load only once
 
     df_woassignedto = st.session_state.df_woassignedto # Access from session state
@@ -1884,7 +1886,6 @@ def manage_wo():
 
     if selected_username:
         st.session_state.selected_username = True
-
 
         wo_woid = df_woassignedto[df_woassignedto['USERNAME'] == selected_username]['WOID']
         unique_woid = wo_woid.unique()

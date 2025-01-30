@@ -1946,14 +1946,14 @@ def manage_wo():
         wi_date = st.date_input(label=":blue[Date of execution(:red[*])]", format="DD/MM/YYYY", disabled=False, key="sd_wi_date")
         wi_note = st.text_area(":blue[Note]")
         wo_nr = selected_wo
-        #wi_insdate=datetime.datetime.now().strftime("%Y-%m-%d")
+        wi_date_fmt = wi_date.strftime("%Y-%m-%d")
 
 
         # Bottone per aggiungere il task
         wi_save_botton_disable = not (taskl1_options and wi_description and wi_time_qty)
         if st.button("Save Work Item", type="primary", disabled=wi_save_botton_disable):  
             work_item = {
-                "wi_date": wi_date, 
+                "wi_date": wi_date_fmt, 
                 "wo_id": wo_nr, 
                 "wi_userid": wo_usercode[0], 
                 "wi_status": ACTIVE_STATUS, 

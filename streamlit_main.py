@@ -1961,7 +1961,12 @@ def main():
   
     open_sqlitecloud_db()
     load_initial_data()
-  
+    # In your main function:
+    if 'df_woassignedto' not in st.session_state:
+        st.session_state.df_woassignedto = load_woassignedto_data()
+    if 'df_workorders' not in st.session_state:
+        st.session_state.df_workorders = load_workorders_data()
+
     page_names_to_funcs = {
         "ℹ️ App Info": display_app_info,
         "📄 Insert Request": insert_request,

@@ -1932,13 +1932,13 @@ def manage_wo():
         
         st.subheader(f":orange[Work Item]")
         taskl1_options = df_tskgrl1["NAME"].tolist()
-        wi_task_l1 = st.selectbox(label=":blue[L1 Task](:red[*])", options=taskl1_options, index=None, key="sb_taskl1")
+        wi_task_l1 = st.selectbox(label=":blue[Task Group L1](:red[*])", options=taskl1_options, index=None, key="sb_wi_taskl1")
         taskl2_options = df_tskgrl2["NAME"].tolist()
-        wi_task_l2 = st.selectbox(label=":blue[L2 Task](:red[*])", options=taskl2_options, index=None, key="sb_taskl2")
+        wi_task_l2 = st.selectbox(label=":blue[Task Group L2](:red[*])", options=taskl2_options, index=None, key="sb_wi_taskl2")
         wi_description = st.text_input(label=":blue[Work item description]", value="")
         wi_time_qty = st.number_input(label=":blue[Time spent (in hours)(:red[*])]:", min_value=0.0, step=0.5)
         wi_time_um = "H"
-        wi_date = st.date_input(":blue[Date of execution(:red[*])]", format="DD/MM/YYYY", disabled=False)
+        wi_date = st.date_input(":blue[Date of execution(:red[*])]", format="DD/MM/YYYY", value=None, dedisabled=False, key="sd_wi_date")
         wi_note = st.text_area(":blue[Note]")
         wo_nr = selected_wo
         #wi_insdate=datetime.datetime.now().strftime("%Y-%m-%d")

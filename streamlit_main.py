@@ -1905,7 +1905,7 @@ def manage_wo():
             df_wo = df_workorders[df_workorders["WOID"] == selected_wo]
             df_wo_out = pd.DataFrame()
             st.write(selected_username)
-            df_wo_out['TDSPECIALIST'] = pd.Dataframe(selected_username)
+            df_wo_out['TDSPECIALIST'] = selected_username
             df_wo_out['WOID'] = df_wo['WOID']
             df_wo_out['TYPE'] = df_wo['TYPE']
             df_wo_out['STATUS'] = df_wo['STATUS']

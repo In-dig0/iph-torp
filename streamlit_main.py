@@ -186,23 +186,8 @@ def load_initial_data() -> None:
         ORDER by A.plinecode 
         """, conn)
 
-    df_tskgrl1 = pd.read_sql_query("""
-        SELECT 
-            A.code AS CODE, 
-            A.name AS NAME
-        FROM TORP_TASKGRP_L1 AS A
-        ORDER by name
-        """, conn)
 
-    df_tskgrl2 = pd.read_sql_query("""
-        SELECT 
-            A.code AS CODE, 
-            A.name AS NAME
-        FROM TORP_TASKGRP_L2 AS A
-        ORDER by name
-        """, conn)
 #######################################################################################################
-@st.cache_data
 def load_requests_data():
     """ Load requests from database to df """
     
@@ -287,6 +272,31 @@ def load_woassignedto_data():
     """, conn)    
 
     return df_woassignedto
+
+def load_tskgrl1_data():
+    
+    df_tskgrl1 = pd.read_sql_query("""
+        SELECT 
+            A.code AS CODE, 
+            A.name AS NAME
+        FROM TORP_TASKGRP_L1 AS A
+        ORDER by name
+        """, conn)
+    
+    return df_tskgrl1
+
+def load_tskgrl2_data():
+    
+    df_tskgrl2 = pd.read_sql_query("""
+        SELECT 
+            A.code AS CODE, 
+            A.name AS NAME,
+            A.pcode AS PCODE
+        FROM TORP_TASKGRP_L2 AS A
+        ORDER by name
+        """, conn)
+
+    return df_tskgrl2
 
 # def load_workorders_data():
 #     """ Load work orders from database to df """
@@ -1857,14 +1867,20 @@ def manage_wo():
         st.write(f"Start loading df_workorders...")
         st.session_state.df_workorders = load_workorders_data()  # Load only once
 
-    df_woassignedto = st.session_state.df_woassignedto # Access from session state
-    df_workorders = st.session_state.df_workorders # Access from session state    
-    # st.write(f"df_woassignedto -> {df_woassignedto}")
-    # st.write(f"df_workorders -> {df_workorders}")
-    #load_requests_data()    
-    #st.success(f"Requests df loaded!")
-    #load_workorders_data()   
-    #st.success(f"Work Order df loaded!")
+    if 'df_tskgrl' not in st.session_state: # Check if it exists
+        st.write(f"Start loading df_tskgrl...")
+        st.session_state.df_tskgrl = load_df_tskgrl_data()  # Load only once
+
+    if 'df_tskgr2' not in st.session_state: # Check if it exists
+        st.write(f"Start loading df_tskgr2...")
+        st.session_state.df_tskgr2 = load_df_tskgr2_data()  # Load only once
+
+    # Access from session state
+    df_woassignedto = st.session_state.df_woassignedto 
+    df_workorders = st.session_state.df_workorders 
+    df_tskgrl = st.session_state.stdf_tskgrl 
+    df_tskgr2 = st.session_state.stdf_tskgrl
+
 
     # Inzialize sessione state
     if 'selected_username' not in st.session_state:
@@ -1956,7 +1972,10 @@ def main():
         st.session_state.df_woassignedto = load_woassignedto_data()
     if 'df_workorders' not in st.session_state:
         st.session_state.df_workorders = load_workorders_data()
-
+    if 'df_tskgrl1' not in st.session_state:
+        st.session_state.df_tskgrl1 = load_tskgrl1_data()
+    if 'df_tskgrl2' not in st.session_state:
+        st.session_state.df_tskgrl2 = load_tskgrl2_data()
 
     page_names_to_funcs = {
         "ℹ️ App Info": display_app_info,

@@ -1943,22 +1943,22 @@ def manage_wo():
         wo_nr = selected_wo
         #wi_insdate=datetime.datetime.now().strftime("%Y-%m-%d")
 
-        work_item = {
-            "wi_date": wi_date, 
-            "wo_id": wo_nr, 
-            "wi_userid": "XX", 
-            "wi_status": ACTIVE_STATUS, 
-            "wi_tskgrl1": wi_task_l1[0], 
-            "wi_tskgrl2": wi_task_l2[0], 
-            "wi_desc": wi_description, 
-            "wi_note": wi_note,            
-            "wi_time_qty": wi_time_qty, 
-            "wi_time_um": wi_time_um
-        }
 
         # Bottone per aggiungere il task
         wi_save_botton_disable = not (taskl1_options and wi_description and wi_time_qty)
-        if st.button("Save Work Item", type="primary", disabled=wi_save_botton_disable):           
+        if st.button("Save Work Item", type="primary", disabled=wi_save_botton_disable):  
+            work_item = {
+                "wi_date": wi_date, 
+                "wo_id": wo_nr, 
+                "wi_userid": "XX", 
+                "wi_status": ACTIVE_STATUS, 
+                "wi_tskgrl1": wi_task_l1, 
+                "wi_tskgrl2": wi_task_l2, 
+                "wi_desc": wi_description, 
+                "wi_note": wi_note,            
+                "wi_time_qty": wi_time_qty, 
+                "wi_time_um": wi_time_um
+            }                     
             rc = save_work_item(work_item)
             #st.success(f"Task '{wi_description}' di durata {wi_duration} ore aggiunto per {selected_wo} il {wi_date}.")
             if rc == True:

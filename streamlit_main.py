@@ -1902,21 +1902,30 @@ def manage_wo():
     if st.session_state.selected_wo:
         st.header(f":orange[Work Order {selected_wo}]")
         with st.expander("WO details"):
-            df_wo = df_workorders[df_workorders["WOID"] == selected_wo]
-            df_wo_out = pd.DataFrame()
-            st.write(selected_username)
-            df_wo_out['TDSPECIALIST'] = selected_username
-            df_wo_out['WOID'] = df_wo['WOID']
-            df_wo_out['TYPE'] = df_wo['TYPE']
-            df_wo_out['STATUS'] = df_wo['STATUS']
-            #df_wo_out['STARTDATE'] = df_wo['STARTDATE']
-            #df_wo_out['ENDDATE'] = df_wo['ENDDATE']
-            df_wo_out['TITLE'] = df_wo['TITLE']
-            df_wo_out['DESCRIPTION'] = df_wo['DESCRIPTION']  
-            df_wo_out['TIME_QTY'] = df_wo['TIME_QTY']  
-            df_wo_out['TIME_UM'] = df_wo['TIME_UM']                          
-            df_wo_out['REQID'] = df_wo['REQID']
-            st.dataframe(df_wo_out, use_container_width=True, hide_index=True)
+            # df_wo = df_workorders[df_workorders["WOID"] == selected_wo]
+            # df_wo_out = pd.DataFrame()
+            # st.write(selected_username)
+            # df_wo_out['TDSPECIALIST'] = selected_username
+            # df_wo_out['WOID'] = df_wo['WOID']
+            # df_wo_out['TYPE'] = df_wo['TYPE']
+            # df_wo_out['STATUS'] = df_wo['STATUS']
+            # #df_wo_out['STARTDATE'] = df_wo['STARTDATE']
+            # #df_wo_out['ENDDATE'] = df_wo['ENDDATE']
+            # df_wo_out['TITLE'] = df_wo['TITLE']
+            # df_wo_out['DESCRIPTION'] = df_wo['DESCRIPTION']  
+            # df_wo_out['TIME_QTY'] = df_wo['TIME_QTY']  
+            # df_wo_out['TIME_UM'] = df_wo['TIME_UM']                          
+            # df_wo_out['REQID'] = df_wo['REQID']
+            # st.dataframe(df_wo_out, use_container_width=True, hide_index=True)
+
+            # Get the work order details
+            df_wo = df_workorders[df_workorders["WOID"] == selected_wo].copy() # Create a copy to avoid SettingWithCopyWarning
+
+            # Add the TDSPECIALIST.  This is the KEY change.
+            df_wo['TDSPECIALIST'] = selected_username  # Directly modify the df_wo DataFrame
+
+            # Now, you can either display the modified df_wo directly
+            st.dataframe(df_wo, use_container_width=True, hide_index=True)
         
         st.subheader(f":orange[Work Item]")
         taskl1_options = df_taskl1["NAME"].tolist()

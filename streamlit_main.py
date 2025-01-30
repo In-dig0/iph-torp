@@ -1855,7 +1855,8 @@ def manage_wo():
 
     df_woassignedto = st.session_state.df_woassignedto # Access from session state
     df_workorders = st.session_state.df_workorders # Access from session state    
-
+    st.write(f"df_woassignedto -> {df_woassignedto}")
+    st.write(f"df_workorders -> {df_workorders}")
     #load_requests_data()    
     #st.success(f"Requests df loaded!")
     #load_workorders_data()   
@@ -1885,10 +1886,10 @@ def manage_wo():
         st.session_state.selected_username = True
 
 
-    wo_woid = df_woassignedto[df_woassignedto['USERNAME'] == selected_username]['WOID']
-    unique_woid = wo_woid.unique()
-    sorted_woid = sorted(unique_woid)
-    wo_woid_options = list(sorted_woid)
+        wo_woid = df_woassignedto[df_woassignedto['USERNAME'] == selected_username]['WOID']
+        unique_woid = wo_woid.unique()
+        sorted_woid = sorted(unique_woid)
+        wo_woid_options = list(sorted_woid)
   
     selected_wo = st.sidebar.selectbox(label=":blue[Work-Order]", options=wo_woid_options, index=None)
     if selected_wo:

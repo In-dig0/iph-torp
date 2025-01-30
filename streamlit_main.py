@@ -84,6 +84,7 @@ def display_app_info() -> None:
     st.markdown("Powered with Streamlit :streamlit:")
     
 #######################################################################################################
+@st.cache_data
 def load_initial_data() -> None:
     """Load initial data from database"""
     global df_depts
@@ -195,6 +196,7 @@ def load_initial_data() -> None:
         """, conn)
 
 #######################################################################################################
+@st.cache_data
 def load_requests_data():
     """ Load requests from database to df """
     
@@ -237,6 +239,7 @@ def load_requests_data():
 
 
 #######################################################################################################
+@st.cache_data
 def load_workorders_data():
     """ Load work orders from database to df """
     

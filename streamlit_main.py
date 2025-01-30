@@ -1880,6 +1880,7 @@ def manage_wo():
     wo_username_options = list(sorted_usernames)
     
     selected_username = st.sidebar.selectbox(label=":blue[Tech Deparment Specialist]", options=wo_username_options, index=None)
+    st.write(selected_username)
     
     df_wo_usercode = df_woassignedto[df_woassignedto['USERNAME'] == selected_username]["USERID"].unique()
     wo_usercode = list(df_wo_usercode)
@@ -1903,7 +1904,8 @@ def manage_wo():
         with st.expander("WO details"):
             df_wo = df_workorders[df_workorders["WOID"] == selected_wo]
             df_wo_out = pd.DataFrame()
-            df_wo_out['TDSPECIALIST'] = selected_username
+            st.write(selected_username)
+            df_wo_out['TDSPECIALIST'] = pd.Dataframe(selected_username)
             df_wo_out['WOID'] = df_wo['WOID']
             df_wo_out['TYPE'] = df_wo['TYPE']
             df_wo_out['STATUS'] = df_wo['STATUS']

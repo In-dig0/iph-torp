@@ -1943,7 +1943,7 @@ def main():
     "🔍 View Request ": view_request,
     "🗂️ Manage Request": manage_request,
 #    "📌 Manage Work Orders": manage_wo,
-    "📌 Manage Work Orders": manage_wi,
+    "📌 Manage Work Orders": manage_wo,
 #    "🔐 Close db": close_sqlitecloud_db,
 #    "--> TEST": my_test
 }    

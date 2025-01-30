@@ -1842,22 +1842,22 @@ def manage_wo():
         try:                          
             sql = """
                 INSERT INTO TORP_WORKITEMS (
-                    insdate, woid, userid, status, tskgrl1, tskgrl2, 
+                    date, woid, userid, status, tskgrl1, tskgrl2, 
                     description, note, time_qty, time_um
                 ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
             """
             values = (
-                witem["wi_ucode"], witem["wi_tskgroup"], witem["wi_tskdate"], witem["wi_qty"], witem["wi_um"],
-                witem["wi_desc"], witem["wi_notes"], witem["wi_status"], witem["wi_woidrow"]
+                witem["wi_date"], witem["wo_id"], witem["wi_userid"], witem["wi_status"], witem["wi_tskgrl1"], witem["wi_tskgrl2"],
+                witem["wi_desc"], witem["wi_note"], witem["wi_time_qty"], witem["wi_time_um"]
             )
             
             cursor.execute(sql, values)
             conn.commit()
-            return next_idrow, True
+            return True
         
         except Exception as e:
             st.error(f"**ERROR inserting data in table TORP_WORKITEM: \n{e}", icon="🚨")
-            return "", False
+            return False
 
     if 'df_woassignedto' not in st.session_state: # Check if it exists
         st.write(f"Start loading df_woassignedto...")
@@ -1867,9 +1867,9 @@ def manage_wo():
         st.write(f"Start loading df_workorders...")
         st.session_state.df_workorders = load_workorders_data()  # Load only once
 
-    if 'df_tskgrl' not in st.session_state: # Check if it exists
-        st.write(f"Start loading df_tskgrl...")
-        st.session_state.df_tskgrl = load_df_tskgrl_data()  # Load only once
+    if 'df_tskgr1' not in st.session_state: # Check if it exists
+        st.write(f"Start loading df_tskgr1...")
+        st.session_state.df_tskgr1 = load_df_tskgr1_data()  # Load only once
 
     if 'df_tskgr2' not in st.session_state: # Check if it exists
         st.write(f"Start loading df_tskgr2...")
@@ -1878,8 +1878,8 @@ def manage_wo():
     # Access from session state
     df_woassignedto = st.session_state.df_woassignedto 
     df_workorders = st.session_state.df_workorders 
-    df_tskgrl = st.session_state.stdf_tskgrl 
-    df_tskgr2 = st.session_state.stdf_tskgrl
+    df_tskgr1 = st.session_state.stdf_tskgr1
+    df_tskgr2 = st.session_state.stdf_tskgr2
 
 
     # Inzialize sessione state
@@ -1943,11 +1943,23 @@ def manage_wo():
         wo_nr = selected_wo
         #wi_insdate=datetime.datetime.now().strftime("%Y-%m-%d")
 
-        work_item = {"wi_date": wi_date, "wo_id": wo_nr, "wi_userid": "XX", "wi_status": ACTIVE_STATUS, "wi_tskgrl1": tskgrl1, "wi_tskgrl2": tskgrl2, "wi_time_qty": wi_time_qty, "wi_time_um": wi_time_um, "wi_desc": wi_description, "wi_note": wi_note}
+        work_item = {
+            "wi_date": wi_date, 
+            "wo_id": wo_nr, 
+            "wi_userid": "XX", 
+            "wi_status": ACTIVE_STATUS, 
+            "wi_tskgrl1": tskgrl1, 
+            "wi_tskgrl2": tskgrl2, 
+            "wi_desc": wi_description, 
+            "wi_note": wi_note,            
+            "wi_time_qty": wi_time_qty, 
+            "wi_time_um": wi_time_um
+        }
+
         # Bottone per aggiungere il task
         wi_save_botton_disable = not (taskl1_options and wi_description and wi_time_qty)
         if st.button("Save Work Item", type="primary", disabled=wi_save_botton_disable):           
-            #wi_nr, rc = save_work_item(work_item)
+            rc = save_work_item(work_item)
             #st.success(f"Task '{wi_description}' di durata {wi_duration} ore aggiunto per {selected_wo} il {wi_date}.")
             if rc == True:
                 st.success(f"Task {wo_nr}/{wi_nr} saved successfully!")

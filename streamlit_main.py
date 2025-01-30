@@ -1774,63 +1774,60 @@ def manage_request():
                         )
 
 
-#######################################################################################################
-def manage_wo():
-    pass
 
 #######################################################################################################
 def manage_wo():
-# Sidebar per selezionare il work-order
-    def fetch_users():
-        query = """
-        SELECT 
-            A.code AS CODE, 
-            A.name AS NAME, 
-            A.deptcode AS DEPTCODE, 
-            B.name AS DEPTNAME
-        FROM TORP_USERS A
-        INNER JOIN TORP_DEPARTMENTS B ON B.code = A.deptcode
-        ORDER BY A.name
-        """
-        return pd.read_sql_query(query, conn)
+# # Sidebar per selezionare il work-order
+#     def fetch_users():
+#         query = """
+#         SELECT 
+#             A.code AS CODE, 
+#             A.name AS NAME, 
+#             A.deptcode AS DEPTCODE, 
+#             B.name AS DEPTNAME
+#         FROM TORP_USERS A
+#         INNER JOIN TORP_DEPARTMENTS B ON B.code = A.deptcode
+#         ORDER BY A.name
+#         """
+#         return pd.read_sql_query(query, conn)
     
-    def fetch_workorders():
-        query = """
-        SELECT 
-            A.idrow as IDROW, 
-            A.type as TYPE, 
-            A.startdate as STARTDATE, 
-            A.enddate as ENDDATE,
-            A.title as TITLE,
-            A.notes as NOTES,
-            A.status as STATUS,
-            A.reqidrow as REQIDROW
-        FROM TORP_WORKORDERS A
-        ORDER BY REQIDROW
-        """
-        return pd.read_sql_query(query, conn)
+#     def fetch_workorders():
+#         query = """
+#         SELECT 
+#             A.idrow as IDROW, 
+#             A.type as TYPE, 
+#             A.startdate as STARTDATE, 
+#             A.enddate as ENDDATE,
+#             A.title as TITLE,
+#             A.notes as NOTES,
+#             A.status as STATUS,
+#             A.reqidrow as REQIDROW
+#         FROM TORP_WORKORDERS A
+#         ORDER BY REQIDROW
+#         """
+#         return pd.read_sql_query(query, conn)
     
-    def fetch_assigned_wo():
-        query = """
-        SELECT 
-            A.usercode as USERCODE, 
-            A.woidrow as WOIDROW, 
-            A.status as STATUS, 
-            B.name as USERNAME 
-        FROM TORP_WOASSIGNEDTO A
-        INNER JOIN TORP_USERS B ON B.code = A.usercode
-        ORDER BY WOIDROW
-        """
-        return pd.read_sql_query(query, conn)
+#     def fetch_assigned_wo():
+#         query = """
+#         SELECT 
+#             A.usercode as USERCODE, 
+#             A.woidrow as WOIDROW, 
+#             A.status as STATUS, 
+#             B.name as USERNAME 
+#         FROM TORP_WOASSIGNEDTO A
+#         INNER JOIN TORP_USERS B ON B.code = A.usercode
+#         ORDER BY WOIDROW
+#         """
+#         return pd.read_sql_query(query, conn)
 
-    def convert_woidrow_to_str(value: int)-> str:
-        return "W" + str(value).zfill(4)
-    def convert_woidrow_to_int(value: str)-> int:
-        return int(value[1:])
-    def convert_reqidrow_to_str(value: int)-> str:
-        return "R" + str(value).zfill(4)
-    def convert_reqidrow_to_int(value: str)-> int:
-        return int(value[1:])
+#     def convert_woidrow_to_str(value: int)-> str:
+#         return "W" + str(value).zfill(4)
+#     def convert_woidrow_to_int(value: str)-> int:
+#         return int(value[1:])
+#     def convert_reqidrow_to_str(value: int)-> str:
+#         return "R" + str(value).zfill(4)
+#     def convert_reqidrow_to_int(value: str)-> int:
+#         return int(value[1:])
 
     def save_work_item(witem: dict) -> Tuple[str, bool]:
         """Save request to database and return request number and status"""
@@ -1866,7 +1863,6 @@ def manage_wo():
         
     load_requests_data()    
     load_workorders_data()   
-    #df_woassignedto = fetch_assigned_wo()
 
     # Inzialize sessione state
     if 'selected_username' not in st.session_state:

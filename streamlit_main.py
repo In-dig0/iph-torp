@@ -1927,7 +1927,7 @@ def manage_wo():
         work_item = {"wi_ucode": wo_usercode[0], "wi_tskgroup": "standard", "wi_tskdate": wi_date,"wi_time_qty": wi_time_qty, "wi_time_um": wi_time_um, "wi_desc": wi_description, "wi_note": wi_note, "wi_status": ACTIVE_STATUS, "wi_woid": wo_nr}
         # Bottone per aggiungere il task
         wi_save_botton_disable = not (taskl1_options and wi_description and wi_time_qty)
-        if st.button("Save Work Item", type="primary", disable=wi_save_botton_disable):           
+        if st.button("Save Work Item", type="primary", disabled=wi_save_botton_disable):           
             wi_nr, rc = save_work_item(work_item)
             #st.success(f"Task '{wi_description}' di durata {wi_duration} ore aggiunto per {selected_wo} il {wi_date}.")
             if rc == True:

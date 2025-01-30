@@ -1861,8 +1861,8 @@ def manage_wo():
 
     df_woassignedto = st.session_state.df_woassignedto # Access from session state
     df_workorders = st.session_state.df_workorders # Access from session state    
-    st.write(f"df_woassignedto -> {df_woassignedto}")
-    st.write(f"df_workorders -> {df_workorders}")
+    # st.write(f"df_woassignedto -> {df_woassignedto}")
+    # st.write(f"df_workorders -> {df_workorders}")
     #load_requests_data()    
     #st.success(f"Requests df loaded!")
     #load_workorders_data()   
@@ -1898,6 +1898,8 @@ def manage_wo():
         unique_woid = wo_woid.unique()
         sorted_woid = sorted(unique_woid)
         wo_woid_options = list(sorted_woid)
+    else:
+        wo_woid_options = []   
   
     selected_wo = st.sidebar.selectbox(label=":blue[Work-Order]", options=wo_woid_options, index=None)
     if selected_wo:
@@ -1970,9 +1972,9 @@ def main():
         st.session_state.df_woassignedto = load_woassignedto_data()
     if 'df_workorders' not in st.session_state:
         st.session_state.df_workorders = load_workorders_data()
-    st.write(f"st.session_state.df_woassignedto --> {st.session_state.df_woassignedto}")
-    st.write(f"st.session_state.df_workorders --> {st.session_state.df_workorders}")
-    
+    #st.write(f"st.session_state.df_woassignedto --> {st.session_state.df_woassignedto}")
+    #st.write(f"st.session_state.df_workorders --> {st.session_state.df_workorders}")
+
     page_names_to_funcs = {
         "ℹ️ App Info": display_app_info,
         "📄 Insert Request": insert_request,

@@ -1837,26 +1837,28 @@ def manage_request():
 #######################################################################################################
 def manage_wo():
 
-    def save_work_item(witem: dict) -> Tuple[str, bool]:
+    def save_work_item(witem: dict) ->  bool:
         """Save request to database and return request number and status"""
         try:                          
             sql = """
                 INSERT INTO TORP_WORKITEMS (
-                    date, woid, userid, status, tskgrl1, tskgrl2, 
-                    description, note, time_qty, time_um
+                    date, woid, userid, status, 
+                    tskgrl1, tskgrl2, description, note, 
+                    time_qty, time_um
                 ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
             """
             values = (
-                witem["wi_date"], witem["wo_id"], witem["wi_userid"], witem["wi_status"], witem["wi_tskgrl1"], witem["wi_tskgrl2"],
-                witem["wi_desc"], witem["wi_note"], witem["wi_time_qty"], witem["wi_time_um"]
+                witem["wi_date"], witem["wo_id"], witem["wi_userid"], witem["wi_status"],
+                witem["wi_tskgrl1"], witem["wi_tskgrl2"], witem["wi_desc"], witem["wi_note"], 
+                witem["wi_time_qty"], witem["wi_time_um"]
             )
-            
             cursor.execute(sql, values)
             conn.commit()
             return True
         
         except Exception as e:
             st.error(f"**ERROR inserting data in table TORP_WORKITEM: \n{e}", icon="🚨")
+            st.rollback()
             return False
 
     if 'df_woassignedto' not in st.session_state: # Check if it exists
@@ -1965,7 +1967,7 @@ def manage_wo():
                 "wi_time_um": wi_time_um
             }                     
             st.write(work_item)
-            #rc = save_work_item(work_item)
+            rc = save_work_item(work_item)
             if rc == True:
                 st.success(f"Task {wo_nr}/{wi_nr} saved successfully!")
     else:

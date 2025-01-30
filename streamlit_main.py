@@ -186,14 +186,21 @@ def load_initial_data() -> None:
         ORDER by A.plinecode 
         """, conn)
 
-    df_taskl1 = pd.read_sql_query("""
+    df_tskgrl1 = pd.read_sql_query("""
         SELECT 
             A.code AS CODE, 
             A.name AS NAME
-        FROM TORP_TASK_L1 AS A
+        FROM TORP_TASKGRP_L1 AS A
         ORDER by name
         """, conn)
 
+    df_tskgrl2 = pd.read_sql_query("""
+        SELECT 
+            A.code AS CODE, 
+            A.name AS NAME
+        FROM TORP_TASKGRP_L2 AS A
+        ORDER by name
+        """, conn)
 #######################################################################################################
 @st.cache_data
 def load_requests_data():
@@ -1822,24 +1829,15 @@ def manage_wo():
 
     def save_work_item(witem: dict) -> Tuple[str, bool]:
         """Save request to database and return request number and status"""
-        try:
-        # # Get next available row ID
-            cursor.execute('SELECT MAX(idrow) FROM TORP_WORKITEMS')
-            max_idrow = cursor.fetchone()[0]
-            if max_idrow is not None:
-                next_idrow = max_idrow + 1
-            else:
-                next_idrow = 1  
-                          
+        try:                          
             sql = """
                 INSERT INTO TORP_WORKITEMS (
-                    idrow, ucode, tskgroup, tskdate, qty, um, 
-                    description, notes, status, woidrow
+                    insdate, woid, userid, status, tskgrl1, tskgrl2, 
+                    description, note, time_qty, time_um
                 ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
             """
-            
             values = (
-                next_idrow, witem["wi_ucode"], witem["wi_tskgroup"], witem["wi_tskdate"], witem["wi_qty"], witem["wi_um"],
+                witem["wi_ucode"], witem["wi_tskgroup"], witem["wi_tskdate"], witem["wi_qty"], witem["wi_um"],
                 witem["wi_desc"], witem["wi_notes"], witem["wi_status"], witem["wi_woidrow"]
             )
             
@@ -1909,45 +1907,31 @@ def manage_wo():
     if st.session_state.selected_wo:
         st.header(f":orange[Work Order {selected_wo}]")
         with st.expander("WO details"):
-            # df_wo = df_workorders[df_workorders["WOID"] == selected_wo]
-            # df_wo_out = pd.DataFrame()
-            # st.write(selected_username)
-            # df_wo_out['TDSPECIALIST'] = selected_username
-            # df_wo_out['WOID'] = df_wo['WOID']
-            # df_wo_out['TYPE'] = df_wo['TYPE']
-            # df_wo_out['STATUS'] = df_wo['STATUS']
-            # #df_wo_out['STARTDATE'] = df_wo['STARTDATE']
-            # #df_wo_out['ENDDATE'] = df_wo['ENDDATE']
-            # df_wo_out['TITLE'] = df_wo['TITLE']
-            # df_wo_out['DESCRIPTION'] = df_wo['DESCRIPTION']  
-            # df_wo_out['TIME_QTY'] = df_wo['TIME_QTY']  
-            # df_wo_out['TIME_UM'] = df_wo['TIME_UM']                          
-            # df_wo_out['REQID'] = df_wo['REQID']
-            # st.dataframe(df_wo_out, use_container_width=True, hide_index=True)
-
             # Get the work order details
             df_wo = df_workorders[df_workorders["WOID"] == selected_wo].copy() # Create a copy to avoid SettingWithCopyWarning
-
             # Add the TDSPECIALIST.  This is the KEY change.
             df_wo['TDSPECIALIST'] = selected_username  # Directly modify the df_wo DataFrame
-
             # Now, you can either display the modified df_wo directly
             st.dataframe(df_wo, use_container_width=True, hide_index=True)
         
         st.subheader(f":orange[Work Item]")
-        taskl1_options = df_taskl1["NAME"].tolist()
-        wi_task_l1 = st.selectbox(label=":blue[L1 Task](:red[*])", options=taskl1_options, key="sb_taskl1")
+        taskl1_options = df_tskgrl1["NAME"].tolist()
+        wi_task_l1 = st.selectbox(label=":blue[L1 Task](:red[*])", options=taskl1_options, index=None, key="sb_taskl1")
+        taskl2_options = df_tskgrl2["NAME"].tolist()
+        wi_task_l2 = st.selectbox(label=":blue[L2 Task](:red[*])", options=taskl2_options, index=None, key="sb_taskl2")
         wi_description = st.text_input(label=":blue[Work item description]", value="")
         wi_time_qty = st.number_input(label=":blue[Time spent (in hours)(:red[*])]:", min_value=0.0, step=0.5)
         wi_time_um = "H"
         wi_date = st.date_input(":blue[Date of execution(:red[*])]", format="DD/MM/YYYY", disabled=False)
         wi_note = st.text_area(":blue[Note]")
         wo_nr = selected_wo
-        work_item = {"wi_ucode": wo_usercode[0], "wi_tskgroup": "standard", "wi_tskdate": wi_date,"wi_time_qty": wi_time_qty, "wi_time_um": wi_time_um, "wi_desc": wi_description, "wi_note": wi_note, "wi_status": ACTIVE_STATUS, "wi_woid": wo_nr}
+        #wi_insdate=datetime.datetime.now().strftime("%Y-%m-%d")
+
+        work_item = {"wi_date": wi_date, "wo_id": wo_nr, "wi_userid": "XX", "wi_status": ACTIVE_STATUS, "wi_tskgrl1": tskgrl1, "wi_tskgrl2": tskgrl2, "wi_time_qty": wi_time_qty, "wi_time_um": wi_time_um, "wi_desc": wi_description, "wi_note": wi_note}
         # Bottone per aggiungere il task
         wi_save_botton_disable = not (taskl1_options and wi_description and wi_time_qty)
         if st.button("Save Work Item", type="primary", disabled=wi_save_botton_disable):           
-            wi_nr, rc = save_work_item(work_item)
+            #wi_nr, rc = save_work_item(work_item)
             #st.success(f"Task '{wi_description}' di durata {wi_duration} ore aggiunto per {selected_wo} il {wi_date}.")
             if rc == True:
                 st.success(f"Task {wo_nr}/{wi_nr} saved successfully!")
@@ -1972,8 +1956,7 @@ def main():
         st.session_state.df_woassignedto = load_woassignedto_data()
     if 'df_workorders' not in st.session_state:
         st.session_state.df_workorders = load_workorders_data()
-    #st.write(f"st.session_state.df_woassignedto --> {st.session_state.df_woassignedto}")
-    #st.write(f"st.session_state.df_workorders --> {st.session_state.df_workorders}")
+
 
     page_names_to_funcs = {
         "ℹ️ App Info": display_app_info,

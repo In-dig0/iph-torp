@@ -1862,7 +1862,9 @@ def manage_wo():
 
         
     load_requests_data()    
+    st.success(f"Requests df loaded!")
     load_workorders_data()   
+    st.success(f"Work Order df loaded!")
 
     # Inzialize sessione state
     if 'selected_username' not in st.session_state:

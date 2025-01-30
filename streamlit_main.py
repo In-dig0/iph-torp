@@ -95,6 +95,7 @@ def load_initial_data() -> None:
     global df_detail
     global df_lk_category_detail
     global df_lk_pline_tdtl
+    global df_taskl1
 
 
     df_depts = pd.read_sql_query("""
@@ -183,6 +184,14 @@ def load_initial_data() -> None:
         FROM TORP_LINK_PLINE_TDTL A
         INNER JOIN TORP_USERS B ON B.code = A.usercode
         ORDER by A.plinecode 
+        """, conn)
+
+    df_taskl1 = pd.read_sql_query("""
+        SELECT 
+            A.code AS CODE, 
+            A.name AS NAME
+        FROM TORP_TASK_L1 AS A
+        ORDER by name
         """, conn)
 
 #######################################################################################################
@@ -1907,6 +1916,8 @@ def manage_wo():
             st.dataframe(df_wo_out, use_container_width=True, hide_index=True)
         
         st.subheader(f"Insert a Work Item")
+        taskl1_options = df_taskl1["NAME"]
+        wi_task_l1 = st.selectbox("L1 Task", option=taskl1_options, key="sb_taskl1")
         wi_description = st.text_input(label="Work item description:", value="")
         wi_time_qty = st.number_input(label="Time spent (in hours):", min_value=0.0, step=0.5)
         wi_time_um = "H"

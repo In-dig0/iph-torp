@@ -1950,7 +1950,7 @@ def manage_wo():
             work_item = {
                 "wi_date": wi_date, 
                 "wo_id": wo_nr, 
-                "wi_userid": "XX", 
+                "wi_userid": wo_usercode[0], 
                 "wi_status": ACTIVE_STATUS, 
                 "wi_tskgrl1": wi_task_l1, 
                 "wi_tskgrl2": wi_task_l2, 
@@ -1959,7 +1959,8 @@ def manage_wo():
                 "wi_time_qty": wi_time_qty, 
                 "wi_time_um": wi_time_um
             }                     
-            rc = save_work_item(work_item)
+            st.write(work_item)
+            #rc = save_work_item(work_item)
             #st.success(f"Task '{wi_description}' di durata {wi_duration} ore aggiunto per {selected_wo} il {wi_date}.")
             if rc == True:
                 st.success(f"Task {wo_nr}/{wi_nr} saved successfully!")

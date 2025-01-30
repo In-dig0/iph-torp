@@ -1903,6 +1903,7 @@ def manage_wo():
         with st.expander("WO details"):
             df_wo = df_workorders[df_workorders["WOID"] == selected_wo]
             df_wo_out = pd.DataFrame()
+            df_wo_out['TDSPECIALIST'] = selected_username
             df_wo_out['WOID'] = df_wo['WOID']
             df_wo_out['TYPE'] = df_wo['TYPE']
             df_wo_out['STATUS'] = df_wo['STATUS']

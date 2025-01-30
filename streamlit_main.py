@@ -1767,7 +1767,7 @@ def manage_wo():
     pass
 
 #######################################################################################################
-def manage_wi():
+def manage_wo():
 # Sidebar per selezionare il work-order
     def fetch_users():
         query = """
@@ -1942,10 +1942,10 @@ def main():
     "📄 Insert Request": insert_request,
     "🔍 View Request ": view_request,
     "🗂️ Manage Request": manage_request,
-    "📌 Manage Work Orders": manage_wo,
-    "🛠️ Manage Work Items": manage_wi,
-    "🔐 Close db": close_sqlitecloud_db,
-    "--> TEST": my_test
+#    "📌 Manage Work Orders": manage_wo,
+    "📌 Manage Work Orders": manage_wi,
+#    "🔐 Close db": close_sqlitecloud_db,
+#    "--> TEST": my_test
 }    
   # Aggiungi l'immagine alla sidebar 
   st.sidebar.image("https://iph.it/wp-content/uploads/2020/02/logo-scritta.png", width=150)

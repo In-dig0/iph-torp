@@ -1931,14 +1931,19 @@ def manage_wo():
             st.dataframe(df_wo, use_container_width=True, hide_index=True)
         
         st.subheader(f":orange[Work Item]")
+        
         taskl1_options = df_tskgrl1["NAME"].tolist()
         wi_task_l1 = st.selectbox(label=":blue[Task Group L1](:red[*])", options=taskl1_options, index=None, key="sb_wi_taskl1")
+        wi_task_l1_code = df_tskgrl1[df_tskgrl1["NAME"]==wi_task_l1]["CODE"].tolist()
+
         taskl2_options = df_tskgrl2["NAME"].tolist()
         wi_task_l2 = st.selectbox(label=":blue[Task Group L2](:red[*])", options=taskl2_options, index=None, key="sb_wi_taskl2")
+        wi_task_l2_code = df_tskgrl2[df_tskgrl2["NAME"]==wi_task_l2]["CODE"].tolist()  
+        
         wi_description = st.text_input(label=":blue[Work item description]", value="")
         wi_time_qty = st.number_input(label=":blue[Time spent (in hours)(:red[*])]:", min_value=0.0, step=0.5)
         wi_time_um = "H"
-        wi_date = st.date_input(label=":blue[Date of execution(:red[*])]", value=None, format="DD/MM/YYYY", disabled=False, key="sd_wi_date")
+        wi_date = st.date_input(label=":blue[Date of execution(:red[*])]", value=today, format="DD/MM/YYYY", disabled=False, key="sd_wi_date")
         wi_note = st.text_area(":blue[Note]")
         wo_nr = selected_wo
         #wi_insdate=datetime.datetime.now().strftime("%Y-%m-%d")
@@ -1952,8 +1957,8 @@ def manage_wo():
                 "wo_id": wo_nr, 
                 "wi_userid": wo_usercode[0], 
                 "wi_status": ACTIVE_STATUS, 
-                "wi_tskgrl1": wi_task_l1, 
-                "wi_tskgrl2": wi_task_l2, 
+                "wi_tskgrl1": wi_task_l1_code[0], 
+                "wi_tskgrl2": wi_task_l2_code[0],  
                 "wi_desc": wi_description, 
                 "wi_note": wi_note,            
                 "wi_time_qty": wi_time_qty, 
@@ -1961,7 +1966,6 @@ def manage_wo():
             }                     
             st.write(work_item)
             #rc = save_work_item(work_item)
-            #st.success(f"Task '{wi_description}' di durata {wi_duration} ore aggiunto per {selected_wo} il {wi_date}.")
             if rc == True:
                 st.success(f"Task {wo_nr}/{wi_nr} saved successfully!")
     else:

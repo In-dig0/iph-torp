@@ -1852,9 +1852,9 @@ def manage_wo():
             return "", False
 
         
-    df_users = fetch_users()    
-    df_workorders = fetch_workorders()    
-    df_woassignedto = fetch_assigned_wo()
+    load_requests_data()    
+    load_workorders_data()   
+    #df_woassignedto = fetch_assigned_wo()
 
     # Inzialize sessione state
     if 'selected_username' not in st.session_state:

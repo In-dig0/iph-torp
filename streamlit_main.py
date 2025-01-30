@@ -1899,7 +1899,7 @@ def manage_wo():
 
     # Input per inserire i dettagli del task svolto
     if st.session_state.selected_wo:
-        st.header(f"Work Order {selected_wo}")
+        st.header(f":orange[Work Order {selected_wo}]")
         with st.expander("WO details"):
             df_wo = df_workorders[df_workorders["WOID"] == selected_wo]
             df_wo_out = pd.DataFrame()
@@ -1917,7 +1917,7 @@ def manage_wo():
         
         st.subheader(f"Insert a Work Item")
         taskl1_options = df_taskl1["NAME"].tolist()
-        wi_task_l1 = st.selectbox(label="L1 Task", option=taskl1_options, key="sb_taskl1")
+        wi_task_l1 = st.selectbox(label="L1 Task", options=taskl1_options, key="sb_taskl1")
         wi_description = st.text_input(label="Work item description:", value="")
         wi_time_qty = st.number_input(label="Time spent (in hours):", min_value=0.0, step=0.5)
         wi_time_um = "H"

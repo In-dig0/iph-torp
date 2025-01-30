@@ -241,7 +241,7 @@ def load_requests_data():
 def load_workorders_data():
     """ Load TORP_WORKORDERS records into df """
     
-    global df_workorders
+    # global df_workorders
     
     df_workorders = pd.read_sql_query("""
     SELECT 
@@ -259,11 +259,13 @@ def load_workorders_data():
     FROM TORP_WORKORDERS A
     ORDER BY REQID
     """, conn)
+    
+    return df_workorders
 
 def load_woassignedto_data():
     """ Load TORP_WOASSIGNEDTO records into df """
     
-    global df_woassignedto
+#    global df_woassignedto
     
     df_woassignedto = pd.read_sql_query("""
     SELECT 
@@ -276,6 +278,8 @@ def load_woassignedto_data():
     WHERE A.status = 'ACTIVE'
     ORDER BY WOID
     """, conn)    
+
+    return df_woassignedto
 
 # def load_workorders_data():
 #     """ Load work orders from database to df """
@@ -1966,7 +1970,9 @@ def main():
         st.session_state.df_woassignedto = load_woassignedto_data()
     if 'df_workorders' not in st.session_state:
         st.session_state.df_workorders = load_workorders_data()
-
+    st.write(f"st.session_state.df_woassignedto --> {st.session_state.df_woassignedto}")
+    st.write(f"st.session_state.df_workorders --> {st.session_state.df_workorders}")
+    
     page_names_to_funcs = {
         "ℹ️ App Info": display_app_info,
         "📄 Insert Request": insert_request,

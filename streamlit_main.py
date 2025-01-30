@@ -1858,7 +1858,7 @@ def manage_wo():
         
         except Exception as e:
             st.error(f"**ERROR inserting data in table TORP_WORKITEM: \n{e}", icon="🚨")
-            st.rollback()
+            conn.rollback()
             return False
 
     if 'df_woassignedto' not in st.session_state: # Check if it exists

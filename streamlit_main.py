@@ -1879,7 +1879,7 @@ def manage_wo():
     sorted_usernames = sorted(unique_usernames)
     wo_username_options = list(sorted_usernames)
     
-    selected_username = st.sidebar.selectbox(label="TD user:", options=wo_username_options, index=None)
+    selected_username = st.sidebar.selectbox(label="Tech Deparment Specialist:", options=wo_username_options, index=None)
     
     df_wo_usercode = df_woassignedto[df_woassignedto['USERNAME'] == selected_username]["USERID"].unique()
     wo_usercode = list(df_wo_usercode)

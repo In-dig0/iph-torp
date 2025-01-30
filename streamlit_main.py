@@ -1955,46 +1955,48 @@ def my_test():
 
 #######################################################################################################
 def main():
+    st.set_page_config(layout="wide")
 #   if not check_password():
 #     st.stop()
-  open_sqlitecloud_db()
-  load_initial_data()
-  st.set_page_config(layout="wide")  
-  page_names_to_funcs = {
-    "ℹ️ App Info": display_app_info,
-    "📄 Insert Request": insert_request,
-    "🔍 View Request ": view_request,
-    "🗂️ Manage Request": manage_request,
-#    "📌 Manage Work Orders": manage_wo,
-    "📌 Manage Work Orders": manage_wo,
-#    "🔐 Close db": close_sqlitecloud_db,
-#    "--> TEST": my_test
-}    
-  # Aggiungi l'immagine alla sidebar 
-  st.sidebar.image("https://iph.it/wp-content/uploads/2020/02/logo-scritta.png", width=150)
   
-  st.markdown(
-        """
-    <style>
-        /* Stile per st.selectbox */
-    div[data-baseweb="select"] > div {
-        border: 2px solid !important;
-    }
-        /* Stile per st.text_input */
-    div[data-baseweb="input"] > div {
-        border: 2px solid !important;
-    }
-         /* Stile per st.text_area */
-     div[data-baseweb="textarea"] > div {
-         border: 2px solid !important;
-     }    
-    </style>
-    """,
-    unsafe_allow_html=True
-  )
+    open_sqlitecloud_db()
+    load_initial_data()
+  
+    page_names_to_funcs = {
+        "ℹ️ App Info": display_app_info,
+        "📄 Insert Request": insert_request,
+        "🔍 View Request ": view_request,
+        "🗂️ Manage Request": manage_request,
+    #    "📌 Manage Work Orders": manage_wo,
+        "📌 Manage Work Orders": manage_wo,
+    #    "🔐 Close db": close_sqlitecloud_db,
+    #    "--> TEST": my_test
+    }    
+    # Aggiungi l'immagine alla sidebar 
+    st.sidebar.image("https://iph.it/wp-content/uploads/2020/02/logo-scritta.png", width=150)
+    
+    st.markdown(
+            """
+        <style>
+            /* Stile per st.selectbox */
+        div[data-baseweb="select"] > div {
+            border: 2px solid !important;
+        }
+            /* Stile per st.text_input */
+        div[data-baseweb="input"] > div {
+            border: 2px solid !important;
+        }
+            /* Stile per st.text_area */
+        div[data-baseweb="textarea"] > div {
+            border: 2px solid !important;
+        }    
+        </style>
+        """,
+        unsafe_allow_html=True
+    )
 
-  demo_name = st.sidebar.selectbox("Choose a function", page_names_to_funcs.keys())
-  page_names_to_funcs[demo_name]()
+    demo_name = st.sidebar.selectbox("Choose a function", page_names_to_funcs.keys())
+    page_names_to_funcs[demo_name]()
 
 if __name__ == "__main__":
     main()

@@ -1981,130 +1981,130 @@ def manage_wo():
         
         st.subheader(f":orange[Task]")
 
-        with st.form(key='task_form'):
-            taskl1_options = df_tskgrl1["NAME"].tolist()
+        #with st.form(key='task_form'):
+        taskl1_options = df_tskgrl1["NAME"].tolist()
+        
+        # Per Task Group L1
+        initial_task_l1 = None if st.session_state.reset_pending else st.session_state.get('sb_wi_taskl1')
+        wi_task_l1 = st.selectbox(
+            label=":blue[Task Group L1]", 
+            options=taskl1_options, 
+            index=None if initial_task_l1 is None else taskl1_options.index(initial_task_l1) if initial_task_l1 in taskl1_options else None, 
+            key="sb_wi_taskl1"
+        )
+        wi_task_l1_code = df_tskgrl1[df_tskgrl1["NAME"]==wi_task_l1]["CODE"].tolist() if wi_task_l1 else []
+
+        # Per Task Group L2
+        taskl2_options = df_tskgrl2["NAME"].tolist()
+        initial_task_l2 = None if st.session_state.reset_pending else st.session_state.get('sb_wi_taskl2')
+        wi_task_l2 = st.selectbox(
+            label=":blue[Task Group L2]", 
+            options=taskl2_options, 
+            index=None if initial_task_l2 is None else taskl2_options.index(initial_task_l2) if initial_task_l2 in taskl2_options else None, 
+            key="sb_wi_taskl2"
+        )
+        wi_task_l2_code = df_tskgrl2[df_tskgrl2["NAME"]==wi_task_l2]["CODE"].tolist() if wi_task_l2 else []
+
+        # Per Description
+        initial_description = "" if st.session_state.reset_pending else st.session_state.get('sb_wi_description', "")
+        wi_description = st.text_input(
+            label=":blue[Task description]", 
+            value=initial_description, 
+            key="sb_wi_description"
+        )
+
+
+        # initial_time_qty = 0.0 if st.session_state.reset_pending else st.session_state.get('sb_wi_time_qty', 0.0)
+        # wi_time_qty = st.number_input(
+        #     label=":blue[Time spent (in hours)(:red[*])]:", 
+        #     value=initial_time_qty,
+        #     min_value=0.0, 
+        #     step=0.5, 
+        #     key="sb_wi_time_qty"
+        # )
+
+        # # Per Time Quantity
+        initial_time_qty = st.session_state.get('sb_wi_time_qty')
+        try:
+            initial_time_qty = float(initial_time_qty) if initial_time_qty else 0.0
+            initial_time_qty = np.float64(initial_time_qty)  # Forza il tipo a float64
+            st.write(f"Tipo di dato prima del number_input: {type(initial_time_qty)}")
+        except (TypeError, ValueError):
+            initial_time_qty = 0.0
+
+        wi_time_qty = st.number_input(
+            label=":blue[Time spent (in hours)(:red[*])]:",
+            value=initial_time_qty if initial_time_qty is not None else 0, # Valore iniziale
+            min_value=0.0,
+            step=0.5,
+            key="sb_wi_time_qty",
+        )
+
+        st.write(f"Valore di wi_time_qty: {wi_time_qty}")  # Stampa il valore dopo l'input
+        
+        #Per Date
+        initial_date = st.session_state.get('sb_wi_date') or datetime.date.today()  # Use session value or today
+        wi_date = st.date_input(
+            label=":blue[Date of execution(:red[*])]",
+            value=initial_date,
+            format="DD/MM/YYYY",
+            key="sb_wi_date"
+        )
+
+        # Per Note
+        initial_note = "" if st.session_state.reset_pending else st.session_state.get('sb_wi_note', "")
+        wi_note = st.text_area(
+            ":blue[Note]", 
+            value=initial_note,
+            key="sb_wi_note"
+        )
+
+        wo_nr = selected_wo
+        wi_time_um = "H"
+        
+        wi_save_botton_disable = False
+        submitted = False
+        submitted = st.form_submit_button("Save Work Item", type="primary", icon="🔥", disabled=wi_save_botton_disable)
+
+        if submitted:
+            # if wi_date:
+            #     wi_date_fmt = wi_date.strftime("%Y-%m-%d")
+            # else:
+            #     wi_date_fmt = datetime.date.today()    
+            # if wi_task_l1_code:
+            #    wi_tskgrl1 = wi_task_l1_code[0]
+            # else: 
+            #    wi_tskgrl1 = ""   
+            # if wi_task_l2_code:
+            #    wi_tskgrl2 = wi_task_l2_code[0] 
+            # else:
+            #    wi_tskgrl2 = ""              
+            # if wo_usercode:
+            #    wi_userid = wo_usercode[0]
+            # else:
+            #    wi_userid = ""    
             
-            # Per Task Group L1
-            initial_task_l1 = None if st.session_state.reset_pending else st.session_state.get('sb_wi_taskl1')
-            wi_task_l1 = st.selectbox(
-                label=":blue[Task Group L1]", 
-                options=taskl1_options, 
-                index=None if initial_task_l1 is None else taskl1_options.index(initial_task_l1) if initial_task_l1 in taskl1_options else None, 
-                key="sb_wi_taskl1"
-            )
-            wi_task_l1_code = df_tskgrl1[df_tskgrl1["NAME"]==wi_task_l1]["CODE"].tolist() if wi_task_l1 else []
+            if wi_time_qty is None or wi_time_qty == 0:
+                st.error("Please enter a valid time quantity")
+                st.stop()
 
-            # Per Task Group L2
-            taskl2_options = df_tskgrl2["NAME"].tolist()
-            initial_task_l2 = None if st.session_state.reset_pending else st.session_state.get('sb_wi_taskl2')
-            wi_task_l2 = st.selectbox(
-                label=":blue[Task Group L2]", 
-                options=taskl2_options, 
-                index=None if initial_task_l2 is None else taskl2_options.index(initial_task_l2) if initial_task_l2 in taskl2_options else None, 
-                key="sb_wi_taskl2"
-            )
-            wi_task_l2_code = df_tskgrl2[df_tskgrl2["NAME"]==wi_task_l2]["CODE"].tolist() if wi_task_l2 else []
-
-            # Per Description
-            initial_description = "" if st.session_state.reset_pending else st.session_state.get('sb_wi_description', "")
-            wi_description = st.text_input(
-                label=":blue[Task description]", 
-                value=initial_description, 
-                key="sb_wi_description"
-            )
-
-
-            # initial_time_qty = 0.0 if st.session_state.reset_pending else st.session_state.get('sb_wi_time_qty', 0.0)
-            # wi_time_qty = st.number_input(
-            #     label=":blue[Time spent (in hours)(:red[*])]:", 
-            #     value=initial_time_qty,
-            #     min_value=0.0, 
-            #     step=0.5, 
-            #     key="sb_wi_time_qty"
-            # )
-
-            # # Per Time Quantity
-            initial_time_qty = st.session_state.get('sb_wi_time_qty')
-            try:
-                initial_time_qty = float(initial_time_qty) if initial_time_qty else 0.0
-                initial_time_qty = np.float64(initial_time_qty)  # Forza il tipo a float64
-                st.write(f"Tipo di dato prima del number_input: {type(initial_time_qty)}")
-            except (TypeError, ValueError):
-                initial_time_qty = 0.0
-
-            wi_time_qty = st.number_input(
-                label=":blue[Time spent (in hours)(:red[*])]:",
-                value=initial_time_qty if initial_time_qty is not None else 0, # Valore iniziale
-                min_value=0.0,
-                step=0.5,
-                key="sb_wi_time_qty",
-            )
-
-            st.write(f"Valore di wi_time_qty: {wi_time_qty}")  # Stampa il valore dopo l'input
-            
-            #Per Date
-            initial_date = st.session_state.get('sb_wi_date') or datetime.date.today()  # Use session value or today
-            wi_date = st.date_input(
-                label=":blue[Date of execution(:red[*])]",
-                value=initial_date,
-                format="DD/MM/YYYY",
-                key="sb_wi_date"
-            )
-
-            # Per Note
-            initial_note = "" if st.session_state.reset_pending else st.session_state.get('sb_wi_note', "")
-            wi_note = st.text_area(
-                ":blue[Note]", 
-                value=initial_note,
-                key="sb_wi_note"
-            )
-
-            wo_nr = selected_wo
-            wi_time_um = "H"
-            
-            wi_save_botton_disable = False
-            submitted = False
-            submitted = st.form_submit_button("Save Work Item", type="primary", icon="🔥", disabled=wi_save_botton_disable)
-
-            if submitted:
-                # if wi_date:
-                #     wi_date_fmt = wi_date.strftime("%Y-%m-%d")
-                # else:
-                #     wi_date_fmt = datetime.date.today()    
-                # if wi_task_l1_code:
-                #    wi_tskgrl1 = wi_task_l1_code[0]
-                # else: 
-                #    wi_tskgrl1 = ""   
-                # if wi_task_l2_code:
-                #    wi_tskgrl2 = wi_task_l2_code[0] 
-                # else:
-                #    wi_tskgrl2 = ""              
-                # if wo_usercode:
-                #    wi_userid = wo_usercode[0]
-                # else:
-                #    wi_userid = ""    
-                
-                if wi_time_qty is None or wi_time_qty == 0:
-                    st.error("Please enter a valid time quantity")
-                    st.stop()
-
-                work_item = {
-                    "wi_date": wi_date_fmt, 
-                    "wo_id": wo_nr, 
-                    "wi_userid": wi_userid, 
-                    "wi_status": ACTIVE_STATUS, 
-                    "wi_tskgrl1": wi_tskgrl1, 
-                    "wi_tskgrl2": wi_tskgrl2,  
-                    "wi_desc": wi_description, 
-                    "wi_note": wi_note,            
-                    "wi_time_qty": wi_time_qty, 
-                    "wi_time_um": wi_time_um
-                }
-                rc = save_work_item(work_item)
-                if rc:
-                    st.success(f"Task {wo_nr} saved successfully!")
-                    st.session_state.reset_pending = True
-                    st.rerun()
+            work_item = {
+                "wi_date": wi_date_fmt, 
+                "wo_id": wo_nr, 
+                "wi_userid": wi_userid, 
+                "wi_status": ACTIVE_STATUS, 
+                "wi_tskgrl1": wi_tskgrl1, 
+                "wi_tskgrl2": wi_tskgrl2,  
+                "wi_desc": wi_description, 
+                "wi_note": wi_note,            
+                "wi_time_qty": wi_time_qty, 
+                "wi_time_um": wi_time_um
+            }
+            rc = save_work_item(work_item)
+            if rc:
+                st.success(f"Task {wo_nr} saved successfully!")
+                st.session_state.reset_pending = True
+                st.rerun()
     
         # Dopo il form, resettiamo il flag se necessario
         if st.session_state.reset_pending:

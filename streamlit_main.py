@@ -2040,15 +2040,11 @@ def manage_wo():
             )
             
             #Per Date
-            if 'sb_wi_date' not in st.session_state or st.session_state.reset_pending:
-                initial_date = datetime.date.today()
-            else:
-                initial_date = st.session_state.get('sb_wi_date', datetime.date.today())
-
+            initial_date = st.session_state.get('sb_wi_date') or datetime.date.today()  # Use session value or today
             wi_date = st.date_input(
-                label=":blue[Date of execution(:red[*])]", 
+                label=":blue[Date of execution(:red[*])]",
                 value=initial_date,
-                format="DD/MM/YYYY", 
+                format="DD/MM/YYYY",
                 key="sb_wi_date"
             )
 

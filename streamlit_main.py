@@ -2000,8 +2000,10 @@ def manage_wo():
             wo_nr = selected_wo
             wi_date_fmt = wi_date.strftime("%Y-%m-%d")
 
-            wi_save_botton_disable = not (taskl1_options and wi_description and wi_time_qty)
-            submitted = st.form_submit_button("Save Work Item", disabled=wi_save_botton_disable)
+            wi_save_botton_disable = not (wi_task_l1 and wi_task_l2 and wi_description and wi_date and wi_time_qty)
+            st.write(f"{wi_task_l1} - {wi_task_l2} -{wi_description} -{wi_date} -{wi_time_qty} -")
+            submitted = False
+            submitted = st.form_submit_button("Save Work Item", type="primary", icon="🔥", disabled=wi_save_botton_disable)
 
             if submitted:
                 work_item = {

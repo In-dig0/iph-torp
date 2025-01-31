@@ -1927,12 +1927,26 @@ def manage_wo():
         with st.expander("WO details"):
             # Get the work order details
             df_wo = df_workorders[df_workorders["WOID"] == selected_wo].copy() # Create a copy to avoid SettingWithCopyWarning
+            df_wo = df_wo.drop(['STARTDATE', 'ENDDATE', 'TDTLID'], axis=1)
             # Add the TDSPECIALIST.  This is the KEY change.
             df_wo['TDSPECIALIST'] = selected_username  # Directly modify the df_wo DataFrame
             # Now, you can either display the modified df_wo directly
-            st.dataframe(df_wo, use_container_width=True, hide_index=True)
+            # Renaming columns
+            df_wo.rename(columns={
+                'TDSPECIALIST': 'Tech Specialist', 
+                'REQID': 'Request Id', 
+                'WOID': 'Workorder Id',
+                'TYPE': 'Type',
+                'TIME_QTY': 'Estimated effort',
+                'TIME_UM': 'Um',
+                'TITLE': 'Title',
+                'DESCRIPTION': 'Description'
+                }, inplace=True)
+            
+            wo_column_order = ["Request Id", "Tech Specialist", "Workorder Id", "Type'", "Estimated effort", "Um", "Title", "Description" ]
+            st.dataframe(df_wo, use_container_width=True, column_order=wo_column_order, hide_index=True)
         
-        st.subheader(f":orange[Work Item]")
+        st.subheader(f":orange[Task]")
         
         taskl1_options = df_tskgrl1["NAME"].tolist()
         wi_task_l1 = st.selectbox(label=":blue[Task Group L1](:red[*])", options=taskl1_options, index=None, key="sb_wi_taskl1")
@@ -1942,7 +1956,7 @@ def manage_wo():
         wi_task_l2 = st.selectbox(label=":blue[Task Group L2](:red[*])", options=taskl2_options, index=None, key="sb_wi_taskl2")
         wi_task_l2_code = df_tskgrl2[df_tskgrl2["NAME"]==wi_task_l2]["CODE"].tolist()  
         
-        wi_description = st.text_input(label=":blue[Work item description]", value="")
+        wi_description = st.text_input(label=":blue[Task description]", value="")
         wi_time_qty = st.number_input(label=":blue[Time spent (in hours)(:red[*])]:", min_value=0.0, step=0.5)
         wi_time_um = "H"
         wi_date = st.date_input(label=":blue[Date of execution(:red[*])]", format="DD/MM/YYYY", disabled=False, key="sd_wi_date")

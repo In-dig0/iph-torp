@@ -2026,7 +2026,7 @@ def manage_wo():
             try:
                 initial_time_qty = float(initial_time_qty) if initial_time_qty else float(0.0)  # Convert to float or 0.0
             except (TypeError, ValueError):  # Handle potential errors
-                initial_time_qty = 0.0
+                initial_time_qty = float(0.0)
 
             wi_time_qty = st.number_input(
                 label=":blue[Time spent (in hours)(:red[*])]:",

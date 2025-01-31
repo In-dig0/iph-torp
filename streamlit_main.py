@@ -1985,29 +1985,25 @@ def manage_wo():
         st.subheader(f":orange[Task]")
         with st.form(key='task_form'):
             taskl1_options = df_tskgrl1["NAME"].tolist()
-            wi_task_l1 = st.selectbox(label=":blue[Task Group L1](:red[*])", options=taskl1_options, index=None, key="sb_wi_taskl1")
+            wi_task_l1 = st.selectbox(label=":blueTask Group L1", options=taskl1_options, index=None, key="sb_wi_taskl1")
             wi_task_l1_code = df_tskgrl1[df_tskgrl1["NAME"]==wi_task_l1]["CODE"].tolist()
 
             taskl2_options = df_tskgrl2["NAME"].tolist()
-            wi_task_l2 = st.selectbox(label=":blue[Task Group L2](:red[*])", options=taskl2_options, index=None, key="sb_wi_taskl2")
-            wi_task_l2_code = df_tskgrl2[df_tskgrl2["NAME"]==wi_task_l2]["CODE"].tolist()  
-            
+            wi_task_l2 = st.selectbox(label=":blueTask Group L2", options=taskl2_options, index=None, key="sb_wi_taskl2")
+            wi_task_l2_code = df_tskgrl2[df_tskgrl2["NAME"]==wi_task_l2]["CODE"].tolist()
+
             wi_description = st.text_input(label=":blue[Task description]", value="", key="sb_wi_description")
             wi_time_qty = st.number_input(label=":blue[Time spent (in hours)(:red[*])]:", min_value=0.0, step=0.5, key="sb_wi_time_qty")
             wi_time_um = "H"
             wi_date = st.date_input(label=":blue[Date of execution(:red[*])]", format="DD/MM/YYYY", disabled=False, key="sb_wi_date")
             wi_note = st.text_area(":blue[Note]", key="sb_wi_note")
             wo_nr = selected_wo
-            wi_date_fmt = wi_date.strftime("%Y-%m-%d")     
+            wi_date_fmt = wi_date.strftime("%Y-%m-%d")
 
-            # Bottone per aggiungere il task
-            wi_save_botton_disable = not (wi_task_l1 and wi_task_l2 and wi_description and wi_time_qty and wi_date)
-            #st.write(f"'{wi_task_l1}' - '{wi_task_l2}' - '{wi_description}' - {wi_time_qty}' - {wi_date}'")
-            wi_save_botton_disable = False
-            submitted = False
+            wi_save_botton_disable = not (taskl1_options and wi_description and wi_time_qty)
             submitted = st.form_submit_button("Save Work Item", disabled=wi_save_botton_disable)
 
-            if submitted: 
+            if submitted:
                 work_item = {
                     "wi_date": wi_date_fmt, 
                     "wo_id": wo_nr, 
@@ -2019,10 +2015,9 @@ def manage_wo():
                     "wi_note": wi_note,            
                     "wi_time_qty": wi_time_qty, 
                     "wi_time_um": wi_time_um
-                }                     
-                #st.write(work_item)
+                }
                 rc = save_work_item(work_item)
-                if rc == True:
+                if rc:
                     st.success(f"Task {wo_nr} saved successfully!")
                     st.session_state.reset_form = True
                     time.sleep(0.5)

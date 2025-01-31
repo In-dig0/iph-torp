@@ -2035,7 +2035,7 @@ def manage_wo():
         wi_time_qty = st.number_input(
             label=":blue[Time spent (in hours)(:red[*])]:",
             value=initial_time_qty,
-            min_value=0.1,
+            min_value=0.0,
             step=0.5,
             key="sb_wi_time_qty",
             placeholder="0.0"  # Show 0.0 as a placeholder

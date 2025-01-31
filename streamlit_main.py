@@ -1977,10 +1977,10 @@ def manage_wo():
             st.dataframe(df_wo, use_container_width=True, column_order=wo_column_order, hide_index=True)
         
         
-        if st.session_state.reset_form:
-            reset_form_state()
-            st.session_state.reset_form = False
-            st.rerun()
+        # if st.session_state.reset_form:
+        #     reset_form_state()
+        #     st.session_state.reset_form = False
+        #     st.rerun()
         
         st.subheader(f":orange[Task]")
         with st.form(key='task_form'):

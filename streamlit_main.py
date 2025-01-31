@@ -2047,7 +2047,7 @@ def manage_wo():
 
             wi_date = st.date_input(
                 label=":blue[Date of execution(:red[*])]", 
-                value=initial_value,
+                value=initial_date,
                 format="DD/MM/YYYY", 
                 key="sb_wi_date"
             )

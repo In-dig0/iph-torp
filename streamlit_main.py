@@ -2046,6 +2046,8 @@ def manage_wo():
             if submitted:
                 if wi_date:
                     wi_date_fmt = wi_date.strftime("%Y-%m-%d")
+                else:
+                    wi_date_fmt = datetime.date.today()    
                 if wi_task_l1_code:
                    wi_tskgrl1 = wi_task_l1_code[0]
                 if wi_task_l2_code:

@@ -2027,6 +2027,7 @@ def manage_wo():
             try:
                 initial_time_qty = float(initial_time_qty) if initial_time_qty else 0.0
                 initial_time_qty = np.float64(initial_time_qty)  # Forza il tipo a float64
+                st.write(f"Tipo di dato prima del number_input: {type(initial_time_qty)}")
             except (TypeError, ValueError):
                 initial_time_qty = 0.0
 
@@ -2038,6 +2039,7 @@ def manage_wo():
                 key="sb_wi_time_qty",
                 placeholder="0.0"  # Show 0.0 as a placeholder
             )
+            st.write(f"Valore di wi_time_qty: {wi_time_qty}")  # Stampa il valore dopo l'input
             
             #Per Date
             initial_date = st.session_state.get('sb_wi_date') or datetime.date.today()  # Use session value or today

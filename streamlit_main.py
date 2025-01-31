@@ -1837,6 +1837,14 @@ def manage_request():
 #######################################################################################################
 def manage_wo():
 
+    def reset_form_state():
+        """Reset all form fields to their initial state"""
+        for key in FORM_KEYS:
+            if key.startswith('sb_'):
+                st.session_state[key] = None
+            else:
+                st.session_state[key] = ""
+    
     def save_work_item(witem: dict) ->  bool:
         """Save request to database and return request number and status"""
         try:                          
@@ -1877,6 +1885,27 @@ def manage_wo():
         st.write(f"Start loading df_tskgrl2...")
         st.session_state.df_tskgrl2 = load_tskgrl2_data()  # Load only once
 
+    
+        # Inizializzazione delle chiavi di stato per i widget
+    FORM_KEYS = [
+        'sb_dept', 'sb_requester', 'sb_pline', 'sb_pfamily',
+        'sb_type', 'sb_category', 'sb_detail',
+        'ti_title', 'ti_description'
+    ]
+    
+    # Inizializzazione dello stato del form
+    if 'form_submitted' not in st.session_state:
+        st.session_state.form_submitted = False
+    
+    if 'reset_form' not in st.session_state:
+        st.session_state.reset_form = False
+        
+    # Inizializzazione delle chiavi del form se non esistono
+    for key in FORM_KEYS:
+        if key not in st.session_state:
+            st.session_state[key] = None if key.startswith('sb_') else ""
+    
+    
     # Access from session state
     df_woassignedto = st.session_state.df_woassignedto 
     df_workorders = st.session_state.df_workorders 
@@ -1946,6 +1975,12 @@ def manage_wo():
             wo_column_order = ["Request Id", "Tech Specialist", "Workorder Id", "Type'", "Estimated effort", "Um", "Title", "Description" ]
             st.dataframe(df_wo, use_container_width=True, column_order=wo_column_order, hide_index=True)
         
+        
+        if st.session_state.reset_form:
+            reset_form_state()
+            st.session_state.reset_form = False
+            st.rerun()
+        
         st.subheader(f":orange[Task]")
         
         taskl1_options = df_tskgrl1["NAME"].tolist()
@@ -1956,11 +1991,11 @@ def manage_wo():
         wi_task_l2 = st.selectbox(label=":blue[Task Group L2](:red[*])", options=taskl2_options, index=None, key="sb_wi_taskl2")
         wi_task_l2_code = df_tskgrl2[df_tskgrl2["NAME"]==wi_task_l2]["CODE"].tolist()  
         
-        wi_description = st.text_input(label=":blue[Task description]", value="")
-        wi_time_qty = st.number_input(label=":blue[Time spent (in hours)(:red[*])]:", min_value=0.0, step=0.5)
+        wi_description = st.text_input(label=":blue[Task description]", value="", key="sb_wi_description")
+        wi_time_qty = st.number_input(label=":blue[Time spent (in hours)(:red[*])]:", min_value=0.0, step=0.5, key="sb_wi_time_qty")
         wi_time_um = "H"
-        wi_date = st.date_input(label=":blue[Date of execution(:red[*])]", format="DD/MM/YYYY", disabled=False, key="sd_wi_date")
-        wi_note = st.text_area(":blue[Note]")
+        wi_date = st.date_input(label=":blue[Date of execution(:red[*])]", format="DD/MM/YYYY", disabled=False, key="sb_wi_date")
+        wi_note = st.text_area(":blue[Note]", key="sb_wi_note")
         wo_nr = selected_wo
         wi_date_fmt = wi_date.strftime("%Y-%m-%d")
 
@@ -1984,6 +2019,9 @@ def manage_wo():
             rc = save_work_item(work_item)
             if rc == True:
                 st.success(f"Task {wo_nr} saved successfully!")
+                st.session_state.reset_form = True
+                time.sleep(0.2)  # Piccola pausa per assicurare il corretto aggiornamento dello stato
+                st.rerun()
     else:
         st.header(f"Please select a work order first!")
 

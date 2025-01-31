@@ -2005,7 +2005,6 @@ def manage_wo():
             wi_date = st.date_input(label=":blue[Date of execution(:red[*])]", format="DD/MM/YYYY", disabled=False, key="sb_wi_date")
             wi_note = st.text_area(":blue[Note]", key="sb_wi_note")
             wo_nr = selected_wo
-            wi_date_fmt = wi_date.strftime("%Y-%m-%d")
             wi_save_botton_disable = not (wi_task_l1 and wi_task_l2 and wi_description and wi_date and wi_time_qty)
             st.write(f"{wi_task_l1} - {wi_task_l2} -{wi_description} -{wi_date} -{wi_time_qty} -")
             

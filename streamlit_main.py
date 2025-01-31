@@ -2067,22 +2067,22 @@ def manage_wo():
         submitted = st.button("Save Work Item", type="primary", icon="🔥", disabled=wi_save_botton_disable)
 
         if submitted:
-            # if wi_date:
-            #     wi_date_fmt = wi_date.strftime("%Y-%m-%d")
-            # else:
-            #     wi_date_fmt = datetime.date.today()    
-            # if wi_task_l1_code:
-            #    wi_tskgrl1 = wi_task_l1_code[0]
-            # else: 
-            #    wi_tskgrl1 = ""   
-            # if wi_task_l2_code:
-            #    wi_tskgrl2 = wi_task_l2_code[0] 
-            # else:
-            #    wi_tskgrl2 = ""              
-            # if wo_usercode:
-            #    wi_userid = wo_usercode[0]
-            # else:
-            #    wi_userid = ""    
+            if wi_date:
+                wi_date_fmt = wi_date.strftime("%Y-%m-%d")
+            else:
+                wi_date_fmt = datetime.date.today()    
+            if wi_task_l1_code:
+               wi_tskgrl1 = wi_task_l1_code[0]
+            else: 
+               wi_tskgrl1 = ""   
+            if wi_task_l2_code:
+               wi_tskgrl2 = wi_task_l2_code[0] 
+            else:
+               wi_tskgrl2 = ""              
+            if wo_usercode:
+               wi_userid = wo_usercode[0]
+            else:
+               wi_userid = ""    
             
             if wi_time_qty is None or wi_time_qty == 0:
                 st.error("Please enter a valid time quantity")

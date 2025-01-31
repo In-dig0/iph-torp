@@ -2006,14 +2006,15 @@ def manage_wo():
             wi_note = st.text_area(":blue[Note]", key="sb_wi_note")
             wo_nr = selected_wo
             wi_date_fmt = wi_date.strftime("%Y-%m-%d")
-
             wi_save_botton_disable = not (wi_task_l1 and wi_task_l2 and wi_description and wi_date and wi_time_qty)
             st.write(f"{wi_task_l1} - {wi_task_l2} -{wi_description} -{wi_date} -{wi_time_qty} -")
+            
             wi_save_botton_disable = False
             submitted = False
             submitted = st.form_submit_button("Save Work Item", type="primary", icon="🔥", disabled=wi_save_botton_disable)
 
             if submitted:
+                wi_date_fmt = wi_date.strftime("%Y-%m-%d")       
                 work_item = {
                     "wi_date": wi_date_fmt, 
                     "wo_id": wo_nr, 

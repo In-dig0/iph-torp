@@ -2001,7 +2001,8 @@ def manage_wo():
             wi_date_fmt = wi_date.strftime("%Y-%m-%d")     
 
             # Bottone per aggiungere il task
-            wi_save_botton_disable = not (taskl1_options and wi_description and wi_time_qty)
+            wi_save_botton_disable = not (taskl1_options and taskl2_options and wi_description and wi_time_qty and wi_date)
+            st.write(f"'{taskl1_options}' - '{taskl2_options}' - '{wi_description}' - {wi_time_qty}' - {wi_date}'")
             submitted = st.form_submit_button("Save Work Item", disabled=wi_save_botton_disable)
 
             if submitted: 

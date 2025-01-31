@@ -2050,10 +2050,16 @@ def manage_wo():
                     wi_date_fmt = datetime.date.today()    
                 if wi_task_l1_code:
                    wi_tskgrl1 = wi_task_l1_code[0]
+                else: 
+                   wi_tskgrl1 = ""   
                 if wi_task_l2_code:
-                   wi_tskgrl2 = wi_task_l2_code[0]          
+                   wi_tskgrl2 = wi_task_l2_code[0] 
+                else:
+                   wi_tskgrl2 = ""              
                 if wo_usercode:
                    wi_userid = wo_usercode[0]
+                else:
+                   wi_userid = ""    
 
                 work_item = {
                     "wi_date": wi_date_fmt, 

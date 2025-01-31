@@ -2044,7 +2044,8 @@ def manage_wo():
             submitted = st.form_submit_button("Save Work Item", type="primary", icon="🔥", disabled=wi_save_botton_disable)
 
             if submitted:
-                wi_date_fmt = wi_date.strftime("%Y-%m-%d")       
+                if wi_date:
+                    wi_date_fmt = wi_date.strftime("%Y-%m-%d")       
                 work_item = {
                     "wi_date": wi_date_fmt, 
                     "wo_id": wo_nr, 

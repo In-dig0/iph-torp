@@ -1902,7 +1902,7 @@ def manage_wo():
         wo_username_options = list(sorted_usernames)
     
     selected_username = st.sidebar.selectbox(label=":blue[Tech Deparment Specialist]", options=wo_username_options, index=None)
-    st.write(selected_username)
+    #st.write(selected_username)
     
     df_wo_usercode = df_woassignedto[df_woassignedto['USERNAME'] == selected_username]["USERID"].unique()
     wo_usercode = list(df_wo_usercode)
@@ -1966,10 +1966,10 @@ def manage_wo():
                 "wi_time_qty": wi_time_qty, 
                 "wi_time_um": wi_time_um
             }                     
-            st.write(work_item)
+            #st.write(work_item)
             rc = save_work_item(work_item)
             if rc == True:
-                st.success(f"Task {wo_nr}/{wi_nr} saved successfully!")
+                st.success(f"Task {wo_nr} saved successfully!")
     else:
         st.header(f"Please select a work order first!")
 

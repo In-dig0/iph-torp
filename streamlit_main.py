@@ -2045,6 +2045,13 @@ def manage_wo():
             else:
                 initial_date = st.session_state.get('sb_wi_date', datetime.date.today())
 
+            wi_date = st.date_input(
+                label=":blue[Date of execution(:red[*])]", 
+                value=initial_value,
+                format="DD/MM/YYYY", 
+                key="sb_wi_date"
+            )
+
             # Per Note
             initial_note = "" if st.session_state.reset_pending else st.session_state.get('sb_wi_note', "")
             wi_note = st.text_area(

@@ -1844,6 +1844,7 @@ def manage_wo():
                 st.session_state[key] = None
             else:
                 st.session_state[key] = ""
+      
     
     def save_work_item(witem: dict) ->  bool:
         """Save request to database and return request number and status"""
@@ -2020,7 +2021,7 @@ def manage_wo():
             if rc == True:
                 st.success(f"Task {wo_nr} saved successfully!")
                 st.session_state.reset_form = True
-                time.sleep(0.2)  # Piccola pausa per assicurare il corretto aggiornamento dello stato
+                time.sleep(0.5)  # Piccola pausa per assicurare il corretto aggiornamento dello stato
                 st.rerun()
     else:
         st.header(f"Please select a work order first!")

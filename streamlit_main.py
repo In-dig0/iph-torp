@@ -1839,11 +1839,20 @@ def manage_wo():
 
     def reset_form_state():
         """Reset all form fields to their initial state"""
+        # # Aggiorna questi con le chiavi effettivamente usate nel form
+        # FORM_KEYS = [
+        #     'sb_wi_taskl1', 'sb_wi_taskl2', 'sb_wi_description',
+        #     'sb_wi_time_qty', 'sb_wi_date', 'sb_wi_note'
+        # ]
+        
         for key in FORM_KEYS:
-            if key.startswith('sb_'):
-                st.session_state[key] = None
-            else:
-                st.session_state[key] = ""
+            if key in st.session_state:
+                if key == 'sb_wi_time_qty':
+                    st.session_state[key] = 0.0
+                elif key == 'sb_wi_date':
+                    st.session_state[key] = datetime.date.today()
+                else:
+                    st.session_state[key] = None
       
     
     def save_work_item(witem: dict) ->  bool:
@@ -1887,13 +1896,11 @@ def manage_wo():
         st.session_state.df_tskgrl2 = load_tskgrl2_data()  # Load only once
 
     
-        # Inizializzazione delle chiavi di stato per i widget
     FORM_KEYS = [
-        'sb_dept', 'sb_requester', 'sb_pline', 'sb_pfamily',
-        'sb_type', 'sb_category', 'sb_detail',
-        'ti_title', 'ti_description'
+        'sb_wi_taskl1', 'sb_wi_taskl2', 'sb_wi_description',
+        'sb_wi_time_qty', 'sb_wi_date', 'sb_wi_note'
     ]
-    
+
     # Inizializzazione dello stato del form
     if 'form_submitted' not in st.session_state:
         st.session_state.form_submitted = False
@@ -1985,11 +1992,11 @@ def manage_wo():
         st.subheader(f":orange[Task]")
         with st.form(key='task_form'):
             taskl1_options = df_tskgrl1["NAME"].tolist()
-            wi_task_l1 = st.selectbox(label=":blueTask Group L1", options=taskl1_options, index=None, key="sb_wi_taskl1")
+            wi_task_l1 = st.selectbox(label=":blue[Task Group L1]", options=taskl1_options, index=None, key="sb_wi_taskl1")
             wi_task_l1_code = df_tskgrl1[df_tskgrl1["NAME"]==wi_task_l1]["CODE"].tolist()
 
             taskl2_options = df_tskgrl2["NAME"].tolist()
-            wi_task_l2 = st.selectbox(label=":blueTask Group L2", options=taskl2_options, index=None, key="sb_wi_taskl2")
+            wi_task_l2 = st.selectbox(label=":blue[Task Group L2]", options=taskl2_options, index=None, key="sb_wi_taskl2")
             wi_task_l2_code = df_tskgrl2[df_tskgrl2["NAME"]==wi_task_l2]["CODE"].tolist()
 
             wi_description = st.text_input(label=":blue[Task description]", value="", key="sb_wi_description")

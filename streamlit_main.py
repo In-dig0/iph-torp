@@ -2002,6 +2002,7 @@ def manage_wo():
 
             wi_save_botton_disable = not (wi_task_l1 and wi_task_l2 and wi_description and wi_date and wi_time_qty)
             st.write(f"{wi_task_l1} - {wi_task_l2} -{wi_description} -{wi_date} -{wi_time_qty} -")
+            wi_save_botton_disable = False
             submitted = False
             submitted = st.form_submit_button("Save Work Item", type="primary", icon="🔥", disabled=wi_save_botton_disable)
 

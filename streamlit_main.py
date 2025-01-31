@@ -2022,7 +2022,12 @@ def manage_wo():
                 st.success(f"Task {wo_nr} saved successfully!")
                 st.session_state.reset_form = True
                 time.sleep(0.5)  # Piccola pausa per assicurare il corretto aggiornamento dello stato
-                st.rerun()
+                # ***KEY CHANGE: Reset the form state DIRECTLY***
+                for key in FORM_KEYS:
+                    if key.startswith('sb_'):
+                        st.session_state[key] = None
+                    else:
+                        st.session_state[key] = ""
     else:
         st.header(f"Please select a work order first!")
 

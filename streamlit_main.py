@@ -2064,7 +2064,7 @@ def manage_wo():
         
         wi_save_botton_disable = False
         submitted = False
-        submitted = st.form_submit_button("Save Work Item", type="primary", icon="🔥", disabled=wi_save_botton_disable)
+        submitted = st.button("Save Work Item", type="primary", icon="🔥", disabled=wi_save_botton_disable)
 
         if submitted:
             # if wi_date:

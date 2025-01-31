@@ -2012,7 +2012,7 @@ def manage_wo():
                 key="sb_wi_description"
             )
 
-            # # Per Time Quantity
+
             # initial_time_qty = 0.0 if st.session_state.reset_pending else st.session_state.get('sb_wi_time_qty', 0.0)
             # wi_time_qty = st.number_input(
             #     label=":blue[Time spent (in hours)(:red[*])]:", 
@@ -2021,6 +2021,7 @@ def manage_wo():
             #     step=0.5, 
             #     key="sb_wi_time_qty"
             # )
+            # # Per Time Quantity
             initial_time_qty = 0.0 if st.session_state.reset_pending else st.session_state.get('sb_wi_time_qty', 0.0)
             wi_time_qty = st.number_input(
                 label=":blue[Time spent (in hours)(:red[*])]:", 
@@ -2038,12 +2039,11 @@ def manage_wo():
                 initial_date = st.session_state.get('sb_wi_date', datetime.date.today())
 
             wi_date = st.date_input(
-                label=":blue[Date of execution(:red[*])]", 
+                label=":blue[Date of execution(:red[*])]",
                 value=initial_date,
-                format="DD/MM/YYYY", 
+                format="DD/MM/YYYY",
                 key="sb_wi_date"
             )
-
             # Per Note
             initial_note = "" if st.session_state.reset_pending else st.session_state.get('sb_wi_note', "")
             wi_note = st.text_area(

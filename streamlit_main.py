@@ -1837,24 +1837,6 @@ def manage_request():
 #######################################################################################################
 def manage_wo():
 
-    def reset_form_state():
-        """Reset all form fields to their initial state"""
-        # # Aggiorna questi con le chiavi effettivamente usate nel form
-        # FORM_KEYS = [
-        #     'sb_wi_taskl1', 'sb_wi_taskl2', 'sb_wi_description',
-        #     'sb_wi_time_qty', 'sb_wi_date', 'sb_wi_note'
-        # ]
-        
-        for key in FORM_KEYS:
-            if key in st.session_state:
-                if key == 'sb_wi_time_qty':
-                    st.session_state[key] = 0.0
-                elif key == 'sb_wi_date':
-                    st.session_state[key] = datetime.date.today()
-                else:
-                    st.session_state[key] = None
-      
-    
     def save_work_item(witem: dict) ->  bool:
         """Save request to database and return request number and status"""
         try:                          
@@ -1879,6 +1861,14 @@ def manage_wo():
             conn.rollback()
             return False
 
+    def reset_form():
+        st.session_state.reset_pending = True
+        st.rerun()
+
+        # All'inizio della funzione
+    if 'reset_pending' not in st.session_state:
+        st.session_state.reset_pending = False 
+        
     if 'df_woassignedto' not in st.session_state: # Check if it exists
         st.write(f"Start loading df_woassignedto...")
         st.session_state.df_woassignedto = load_woassignedto_data()  # Load only once
@@ -1894,12 +1884,7 @@ def manage_wo():
     if 'df_tskgrl2' not in st.session_state: # Check if it exists
         st.write(f"Start loading df_tskgrl2...")
         st.session_state.df_tskgrl2 = load_tskgrl2_data()  # Load only once
-
-    
-    FORM_KEYS = [
-        'sb_wi_taskl1', 'sb_wi_taskl2', 'sb_wi_description',
-        'sb_wi_time_qty', 'sb_wi_date', 'sb_wi_note'
-    ]
+  
 
     # Inizializzazione dello stato del form
     if 'form_submitted' not in st.session_state:
@@ -1908,6 +1893,11 @@ def manage_wo():
     if 'reset_form' not in st.session_state:
         st.session_state.reset_form = False
         
+    FORM_KEYS = [
+        'sb_wi_taskl1', 'sb_wi_taskl2', 'sb_wi_description',
+        'sb_wi_time_qty', 'sb_wi_date', 'sb_wi_note'
+    ]
+
     # Inizializzazione delle chiavi del form se non esistono
     for key in FORM_KEYS:
         if key not in st.session_state:
@@ -1984,29 +1974,70 @@ def manage_wo():
             st.dataframe(df_wo, use_container_width=True, column_order=wo_column_order, hide_index=True)
         
         
-        # if st.session_state.reset_form:
-        #     reset_form_state()
-        #     st.session_state.reset_form = False
-        #     st.rerun()
-        
         st.subheader(f":orange[Task]")
+
         with st.form(key='task_form'):
             taskl1_options = df_tskgrl1["NAME"].tolist()
-            wi_task_l1 = st.selectbox(label=":blue[Task Group L1]", options=taskl1_options, index=None, key="sb_wi_taskl1")
-            wi_task_l1_code = df_tskgrl1[df_tskgrl1["NAME"]==wi_task_l1]["CODE"].tolist()
+            
+            # Per Task Group L1
+            initial_task_l1 = None if st.session_state.reset_pending else st.session_state.get('sb_wi_taskl1')
+            wi_task_l1 = st.selectbox(
+                label=":blue[Task Group L1]", 
+                options=taskl1_options, 
+                index=None if initial_task_l1 is None else taskl1_options.index(initial_task_l1) if initial_task_l1 in taskl1_options else None, 
+                key="sb_wi_taskl1"
+            )
+            wi_task_l1_code = df_tskgrl1[df_tskgrl1["NAME"]==wi_task_l1]["CODE"].tolist() if wi_task_l1 else []
 
+            # Per Task Group L2
             taskl2_options = df_tskgrl2["NAME"].tolist()
-            wi_task_l2 = st.selectbox(label=":blue[Task Group L2]", options=taskl2_options, index=None, key="sb_wi_taskl2")
-            wi_task_l2_code = df_tskgrl2[df_tskgrl2["NAME"]==wi_task_l2]["CODE"].tolist()
+            initial_task_l2 = None if st.session_state.reset_pending else st.session_state.get('sb_wi_taskl2')
+            wi_task_l2 = st.selectbox(
+                label=":blue[Task Group L2]", 
+                options=taskl2_options, 
+                index=None if initial_task_l2 is None else taskl2_options.index(initial_task_l2) if initial_task_l2 in taskl2_options else None, 
+                key="sb_wi_taskl2"
+            )
+            wi_task_l2_code = df_tskgrl2[df_tskgrl2["NAME"]==wi_task_l2]["CODE"].tolist() if wi_task_l2 else []
 
-            wi_description = st.text_input(label=":blue[Task description]", value="", key="sb_wi_description")
-            wi_time_qty = st.number_input(label=":blue[Time spent (in hours)(:red[*])]:", min_value=0.0, step=0.5, key="sb_wi_time_qty")
+            # Per Description
+            initial_description = "" if st.session_state.reset_pending else st.session_state.get('sb_wi_description', "")
+            wi_description = st.text_input(
+                label=":blue[Task description]", 
+                value=initial_description, 
+                key="sb_wi_description"
+            )
+
+            # Per Time Quantity
+            initial_time_qty = 0.0 if st.session_state.reset_pending else st.session_state.get('sb_wi_time_qty', 0.0)
+            wi_time_qty = st.number_input(
+                label=":blue[Time spent (in hours)(:red[*])]:", 
+                value=initial_time_qty,
+                min_value=0.0, 
+                step=0.5, 
+                key="sb_wi_time_qty"
+            )
             wi_time_um = "H"
-            wi_date = st.date_input(label=":blue[Date of execution(:red[*])]", format="DD/MM/YYYY", disabled=False, key="sb_wi_date")
-            wi_note = st.text_area(":blue[Note]", key="sb_wi_note")
+
+            # Per Date
+            initial_date = datetime.date.today() if st.session_state.reset_pending else st.session_state.get('sb_wi_date', datetime.date.today())
+            wi_date = st.date_input(
+                label=":blue[Date of execution(:red[*])]", 
+                value=initial_date,
+                format="DD/MM/YYYY", 
+                key="sb_wi_date"
+            )
+
+            # Per Note
+            initial_note = "" if st.session_state.reset_pending else st.session_state.get('sb_wi_note', "")
+            wi_note = st.text_area(
+                ":blue[Note]", 
+                value=initial_note,
+                key="sb_wi_note"
+            )
+
             wo_nr = selected_wo
-            wi_save_botton_disable = not (wi_task_l1 and wi_task_l2 and wi_description and wi_date and wi_time_qty)
-            st.write(f"{wi_task_l1} - {wi_task_l2} -{wi_description} -{wi_date} -{wi_time_qty} -")
+
             
             wi_save_botton_disable = False
             submitted = False
@@ -2029,10 +2060,13 @@ def manage_wo():
                 rc = save_work_item(work_item)
                 if rc:
                     st.success(f"Task {wo_nr} saved successfully!")
-                    st.session_state.reset_form = True
-                    time.sleep(0.5)
-                    reset_form_state()
+                    st.session_state.reset_pending = True
                     st.rerun()
+    
+        # Dopo il form, resettiamo il flag se necessario
+        if st.session_state.reset_pending:
+            st.session_state.reset_pending = False    
+    
     else:
         st.header(f"Please select a work order first!")
 

@@ -2001,6 +2001,10 @@ def manage_wo():
         wi_date_fmt = wi_date.strftime("%Y-%m-%d")
 
 
+        
+        @st.cache_resource  # Add this decorator
+        def get_form_state():
+            return {}  # Return an empty dictionary
         # Bottone per aggiungere il task
         wi_save_botton_disable = not (taskl1_options and wi_description and wi_time_qty)
         if st.button("Save Work Item", type="primary", disabled=wi_save_botton_disable):  
@@ -2020,14 +2024,22 @@ def manage_wo():
             rc = save_work_item(work_item)
             if rc == True:
                 st.success(f"Task {wo_nr} saved successfully!")
-                st.session_state.reset_form = True
+                #st.session_state.reset_form = True
                 time.sleep(0.5)  # Piccola pausa per assicurare il corretto aggiornamento dello stato
-                # ***KEY CHANGE: Reset the form state DIRECTLY***
-                for key in FORM_KEYS:
-                    if key.startswith('sb_'):
-                        st.session_state[key] = None
-                    else:
-                        st.session_state[key] = ""
+                # # ***KEY CHANGE: Reset the form state DIRECTLY***
+                # for key in FORM_KEYS:
+                #     if key.startswith('sb_'):
+                #         st.session_state[key] = None
+                #     else:
+                #         st.session_state[key] = ""
+                
+
+                # Reset the form state using st.cache_resource
+                form_state = get_form_state()  # Call the cached function to get the empty dictionary
+
+                # Clear the success message after a delay
+                #time.sleep(2)  # Display the message for 2 seconds
+                st.rerun()  # Force a full refresh of the app
     else:
         st.header(f"Please select a work order first!")
 

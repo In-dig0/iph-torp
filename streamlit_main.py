@@ -2024,14 +2024,14 @@ def manage_wo():
             # # Per Time Quantity
             initial_time_qty = st.session_state.get('sb_wi_time_qty')
             try:
-                initial_time_qty = float(initial_time_qty) if initial_time_qty else 0.0  # Convert to float or 0.0
+                initial_time_qty = float(initial_time_qty) if initial_time_qty else float(0.0)  # Convert to float or 0.0
             except (TypeError, ValueError):  # Handle potential errors
                 initial_time_qty = 0.0
 
             wi_time_qty = st.number_input(
                 label=":blue[Time spent (in hours)(:red[*])]:",
                 value=initial_time_qty,
-#                min_value=0.0,
+                min_value=0.1,
                 step=0.5,
                 key="sb_wi_time_qty",
                 placeholder="0.0"  # Show 0.0 as a placeholder

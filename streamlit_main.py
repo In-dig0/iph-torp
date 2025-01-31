@@ -2045,14 +2045,21 @@ def manage_wo():
 
             if submitted:
                 if wi_date:
-                    wi_date_fmt = wi_date.strftime("%Y-%m-%d")       
+                    wi_date_fmt = wi_date.strftime("%Y-%m-%d")
+                if wi_task_l1_code:
+                   wi_tskgrl1 = wi_task_l1_code[0]
+                if wi_task_l2_code:
+                   wi_tskgrl2 = wi_task_l2_code[0]          
+                if wo_usercode:
+                   wi_userid = wo_usercode[0]
+
                 work_item = {
                     "wi_date": wi_date_fmt, 
                     "wo_id": wo_nr, 
-                    "wi_userid": wo_usercode[0], 
+                    "wi_userid": wi_userid, 
                     "wi_status": ACTIVE_STATUS, 
-                    "wi_tskgrl1": wi_task_l1_code[0], 
-                    "wi_tskgrl2": wi_task_l2_code[0],  
+                    "wi_tskgrl1": wi_tskgrl1, 
+                    "wi_tskgrl2": wi_tskgrl2,  
                     "wi_desc": wi_description, 
                     "wi_note": wi_note,            
                     "wi_time_qty": wi_time_qty, 

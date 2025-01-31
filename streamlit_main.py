@@ -2022,6 +2022,7 @@ def manage_wo():
             #     step=0.5, 
             #     key="sb_wi_time_qty"
             # )
+
             # # Per Time Quantity
             initial_time_qty = st.session_state.get('sb_wi_time_qty')
             try:
@@ -2039,6 +2040,7 @@ def manage_wo():
                 key="sb_wi_time_qty",
                 placeholder="0.0"  # Show 0.0 as a placeholder
             )
+
             st.write(f"Valore di wi_time_qty: {wi_time_qty}")  # Stampa il valore dopo l'input
             
             #Per Date

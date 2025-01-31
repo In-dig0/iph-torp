@@ -1839,7 +1839,11 @@ def manage_wo():
 
     def save_work_item(witem: dict) ->  bool:
         """Save request to database and return request number and status"""
-        try:                          
+        try:
+
+            # Stampa i valori ricevuti per debug
+            st.write(f"Saving work item: {witem}")
+            st.write(f"Type of time_qty: {type(witem['time_qty'])}")                                    
             sql = """
                 INSERT INTO TORP_WORKITEMS (
                     date, woid, userid, status, 
@@ -2008,11 +2012,19 @@ def manage_wo():
                 key="sb_wi_description"
             )
 
-            # Per Time Quantity
+            # # Per Time Quantity
+            # initial_time_qty = 0.0 if st.session_state.reset_pending else st.session_state.get('sb_wi_time_qty', 0.0)
+            # wi_time_qty = st.number_input(
+            #     label=":blue[Time spent (in hours)(:red[*])]:", 
+            #     value=initial_time_qty,
+            #     min_value=0.0, 
+            #     step=0.5, 
+            #     key="sb_wi_time_qty"
+            # )
             initial_time_qty = 0.0 if st.session_state.reset_pending else st.session_state.get('sb_wi_time_qty', 0.0)
             wi_time_qty = st.number_input(
                 label=":blue[Time spent (in hours)(:red[*])]:", 
-                value=initial_time_qty,
+                value=initial_time_qty,  # Assicura che sia sempre un float
                 min_value=0.0, 
                 step=0.5, 
                 key="sb_wi_time_qty"
@@ -2020,7 +2032,11 @@ def manage_wo():
             wi_time_um = "H"
 
             # Per Date
-            initial_date = datetime.date.today() if st.session_state.reset_pending else st.session_state.get('sb_wi_date', datetime.date.today())
+            if 'sb_wi_date' not in st.session_state or st.session_state.reset_pending:
+                initial_date = datetime.date.today()
+            else:
+                initial_date = st.session_state.get('sb_wi_date', datetime.date.today())
+
             wi_date = st.date_input(
                 label=":blue[Date of execution(:red[*])]", 
                 value=initial_date,
@@ -2044,22 +2060,26 @@ def manage_wo():
             submitted = st.form_submit_button("Save Work Item", type="primary", icon="🔥", disabled=wi_save_botton_disable)
 
             if submitted:
-                if wi_date:
-                    wi_date_fmt = wi_date.strftime("%Y-%m-%d")
-                else:
-                    wi_date_fmt = datetime.date.today()    
-                if wi_task_l1_code:
-                   wi_tskgrl1 = wi_task_l1_code[0]
-                else: 
-                   wi_tskgrl1 = ""   
-                if wi_task_l2_code:
-                   wi_tskgrl2 = wi_task_l2_code[0] 
-                else:
-                   wi_tskgrl2 = ""              
-                if wo_usercode:
-                   wi_userid = wo_usercode[0]
-                else:
-                   wi_userid = ""    
+                # if wi_date:
+                #     wi_date_fmt = wi_date.strftime("%Y-%m-%d")
+                # else:
+                #     wi_date_fmt = datetime.date.today()    
+                # if wi_task_l1_code:
+                #    wi_tskgrl1 = wi_task_l1_code[0]
+                # else: 
+                #    wi_tskgrl1 = ""   
+                # if wi_task_l2_code:
+                #    wi_tskgrl2 = wi_task_l2_code[0] 
+                # else:
+                #    wi_tskgrl2 = ""              
+                # if wo_usercode:
+                #    wi_userid = wo_usercode[0]
+                # else:
+                #    wi_userid = ""    
+                
+                if wi_time_qty is None or wi_time_qty == 0:
+                    st.error("Please enter a valid time quantity")
+                    st.stop()
 
                 work_item = {
                     "wi_date": wi_date_fmt, 

@@ -7,6 +7,7 @@ import json
 import re
 from dataclasses import dataclass
 from typing import Optional, Tuple, Dict, List
+import numpy as np
 
 # 3th party packages
 import streamlit as st
@@ -2024,9 +2025,10 @@ def manage_wo():
             # # Per Time Quantity
             initial_time_qty = st.session_state.get('sb_wi_time_qty')
             try:
-                initial_time_qty = float(initial_time_qty) if initial_time_qty else float(0.0)  # Convert to float or 0.0
-            except (TypeError, ValueError):  # Handle potential errors
-                initial_time_qty = float(0.0)
+                initial_time_qty = float(initial_time_qty) if initial_time_qty else 0.0
+                initial_time_qty = np.float64(initial_time_qty)  # Forza il tipo a float64
+            except (TypeError, ValueError):
+                initial_time_qty = 0.0
 
             wi_time_qty = st.number_input(
                 label=":blue[Time spent (in hours)(:red[*])]:",
@@ -2036,19 +2038,13 @@ def manage_wo():
                 key="sb_wi_time_qty",
                 placeholder="0.0"  # Show 0.0 as a placeholder
             )
-            # Per Date
-            # if 'sb_wi_date' not in st.session_state or st.session_state.reset_pending:
-            #     initial_date = datetime.date.today()
-            # else:
-            #     initial_date = st.session_state.get('sb_wi_date', datetime.date.today())
+            
+            #Per Date
+            if 'sb_wi_date' not in st.session_state or st.session_state.reset_pending:
+                initial_date = datetime.date.today()
+            else:
+                initial_date = st.session_state.get('sb_wi_date', datetime.date.today())
 
-            initial_date = st.session_state.get('sb_wi_date') or datetime.date.today()
-            wi_date = st.date_input(
-                label=":blue[Date of execution(:red[*])]",
-                value=initial_date,
-                format="DD/MM/YYYY",
-                key="sb_wi_date"
-            )
             # Per Note
             initial_note = "" if st.session_state.reset_pending else st.session_state.get('sb_wi_note', "")
             wi_note = st.text_area(

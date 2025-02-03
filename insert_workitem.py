@@ -68,9 +68,10 @@ def insert_workitems(conn):
     previus_7days = datetime.datetime.now() - datetime.timedelta(days=7)
     selected_from_date = st.sidebar.date_input(":blue[From date]", value=previus_7days, key="di_datefrom", format="DD/MM/YYYY", disabled=False)
     selected_to_date = st.sidebar.date_input(":blue[To date]", value="today", key="di_dateto", format="DD/MM/YYYY", disabled=False)
-    filtered_workitems = st.session_state.df_workitems[st.session_state.df_workitems["USERID"]==selected_usercode]
+    
     search_button = st.sidebar.button("Search", key="search_button", type="primary", use_container_width=True, on_click=None, disabled=disable_search_button)
     if search_button:
+        filtered_workitems = st.session_state.df_workitems[st.session_state.df_workitems["USERID"]==selected_usercode]
         st.dataframe(data=st.session_state.df_workitems, use_container_width=True, hide_index=True)
         #st.dataframe(data=None, width=None, height=None, *, use_container_width=False, hide_index=None, column_order=None, column_config=None, key=None, on_select="ignore", selection_mode="multi-row")
 

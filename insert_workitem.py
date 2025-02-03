@@ -42,8 +42,8 @@ def insert_workitems(conn):
         if key not in st.session_state:
             st.session_state[key] = loader(conn)
 
-    st.write(f"Sessione state stamp:")
-    st.write(st.session_state)
+    #st.write(f"Sessione state stamp:")
+    #st.write(st.session_state)
 
     st.sidebar.divider()
     st.sidebar.header(f":orange[Filters]")

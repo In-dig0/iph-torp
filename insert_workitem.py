@@ -655,7 +655,7 @@ def insert_workitems(conn):
             try:
                 initial_time_qty = float(initial_time_qty) if initial_time_qty else 0.0
                 initial_time_qty = np.float64(initial_time_qty)  # Forza il tipo a float64
-                st.write(f"Tipo di dato prima del number_input: {type(initial_time_qty)}")
+                #st.write(f"Tipo di dato prima del number_input: {type(initial_time_qty)}")
             except (TypeError, ValueError):
                 initial_time_qty = 0.0
 
@@ -667,7 +667,7 @@ def insert_workitems(conn):
                 key="sb_wi_time_qty",
             )
 
-            st.write(f"Valore di wi_time_qty: {wi_time_qty}")  # Stampa il valore dopo l'input
+            #st.write(f"Valore di wi_time_qty: {wi_time_qty}")  # Stampa il valore dopo l'input
             
             #Per Date
             initial_date = st.session_state.get('sb_wi_date') or datetime.date.today()  # Use session value or today

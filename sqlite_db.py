@@ -384,41 +384,53 @@ def load_woassignedto_data(conn):
     return df_woassignedto
 
 
-def get_next_object_id(obj_class, obj_year, obj_pline, conn) -> str:
+def get_next_object_id(obj_class, obj_year, obj_pline, obj_parent, conn) -> str:
     """Get next available row ID"""
 
     ZERO_PADDING_NR = 4
     SEP_CHAR = '-'
+    WO_PREFIX = "W"
+    next_rowid = ""
 
-    try:
-        cursor = conn.cursor()
-        cursor.execute('SELECT prefix AS PREFIX, prog AS PROG FROM TORP_OBJNUMERATOR WHERE obj_class=? and obj_year=? and obj_pline=?', (obj_class, obj_year, obj_pline))
-        results = cursor.fetchone()
-        if results:
-            prefix = results[0]
-            next_prog = int(results[1]) + 1
-            next_rowid = prefix + obj_year[2:4] + SEP_CHAR + str(next_prog).zfill(ZERO_PADDING_NR)
-            cursor.execute(
-                "UPDATE TORP_OBJNUMERATOR SET prog = ? WHERE obj_class=? and obj_year=? and obj_pline=?",
-                (next_prog, obj_class, obj_year, obj_pline)
-            )               
-        else:        
-            prefix = obj_class[0]
-            next_prog = 1
-            next_rowid = prefix + obj_year[2:4] + SEP_CHAR + str(next_prog).zfill(ZERO_PADDING_NR)
-            cursor.execute(
-                "INSERT INTO TORP_OBJNUMERATOR (obj_class, obj_year, obj_pline, prefix, prog) VALUES (?, ?, ?, ?, ?)",
-                (obj_class, obj_year, obj_pline, prefix, next_prog)
-            )
+    # Work Order numeration-> Prefix + numeration of Request
+    if obj_class == "WOR": 
+        next_rowid = WO_PREFIX + obj_parent[1:]
+    
+    # Request numeration
+    if obj_class == "REQ":    
+        try:
+            cursor = conn.cursor()
+            cursor.execute('SELECT prefix AS PREFIX, prog AS PROG FROM TORP_OBJNUMERATOR WHERE obj_class=? and obj_year=? and obj_pline=?', (obj_class, obj_year, obj_pline))
+            results = cursor.fetchone()
+            if results:
+                prefix = results[0]
+                next_prog = int(results[1]) + 1
+                next_rowid = prefix + obj_year[2:4] + SEP_CHAR + str(next_prog).zfill(ZERO_PADDING_NR)
+                cursor.execute(
+                    "UPDATE TORP_OBJNUMERATOR SET prog = ? WHERE obj_class=? and obj_year=? and obj_pline=?",
+                    (next_prog, obj_class, obj_year, obj_pline)
+                )               
+            else:        
+                prefix = obj_class[0]
+                next_prog = 1
+                next_rowid = prefix + obj_year[2:4] + SEP_CHAR + str(next_prog).zfill(ZERO_PADDING_NR)
+                cursor.execute(
+                    "INSERT INTO TORP_OBJNUMERATOR (obj_class, obj_year, obj_pline, prefix, prog) VALUES (?, ?, ?, ?, ?)",
+                    (obj_class, obj_year, obj_pline, prefix, next_prog)
+                )
 
-        conn.commit()                        
-    except Exception as errMsg:
-        st.error(f"**ERROR impossible to get the next rowid from table TORP_OBJNUMERATOR: {errMsg}")
-        conn.rollback()
+            conn.commit()                        
+        except Exception as errMsg:
+            st.error(f"**ERROR impossible to get the next rowid from table TORP_OBJNUMERATOR: {errMsg}")
+            conn.rollback()
+            return ""
+        finally:
+            if cursor:
+                cursor.close() # Close the cursor in a finally block
+    
+    else:
+        st.error(f"**ERROR impossible to get the next rowid for object {obj_class}-{obj_year}-{obj_pline}")
         return ""
-    finally:
-        if cursor:
-            cursor.close() # Close the cursor in a finally block
     
     return next_rowid
 

@@ -24,7 +24,7 @@ def view_request(conn) -> None:
         """Reset all session state variables and cached data"""
         
         "Reload request data into df"
-        st.session_state['df_requests'] = sqlite_db.load_requests_data
+        st.session_state['df_requests'] = sqlite_db.load_requests_data(conn)
         st.write(st.session_state)
         # Lista delle chiavi di sessione da eliminare
         keys_to_clear = [

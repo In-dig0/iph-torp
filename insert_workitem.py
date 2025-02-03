@@ -69,13 +69,12 @@ def insert_workitems(conn):
 
         st.subheader(f":orange[List of Work items]")
         with st.container(border=True, key="Workitem grid"):
-
             st.dataframe(data=filtered_workitems, use_container_width=True, hide_index=False)
         #st.dataframe(data=None, width=None, height=None, *, use_container_width=False, hide_index=None, column_order=None, column_config=None, key=None, on_select="ignore", selection_mode="multi-row")
         st.divider()
         st.subheader(f":orange[Task]")
         with st.container(border=True, key="Insert Task"):
-
+            pass
             # #with st.form(key='task_form'):
             # taskl1_options = df_tskgrl1["NAME"].tolist()
             

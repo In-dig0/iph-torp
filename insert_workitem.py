@@ -8,6 +8,13 @@ from typing import Optional, Tuple, Dict, List
 import servant
 
 def insert_workitems(conn):
+
+    def reset_form():
+        st.session_state.reset_pending = True
+        st.rerun()
+
+    if 'reset_pending' not in st.session_state:
+        st.session_state.reset_pending = False 
     
         # Load data into session state if not already present
     session_data = {

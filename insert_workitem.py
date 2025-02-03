@@ -45,22 +45,13 @@ def insert_workitems(conn):
         wo_username_options = list(sorted_usernames)
     
     selected_username = st.sidebar.selectbox(label=":blue[Tech Department Specialist]", options=wo_username_options, index=None)
-    #st.write(selected_username)
+    selected_usercode = servant.get_code_from_name(st.session_state.df_users, selected_username, "CODE")
     
-    df_wo_usercode = st.session_state.df_woassignedto[st.session_state.df_woassignedto['USERNAME'] == selected_username]["USERID"].unique()
-    wo_usercode = list(df_wo_usercode)
 
     if selected_username:
         st.session_state.selected_username = True
-        df_selected_usercode = st.session_state.df_users[st.session_state.df_users["NAME"]==selected_username]["CODE"]
-        selected_usercode = servant.get_code_from_name(st.session_state.df_users, df_selected_usercode, "CODE")
-        wo_woid = st.session_state.df_woassignedto[st.session_state.df_woassignedto['USERNAME'] == selected_username]['WOID']
-        unique_woid = wo_woid.unique()
-        sorted_woid = sorted(unique_woid)
-        wo_woid_options = list(sorted_woid)
         disable_search_button = False
     else:
-        wo_woid_options = []
         disable_search_button = True
 
 

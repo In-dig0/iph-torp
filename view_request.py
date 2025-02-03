@@ -25,7 +25,7 @@ def view_request(conn) -> None:
         
         "Reload request data into df"
         st.session_state['df_requests'] = sqlite_db.load_requests_data
-        
+        st.write(st.session_state)
         # Lista delle chiavi di sessione da eliminare
         keys_to_clear = [
             'grid_data',

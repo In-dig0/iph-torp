@@ -589,7 +589,7 @@ def insert_workitems(conn):
         )
         wi_task_l1_code = st.session_state.df_tskgrl1[df_tskgrl1["NAME"]==wi_task_l1]["CODE"].tolist() if wi_task_l1 else []
     st.divider()
-    create_wi_button = st.form_submit_button("Create Work Item", type="primary")
+    create_wi_button = st.button("Create Work Item", type="primary")
 
 
 # Nella funzione insert_workitems()

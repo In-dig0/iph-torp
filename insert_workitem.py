@@ -62,7 +62,8 @@ def insert_workitems(conn):
     
     search_button = st.sidebar.button("Search", key="search_button", type="primary", use_container_width=True, on_click=None, disabled=disable_search_button)
     if search_button:
-        filtered_workitems = st.session_state.df_workitems[st.session_state.df_workitems["USERID"]==selected_usercode]
+        workitems = st.session_state.df_workitems[st.session_state.df_workitems["USERID"]==selected_usercode & st.session_state.df_workitems["DATE"] >= selected_from_date & st.session_state.df_workitems["DATE"] <= selected_to_date]
+
         st.dataframe(data=filtered_workitems, use_container_width=True, hide_index=False)
         #st.dataframe(data=None, width=None, height=None, *, use_container_width=False, hide_index=None, column_order=None, column_config=None, key=None, on_select="ignore", selection_mode="multi-row")
 

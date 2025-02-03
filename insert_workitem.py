@@ -75,16 +75,31 @@ def insert_workitems(conn):
     if selected_username:
         selected_usercode = servant.get_code_from_name(st.session_state.df_users, selected_username, "CODE")
         
-        # Filter workitems dynamically based on selections
+        # Filter workitems dynamically
         filtered_workitems = st.session_state.df_workitems[
             (st.session_state.df_workitems["USERID"] == selected_usercode) &
             (st.session_state.df_workitems["DATE"] >= selected_from_date) &
             (st.session_state.df_workitems["DATE"] <= selected_to_date)
         ]
 
+        # Add radio button for view selection
+        view_option = st.sidebar.radio(
+            ":blue[View Options]", 
+            ["Detail View", "Grouped by Work Order"]
+        )
+
         st.subheader(f":orange[List of Work items]")
         with st.container(border=True, key="Workitem grid"):
-            st.dataframe(data=filtered_workitems, use_container_width=True, hide_index=False)
+            if view_option == "Detail View":
+                st.dataframe(data=filtered_workitems, use_container_width=True, hide_index=False)
+            else:
+                # Group by WOID and sum TIME_QTY
+                grouped_workitems = filtered_workitems.groupby("WOID")["TIME_QTY"].sum().reset_index()
+                grouped_workitems.columns = ["Work Order ID", "Total Time Quantity"]
+                st.dataframe(data=grouped_workitems, use_container_width=True, hide_index=False)
+    
+    
+    
     else:
         # If no username is selected, show an empty or default state
         st.info("Please select a Tech Department Specialist to view work items")

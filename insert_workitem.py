@@ -94,8 +94,8 @@ def insert_workitems(conn):
                 st.dataframe(data=filtered_workitems, use_container_width=True, hide_index=False)
             else:
                 # Group by WOID and sum TIME_QTY
-                grouped_workitems = filtered_workitems.groupby("WOID")["TIME_QTY"].sum().reset_index()
-                grouped_workitems.columns = ["Work Order ID", "Total Time Quantity"]
+                grouped_workitems = filtered_workitems.groupby("WOID","TIME_UM")["TIME_QTY"].sum().reset_index()
+                grouped_workitems.columns = ["Work Order ID", "Total Time Quantity", "TIME_UM"]
                 st.dataframe(data=grouped_workitems, use_container_width=True, hide_index=False)
     
     

@@ -88,7 +88,7 @@ def insert_workitems(conn):
             wi_task_l1 = st.selectbox(
                 label=":blue[Task Group L1]", 
                 options=taskl1_options, 
-                indx= None
+                index= None,
                 key="sb_wi_taskl1"
              )
             if wi_task_l1:

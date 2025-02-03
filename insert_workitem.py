@@ -634,7 +634,7 @@ def insert_workitems(conn):
 
 
             st.divider()
-            #create_wi_button = st.form_submit_button("Create Work Item", type="primary")
+            create_wi_button = st.form_submit_button("Create Work Item", type="primary")
 
 
             # Display selected values (outside the form)

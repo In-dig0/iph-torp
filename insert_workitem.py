@@ -591,57 +591,57 @@ def insert_workitems(conn):
         st.divider()
 
         st.subheader(f":orange[New Task]")
-        #with st.form(key='task_form', clear_on_submit=False):
-        taskl1_options = st.session_state.df_tskgrl1["NAME"].tolist()
+        with st.form(key='task_form', clear_on_submit=False):
+            taskl1_options = st.session_state.df_tskgrl1["NAME"].tolist()
 
-        initial_task_l1 = st.session_state.sb_wi_taskl1
-        wi_task_l1 = st.selectbox(
-            label=":blue[Task Group L1]",
-            options=taskl1_options,
-            index=taskl1_options.index(initial_task_l1) if initial_task_l1 in taskl1_options else None,
-            key="sb_wi_taskl1"
-        )
+            initial_task_l1 = st.session_state.sb_wi_taskl1
+            wi_task_l1 = st.selectbox(
+                label=":blue[Task Group L1]",
+                options=taskl1_options,
+                index=taskl1_options.index(initial_task_l1) if initial_task_l1 in taskl1_options else None,
+                key="sb_wi_taskl1"
+            )
 
-        wi_task_l1_code = st.session_state.df_tskgrl1[st.session_state.df_tskgrl1["NAME"] == wi_task_l1]["CODE"].tolist() if wi_task_l1 else []
+            wi_task_l1_code = st.session_state.df_tskgrl1[st.session_state.df_tskgrl1["NAME"] == wi_task_l1]["CODE"].tolist() if wi_task_l1 else []
 
-        # # Dynamically update TASKGR2 options based on TASKGR1 selection
-        # if wi_task_l1_code:
-        #     filtered_wi_task_l2 = sorted(st.session_state.df_tskgrl2[st.session_state.df_tskgrl2["CODE"].isin(wi_task_l1_code)]["NAME"].tolist()) #.isin() to handle multiple codes if needed.
-        # else:
-        #     filtered_wi_task_l2 = sorted(st.session_state.df_tskgrl2["NAME"].tolist())
+            # # Dynamically update TASKGR2 options based on TASKGR1 selection
+            # if wi_task_l1_code:
+            #     filtered_wi_task_l2 = sorted(st.session_state.df_tskgrl2[st.session_state.df_tskgrl2["CODE"].isin(wi_task_l1_code)]["NAME"].tolist()) #.isin() to handle multiple codes if needed.
+            # else:
+            #     filtered_wi_task_l2 = sorted(st.session_state.df_tskgrl2["NAME"].tolist())
 
-        # initial_task_l2 = st.session_state.sb_wi_taskl2 if st.session_state.sb_wi_taskl2 in filtered_wi_task_l2 else None #Keep previous selection if still available.
-        # wi_task_l2 = st.selectbox(
-        #     label=":blue[Task Group L2]",
-        #     options=filtered_wi_task_l2,
-        #     index=filtered_wi_task_l2.index(initial_task_l2) if initial_task_l2 in filtered_wi_task_l2 else None,
-        #     key="sb_wi_taskl2"  # Key for TASKGR2
-        # )
+            # initial_task_l2 = st.session_state.sb_wi_taskl2 if st.session_state.sb_wi_taskl2 in filtered_wi_task_l2 else None #Keep previous selection if still available.
+            # wi_task_l2 = st.selectbox(
+            #     label=":blue[Task Group L2]",
+            #     options=filtered_wi_task_l2,
+            #     index=filtered_wi_task_l2.index(initial_task_l2) if initial_task_l2 in filtered_wi_task_l2 else None,
+            #     key="sb_wi_taskl2"  # Key for TASKGR2
+            # )
 
-    # Filtra TASKGR2 usando isin
-        if wi_task_l1_code:
-            filtered_wi_task_l2 = sorted(st.session_state.df_tskgrl2[st.session_state.df_tskgrl2["CODE"].isin(wi_task_l1_code)]["NAME"].tolist())
-        else:
-            filtered_wi_task_l2 = sorted(st.session_state.df_tskgrl2["NAME"].tolist())
-        
-        initial_task_l2 = st.session_state.sb_wi_taskl2 if st.session_state.sb_wi_taskl2 in filtered_wi_task_l2 else None #Keep previous selection if still available.
-        wi_task_l2 = st.selectbox(
-            label=":blue[Task Group L2]",
-            options=filtered_wi_task_l2,
-            index=filtered_wi_task_l2.index(initial_task_l2) if initial_task_l2 in filtered_wi_task_l2 else None,
-            key="sb_wi_taskl2"  # Key for TASKGR2
-        )
-
-
-        st.divider()
-        #create_wi_button = st.form_submit_button("Create Work Item", type="primary")
+        # Filtra TASKGR2 usando isin
+            if wi_task_l1_code:
+                filtered_wi_task_l2 = sorted(st.session_state.df_tskgrl2[st.session_state.df_tskgrl2["CODE"].isin(wi_task_l1_code)]["NAME"].tolist())
+            else:
+                filtered_wi_task_l2 = sorted(st.session_state.df_tskgrl2["NAME"].tolist())
+            
+            initial_task_l2 = st.session_state.sb_wi_taskl2 if st.session_state.sb_wi_taskl2 in filtered_wi_task_l2 else None #Keep previous selection if still available.
+            wi_task_l2 = st.selectbox(
+                label=":blue[Task Group L2]",
+                options=filtered_wi_task_l2,
+                index=filtered_wi_task_l2.index(initial_task_l2) if initial_task_l2 in filtered_wi_task_l2 else None,
+                key="sb_wi_taskl2"  # Key for TASKGR2
+            )
 
 
-        # Display selected values (outside the form)
-        if st.session_state.sb_wi_taskl1:
-            st.write(f"Selected Task Group L1: {st.session_state.sb_wi_taskl1}")
-        if st.session_state.sb_wi_taskl2:
-            st.write(f"Selected Task Group L2: {st.session_state.sb_wi_taskl2}")
+            st.divider()
+            #create_wi_button = st.form_submit_button("Create Work Item", type="primary")
+
+
+            # Display selected values (outside the form)
+            if st.session_state.sb_wi_taskl1:
+                st.write(f"Selected Task Group L1: {st.session_state.sb_wi_taskl1}")
+            if st.session_state.sb_wi_taskl2:
+                st.write(f"Selected Task Group L2: {st.session_state.sb_wi_taskl2}")
 
         # #... (your other code, including the dataframe display)
         # st.subheader(f":orange[List of Work items]")

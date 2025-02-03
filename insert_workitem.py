@@ -590,6 +590,12 @@ def insert_workitems(conn):
         # st.session_state.other_element_value = other_element # Update session state
         
         st.divider()
+        # Filtering Logic for TASKGR2 (MOVED OUTSIDE THE FORM)
+        if st.session_state.get('selected_task_l1'):  # Use get to avoid KeyError
+            wi_task_l1_code = st.session_state.df_tskgrl1[st.session_state.df_tskgrl1["NAME"] == st.session_state.get('selected_task_l1')]["CODE"].tolist()
+            filtered_wi_task_l2 = sorted(st.session_state.df_tskgrl2[st.session_state.df_tskgrl2["CODE"].isin(wi_task_l1_code)]["NAME"].tolist()) if wi_task_l1_code else []
+        else:
+            filtered_wi_task_l2 = sorted(st.session_state.df_tskgrl2["NAME"].tolist())
 
         st.subheader(f":orange[New Task]")
         with st.form(key='task_form', clear_on_submit=False):
@@ -610,11 +616,11 @@ def insert_workitems(conn):
 
             wi_task_l1_code = st.session_state.df_tskgrl1[st.session_state.df_tskgrl1["NAME"] == wi_task_l1]["CODE"].tolist() if wi_task_l1 else []
 
-            # Filtra TASKGR2 usando il valore memorizzato nella sessione
-            if st.session_state.selected_task_l1:  # Usa selected_task_l1
-                filtered_wi_task_l2 = sorted(st.session_state.df_tskgrl2[st.session_state.df_tskgrl2["CODE"].isin(wi_task_l1_code)]["NAME"].tolist())
-            else:
-                filtered_wi_task_l2 = sorted(st.session_state.df_tskgrl2["NAME"].tolist())
+            # # Filtra TASKGR2 usando il valore memorizzato nella sessione
+            # if st.session_state.selected_task_l1:  # Usa selected_task_l1
+            #     filtered_wi_task_l2 = sorted(st.session_state.df_tskgrl2[st.session_state.df_tskgrl2["CODE"].isin(wi_task_l1_code)]["NAME"].tolist())
+            # else:
+            #     filtered_wi_task_l2 = sorted(st.session_state.df_tskgrl2["NAME"].tolist())
 
 
         # # Filtra TASKGR2 usando isin
@@ -623,12 +629,13 @@ def insert_workitems(conn):
         #     else:
         #         filtered_wi_task_l2 = sorted(st.session_state.df_tskgrl2["NAME"].tolist())
             
-            initial_task_l2 = st.session_state.sb_wi_taskl2 if st.session_state.sb_wi_taskl2 in filtered_wi_task_l2 else None #Keep previous selection if still available.
+
+            initial_task_l2 = st.session_state.get('sb_wi_taskl2') if st.session_state.get('sb_wi_taskl2') in filtered_wi_task_l2 else None
             wi_task_l2 = st.selectbox(
                 label=":blue[Task Group L2]",
-                options=filtered_wi_task_l2,
+                options=filtered_wi_task_l2, # Use the filtered list!
                 index=filtered_wi_task_l2.index(initial_task_l2) if initial_task_l2 in filtered_wi_task_l2 else None,
-                key="sb_wi_taskl2"  # Key for TASKGR2
+                key="sb_wi_taskl2"
             )
 
 
@@ -691,8 +698,7 @@ def insert_workitems(conn):
 
 
             st.divider()
-            create_wi_button_submitted = st.form_submit_button("Create Work Item", type="primary")
-            if create_wi_button_submitted:
+            def callback():
                 if wi_date:
                     wi_date_fmt = wi_date.strftime("%Y-%m-%d")
                 else:
@@ -708,11 +714,7 @@ def insert_workitems(conn):
                 if wo_usercode:
                     wi_userid = wo_usercode[0]
                 else:
-                    wi_userid = ""    
-                
-                if wi_time_qty is None or wi_time_qty == 0:
-                    st.error("Please enter a valid time quantity")
-                    st.stop()
+                    wi_userid = ""                   
 
                 work_item = {
                     "wi_date": wi_date_fmt, 
@@ -726,7 +728,9 @@ def insert_workitems(conn):
                     "wi_time_qty": wi_time_qty, 
                     "wi_time_um": wi_time_um
                 }
-                st.write(work_item)
+                st.success(work_item)
+
+            create_wi_button_submitted = st.form_submit_button("Create Work Item", type="primary", on_click=callback)
 
 
 

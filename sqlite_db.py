@@ -385,7 +385,7 @@ def load_woassignedto_data(conn):
 
 
 def load_workitems_data(conn):
-    """ Load TORP_WORKITEM records into df """
+    """ Load TORP_WORTORP_WORKITEMS records into df """
        
     try:
         df_workitem = pd.read_sql_query("""
@@ -400,12 +400,12 @@ def load_workitems_data(conn):
             A.note AS NOTE,
             A.time_qty AS TIME_QTY,
             A.time_um AS TIME_UM
-        FROM TORP_WORKITEM A  
+        FROM TORP_WORKITEMS A  
         WHERE A.status = 'ACTIVE'
         ORDER BY WOID
         """, conn)    
     except Exception as errMsg:
-        st.error(f"**ERROR load data from TORP_WORKITEM: \n{errMsg}", icon="🚨")
+        st.error(f"**ERROR load data from TORP_WORKITEMS: \n{errMsg}", icon="🚨")
         return None
     return df_workitem
 

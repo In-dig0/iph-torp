@@ -52,6 +52,8 @@ def insert_workitems(conn):
 
     if selected_username:
         st.session_state.selected_username = True
+        df_selected_usercode = st.session_state.df_users[st.session_state.df_users["USERNAME"]==selected_username]["USERID"]
+        selected_usercode = servant.get_code_from_name(st.session_state.df_users, df_selected_usercode, "CODE")
         wo_woid = st.session_state.df_woassignedto[st.session_state.df_woassignedto['USERNAME'] == selected_username]['WOID']
         unique_woid = wo_woid.unique()
         sorted_woid = sorted(unique_woid)
@@ -66,6 +68,7 @@ def insert_workitems(conn):
     previus_7days = datetime.datetime.now() - datetime.timedelta(days=7)
     selected_from_date = st.sidebar.date_input(":blue[From date]", value=previus_7days, key="di_datefrom", format="DD/MM/YYYY", disabled=False)
     selected_to_date = st.sidebar.date_input(":blue[To date]", value="today", key="di_dateto", format="DD/MM/YYYY", disabled=False)
+    filtered_workitems = st.session_state.df_workitems[st.session_state.df_workitems["USERID"]==selected_usercode]
     search_button = st.sidebar.button("Search", key="search_button", type="primary", use_container_width=True, on_click=None, disabled=disable_search_button)
     if search_button:
         st.dataframe(data=st.session_state.df_workitems, use_container_width=True, hide_index=True)

@@ -206,8 +206,8 @@ def view_request(conn) -> None:
     #     key='main_grid'
     # )
 
-    # Salva la risposta della griglia nello stato della sessione
-    st.session_state['grid_response'] = grid_response
+    # # Salva la risposta della griglia nello stato della sessione
+    # st.session_state['grid_response'] = grid_response
 
     col1, col2, col3 = st.columns([1, 1, 4])
     with col1:

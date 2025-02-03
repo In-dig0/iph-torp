@@ -134,7 +134,7 @@ def view_request(conn) -> None:
     grid_builder.configure_selection(
     selection_mode='single',     # Enable multiple row selection
     use_checkbox=False,             # Show checkboxes for selection
-    header_checkbox=True
+    header_checkbox=False
     )
     grid_options = grid_builder.build()
     # List of available themes
@@ -192,22 +192,6 @@ def view_request(conn) -> None:
             key="main_grid"
         )
 
-    # Configura le opzioni della griglia
-
-    # gb = GridOptionsBuilder.from_dataframe(df_requests_grid)
-    # gb.configure_selection('single')
-    # grid_options = gb.build()
-
-    # # Mostra la griglia
-    # grid_response = AgGrid(
-    #     df_requests_grid,
-    #     gridOptions=grid_options,
-    #     update_mode=GridUpdateMode.SELECTION_CHANGED,
-    #     key='main_grid'
-    # )
-
-    # # Salva la risposta della griglia nello stato della sessione
-    # st.session_state['grid_response'] = grid_response
 
     col1, col2, col3 = st.columns([1, 1, 4])
     with col1:

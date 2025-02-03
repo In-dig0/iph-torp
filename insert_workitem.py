@@ -569,9 +569,9 @@ def insert_workitems(conn):
             (st.session_state.df_workitems["DATE"] >= selected_from_date) &
             (st.session_state.df_workitems["DATE"] <= selected_to_date)]
 
-        st.subheader(f":orange[List of Work items]")
-        with st.container(border=True, key="Workitem grid"):
-            st.dataframe(data=filtered_workitems, use_container_width=True, hide_index=False)
+        # st.subheader(f":orange[List of Work items]")
+        # with st.container(border=True, key="Workitem grid"):
+        #     st.dataframe(data=filtered_workitems, use_container_width=True, hide_index=False)
         
 
                 # Initialize session state variables if they don't exist

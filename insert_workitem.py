@@ -87,12 +87,13 @@ def insert_workitems(conn):
         with st.container(border=True, key="Insert Task"):
             
             #taskl1_options = st.session_state.df_tskgrl1["NAME"].tolist().sort()
-            taskl1_options = sort(st.session_state.df_tskgrl1["NAME"].tolist())
-
+            taskl1_options = st.session_state.df_tskgrl1["NAME"].tolist()
+            taskl1_options_sorted = taskl1_options.sort()
             st.write(taskl1_options)
+            
             wi_task_l1 = st.selectbox(
                 label=":blue[Task Group L1]", 
-                options=taskl1_options, 
+                options=taskl1_options_sorted, 
                 index= None,
                 key="sb_wi_taskl1"
              )

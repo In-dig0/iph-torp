@@ -7,6 +7,43 @@ from typing import Optional, Tuple, Dict, List
 # Internal app module
 import servant
 
+def create_work_item(conn):
+    # Load data from session state
+    df_users = st.session_state['df_users']
+    df_workorders = st.session_state['df_workorders'] 
+    df_tskgrl1 = st.session_state['df_tskgrl1']
+    df_tskgrl2 = st.session_state['df_tskgrl2']
+
+    # TD Specialist dropdown
+    td_specialists = df_users['USERNAME'].unique()
+    selected_td_specialist = st.sidebar.selectbox("TD Specialist", td_specialists)
+
+    # Work Order Number dropdown 
+    wo_numbers = df_workorders['WOID'].unique()
+    selected_wo_number = st.sidebar.selectbox("Work Order Number", wo_numbers)
+
+    # Task Group Level 1 dropdown
+    tskgrl1_options = df_tskgrl1['TSKGRL1'].unique()
+    selected_tskgrl1 = st.sidebar.selectbox("Task Group Level 1", tskgrl1_options)
+
+    # Task Group Level 2 dropdown (dependent on Level 1)
+    tskgrl2_options = df_tskgrl2[df_tskgrl2['TSKGRL1'] == selected_tskgrl1]['TSKGRL2'].unique()
+    selected_tskgrl2 = st.sidebar.selectbox("Task Group Level 2", tskgrl2_options)
+
+    # Execution Date
+    execution_date = st.sidebar.date_input("Execution Date", value=datetime.datetime.now(), format="DD/MM/YYYY")
+
+    # Quantity
+    quantity = st.sidebar.number_input("Quantity", min_value=0.0, step=0.5, value=0.0)
+
+    # Notes
+    notes = st.sidebar.text_area("Notes")
+
+    # Save button
+    if st.sidebar.button("Save"):
+        # Code to save the new work item goes here
+        st.success("New work item created!")
+
 def insert_workitems(conn):
     # Initialize session state if not already set
     if 'reset_pending' not in st.session_state:
@@ -104,15 +141,15 @@ def insert_workitems(conn):
         # If no username is selected, show an empty or default state
         st.info("Please select a Tech Department Specialist to view work items")
 
-    # Initialize other session state variables
-    if 'sb_wi_taskl1' not in st.session_state:
-        st.session_state.sb_wi_taskl1 = None
-    if 'sb_wi_taskl2' not in st.session_state:
-        st.session_state.sb_wi_taskl2 = None
-    if 'other_element_value' not in st.session_state:
-        st.session_state.other_element_value = ""
+    # # Initialize other session state variables
+    # if 'sb_wi_taskl1' not in st.session_state:
+    #     st.session_state.sb_wi_taskl1 = None
+    # if 'sb_wi_taskl2' not in st.session_state:
+    #     st.session_state.sb_wi_taskl2 = None
+    # if 'other_element_value' not in st.session_state:
+    #     st.session_state.other_element_value = ""
 
-    st.divider()
+    # st.divider()
 # def insert_workitems(conn):
 #     # Initialize session state if not already set
 #     if 'reset_pending' not in st.session_state:

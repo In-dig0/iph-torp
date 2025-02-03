@@ -631,6 +631,64 @@ def insert_workitems(conn):
             )
 
 
+            # Per Description
+            initial_description = "" if st.session_state.reset_pending else st.session_state.get('sb_wi_description', "")
+            wi_description = st.text_input(
+                label=":blue[Task description]", 
+                value=initial_description, 
+                key="sb_wi_description"
+            )
+
+
+            # initial_time_qty = 0.0 if st.session_state.reset_pending else st.session_state.get('sb_wi_time_qty', 0.0)
+            # wi_time_qty = st.number_input(
+            #     label=":blue[Time spent (in hours)(:red[*])]:", 
+            #     value=initial_time_qty,
+            #     min_value=0.0, 
+            #     step=0.5, 
+            #     key="sb_wi_time_qty"
+            # )
+
+            # # Per Time Quantity
+            initial_time_qty = st.session_state.get('sb_wi_time_qty')
+            try:
+                initial_time_qty = float(initial_time_qty) if initial_time_qty else 0.0
+                initial_time_qty = np.float64(initial_time_qty)  # Forza il tipo a float64
+                st.write(f"Tipo di dato prima del number_input: {type(initial_time_qty)}")
+            except (TypeError, ValueError):
+                initial_time_qty = 0.0
+
+            wi_time_qty = st.number_input(
+                label=":blue[Time spent (in hours)(:red[*])]:",
+                value=initial_time_qty if initial_time_qty is not None else 0, # Valore iniziale
+                min_value=0.0,
+                step=0.5,
+                key="sb_wi_time_qty",
+            )
+
+            st.write(f"Valore di wi_time_qty: {wi_time_qty}")  # Stampa il valore dopo l'input
+            
+            #Per Date
+            initial_date = st.session_state.get('sb_wi_date') or datetime.date.today()  # Use session value or today
+            wi_date = st.date_input(
+                label=":blue[Date of execution(:red[*])]",
+                value=initial_date,
+                format="DD/MM/YYYY",
+                key="sb_wi_date"
+            )
+
+            # Per Note
+            initial_note = "" if st.session_state.reset_pending else st.session_state.get('sb_wi_note', "")
+            wi_note = st.text_area(
+                ":blue[Note]", 
+                value=initial_note,
+                key="sb_wi_note"
+            )
+
+            wo_nr = selected_wo
+            wi_time_um = "H"
+
+
             st.divider()
             create_wi_button = st.form_submit_button("Create Work Item", type="primary")
 

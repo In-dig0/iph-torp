@@ -600,7 +600,8 @@ def insert_workitems(conn):
             )
 
             wi_task_l1_code = st.session_state.df_tskgrl1[st.session_state.df_tskgrl1["NAME"] == wi_task_l1]["CODE"].tolist() if wi_task_l1 else []
-    
+            st.write(wi_task_l1_code)
+            
             if wi_task_l1_code:
                 filtered_wi_task_l2 = sorted(st.session_state.df_tskgrl2[st.session_state.df_tskgrl2["CODE"] == wi_task_l1_code]["NAME"].tolist())
             else:

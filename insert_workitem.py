@@ -27,6 +27,8 @@ def insert_workitems(conn):
         'df_workorders': sqlite_db.load_workorders_data,
         'df_woassignedto': sqlite_db.load_woassignedto_data,
         'df_workitems': sqlite_db.load_workitems_data,
+        'df_tskgrl1': sqlite_db.load_tskgrl1_data,
+        'df_tskgrl2': sqlite_db.load_tskgrl2_data,
     }
 
     for key, loader in session_data.items():

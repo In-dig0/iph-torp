@@ -74,19 +74,18 @@ def insert_workitems(conn):
         st.divider()
         st.subheader(f":orange[Task]")
         with st.container(border=True, key="Insert Task"):
-            pass
-            # #with st.form(key='task_form'):
-            # taskl1_options = df_tskgrl1["NAME"].tolist()
+            
+            taskl1_options = df_tskgrl1["NAME"].tolist()
             
             # # Per Task Group L1
-            # initial_task_l1 = None if st.session_state.reset_pending else st.session_state.get('sb_wi_taskl1')
-            # wi_task_l1 = st.selectbox(
-            #     label=":blue[Task Group L1]", 
-            #     options=taskl1_options, 
-            #     index=None if initial_task_l1 is None else taskl1_options.index(initial_task_l1) if initial_task_l1 in taskl1_options else None, 
-            #     key="sb_wi_taskl1"
-            # )
-            # wi_task_l1_code = df_tskgrl1[df_tskgrl1["NAME"]==wi_task_l1]["CODE"].tolist() if wi_task_l1 else []
+            initial_task_l1 = None if st.session_state.reset_pending else st.session_state.get('sb_wi_taskl1')
+            wi_task_l1 = st.selectbox(
+                label=":blue[Task Group L1]", 
+                options=taskl1_options, 
+                index=None if initial_task_l1 is None else taskl1_options.index(initial_task_l1) if initial_task_l1 in taskl1_options else None, 
+                key="sb_wi_taskl1"
+            )
+            wi_task_l1_code = st.session_state.df_tskgrl1[st.session_state.df_tskgrl1["NAME"]==wi_task_l1]["CODE"].tolist() if wi_task_l1 else []
 
             # # Per Task Group L2
             # taskl2_options = df_tskgrl2["NAME"].tolist()

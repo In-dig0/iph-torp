@@ -103,59 +103,12 @@ def insert_workitems(conn):
             else:
                 filtered_wi_task_l2 = sorted(st.session_state.df_tskgrl2["NAME"].tolist())
 
-
             wi_task_l2 = st.selectbox(
                 label=":blue[Task Group L1]", 
                 options=filtered_wi_task_l2,
                 index= None,
                 key="sb_wi_taskl2"
              )
-            # taskl2_options = st.session_state.df_tskgrl2["NAME"].tolist()
-            # initial_task_l2 = None if st.session_state.reset_pending else st.session_state.get('sb_wi_taskl2')
-            # wi_task_l2 = st.selectbox(
-            #     label=":blue[Task Group L2]", 
-            #     options=taskl2_options, 
-            #     index=None if initial_task_l2 is None else taskl2_options.index(initial_task_l2) if initial_task_l2 in taskl2_options else None, 
-            #     key="sb_wi_taskl2"
-            # )
-            # wi_task_l2_code = st.session_state.df_tskgrl2[st.session_state.df_tskgrl2["NAME"]==wi_task_l2]["CODE"].tolist() if wi_task_l2 else []
-
-            # if wi_task_l1_code:
-            #     taskl2_options = st.session_state.df_tskgrl2[st.session_state.df_tskgrl2==wi_task_l1_code]["NAME"].tolist()
-            #     taskl2_options_sorted = sorted(taskl2_options) 
-
-            #     wi_task_l2 = st.selectbox(
-            #     label=":blue[Task Group L2]", 
-            #     options=taskl2_options_sorted, 
-            #     index= None,
-            #     key="sb_wi_taskl2"
-            #  )
-            #     if wi_task_l2:
-            #         wi_task_l2_code = servant.get_code_from_name(st.session_state.df_tskgrl2, wi_task_l2, "CODE")
-            #     else:
-            #         wi_task_l2_code = None          
-
-            # # # Per Task Group L1
-            # initial_task_l1 = None if st.session_state.reset_pending else st.session_state.get('sb_wi_taskl1')
-            # wi_task_l1 = st.selectbox(
-            #     label=":blue[Task Group L1]", 
-            #     options=taskl1_options, 
-            #     index=None if initial_task_l1 is None else taskl1_options.index(initial_task_l1) if initial_task_l1 in taskl1_options else None, 
-            #     key="sb_wi_taskl1"
-            # )
-            # wi_task_l1_code = st.session_state.df_tskgrl1[st.session_state.df_tskgrl1["NAME"]==wi_task_l1]["CODE"].tolist() if wi_task_l1 else []
-            # st.write(wi_task_l1_code)
             
-            # # Per Task Group L2
-            # taskl2_options = st.session_state.df_tskgrl2["NAME"].tolist()
-            # initial_task_l2 = None if st.session_state.reset_pending else st.session_state.get('sb_wi_taskl2')
-            # wi_task_l2 = st.selectbox(
-            #     label=":blue[Task Group L2]", 
-            #     options=taskl2_options, 
-            #     index=None if initial_task_l2 is None else taskl2_options.index(initial_task_l2) if initial_task_l2 in taskl2_options else None, 
-            #     key="sb_wi_taskl2"
-            # )
-            # wi_task_l2_code = st.session_state.df_tskgrl2[st.session_state.df_tskgrl2["NAME"]==wi_task_l2]["CODE"].tolist() if wi_task_l2 else []
-
-
-        
+            st.divider()
+            create_wi_button = st.button("Create Work Item", type="primary")

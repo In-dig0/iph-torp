@@ -168,30 +168,45 @@ def view_request(conn) -> None:
         st.session_state.grid_data = df_requests_grid.copy() # Mostra tutti i dati se il filtro è None
 
     st.subheader("Request list:") 
-    # Creazione/Aggiornamento della griglia (UNA SOLA VOLTA per ciclo di esecuzione)
-    if st.session_state.grid_response is None:
-        st.session_state.grid_response = AgGrid(
-            st.session_state.grid_data,
-            gridOptions=grid_options,
-            allow_unsafe_jscode=True,
-            theme=available_themes[2],
-            fit_columns_on_grid_load=False,
-            update_mode=GridUpdateMode.MODEL_CHANGED,
-            data_return_mode=DataReturnMode.AS_INPUT,
-            key="main_grid"
-        )
-    else:
-        st.session_state.grid_response = AgGrid( # Aggiorna la griglia esistente
-            st.session_state.grid_data,
-            gridOptions=grid_options,
-            allow_unsafe_jscode=True,
-            theme=available_themes[2],
-            fit_columns_on_grid_load=False,
-            update_mode=GridUpdateMode.MODEL_CHANGED,
-            data_return_mode=DataReturnMode.AS_INPUT,
-            key="main_grid"
-        )
+    # # Creazione/Aggiornamento della griglia (UNA SOLA VOLTA per ciclo di esecuzione)
+    # if st.session_state.grid_response is None:
+    #     st.session_state.grid_response = AgGrid(
+    #         st.session_state.grid_data,
+    #         gridOptions=grid_options,
+    #         allow_unsafe_jscode=True,
+    #         theme=available_themes[2],
+    #         fit_columns_on_grid_load=False,
+    #         update_mode=GridUpdateMode.MODEL_CHANGED,
+    #         data_return_mode=DataReturnMode.AS_INPUT,
+    #         key="main_grid"
+    #     )
+    # else:
+    #     st.session_state.grid_response = AgGrid( # Aggiorna la griglia esistente
+    #         st.session_state.grid_data,
+    #         gridOptions=grid_options,
+    #         allow_unsafe_jscode=True,
+    #         theme=available_themes[2],
+    #         fit_columns_on_grid_load=False,
+    #         update_mode=GridUpdateMode.MODEL_CHANGED,
+    #         data_return_mode=DataReturnMode.AS_INPUT,
+    #         key="main_grid"
+    #     )
+    # Configura le opzioni della griglia
+    gb = GridOptionsBuilder.from_dataframe(df_requests_grid)
+    gb.configure_selection('single')
+    grid_options = gb.build()
 
+    # Mostra la griglia
+    grid_response = AgGrid(
+        df_requests_grid,
+        gridOptions=grid_options,
+        update_mode=GridUpdateMode.SELECTION_CHANGED,
+        key='main_grid'
+    )
+
+    # Salva la risposta della griglia nello stato della sessione
+    st.session_state['grid_response'] = grid_response
+    
     col1, col2, col3 = st.columns([1, 1, 4])
     with col1:
         if st.button("🔄 Refresh", type="tertiary"):

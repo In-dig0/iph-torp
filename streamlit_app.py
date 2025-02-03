@@ -42,6 +42,7 @@ def main():
     # "🗂️ Manage Request": manage_request,
     # "📌 Manage Work Orders": manage_wo,
     # "🛠️ Manage Work Items": manage_wi,
+    "🛠️ Insert Workitem": lambda: insert_workitem.insert_workitem(conn)
     # "🔐 Close db": close_sqlitecloud_db,
     # "--> TEST": my_test
 }    

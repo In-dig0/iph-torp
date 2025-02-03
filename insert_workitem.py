@@ -99,15 +99,26 @@ def insert_workitems(conn):
             else:
                 wi_task_l1_code = None
 
-            taskl2_options = st.session_state.df_tskgrl2["NAME"].tolist()
-            initial_task_l2 = None if st.session_state.reset_pending else st.session_state.get('sb_wi_taskl2')
+            if wi_task_l1:
+                filtered_wi_task_l2 = sorted(st.session_state.df_tskgrl2[st.session_state.df_tskgrl2["CODE"] == wi_task_l1_code].tolist())
+            else:
+                filtered_wi_task_l2 = sorted(st.session_state.df_tskgrl2.to_list())
+
             wi_task_l2 = st.selectbox(
-                label=":blue[Task Group L2]", 
-                options=taskl2_options, 
-                index=None if initial_task_l2 is None else taskl2_options.index(initial_task_l2) if initial_task_l2 in taskl2_options else None, 
+                label=":blue[Task Group L1]", 
+                options=filtered_wi_task_l2, 
+                index= None,
                 key="sb_wi_taskl2"
-            )
-            wi_task_l2_code = st.session_state.df_tskgrl2[st.session_state.df_tskgrl2["NAME"]==wi_task_l2]["CODE"].tolist() if wi_task_l2 else []
+             )
+            # taskl2_options = st.session_state.df_tskgrl2["NAME"].tolist()
+            # initial_task_l2 = None if st.session_state.reset_pending else st.session_state.get('sb_wi_taskl2')
+            # wi_task_l2 = st.selectbox(
+            #     label=":blue[Task Group L2]", 
+            #     options=taskl2_options, 
+            #     index=None if initial_task_l2 is None else taskl2_options.index(initial_task_l2) if initial_task_l2 in taskl2_options else None, 
+            #     key="sb_wi_taskl2"
+            # )
+            # wi_task_l2_code = st.session_state.df_tskgrl2[st.session_state.df_tskgrl2["NAME"]==wi_task_l2]["CODE"].tolist() if wi_task_l2 else []
 
             # if wi_task_l1_code:
             #     taskl2_options = st.session_state.df_tskgrl2[st.session_state.df_tskgrl2==wi_task_l1_code]["NAME"].tolist()

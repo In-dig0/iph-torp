@@ -1,7 +1,8 @@
 pandas
 streamlit
 sqlitecloud
-pytz
+#pytz
 streamlit-aggrid
-streamlit-modal
-extra-streamlit-components
+#streamlit-modal
+#extra-streamlit-components
+reportlab

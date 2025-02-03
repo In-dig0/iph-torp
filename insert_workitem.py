@@ -81,10 +81,10 @@ def insert_workitems(conn):
             st.dataframe(data=filtered_workitems, use_container_width=True, hide_index=False)
         #st.dataframe(data=None, width=None, height=None, *, use_container_width=False, hide_index=None, column_order=None, column_config=None, key=None, on_select="ignore", selection_mode="multi-row")
         st.divider()
-        st.subheader(f":orange[Task]")
+        st.subheader(f":orange[New Task]")
         with st.container(border=True, key="Insert Task"):
             
-            taskl1_options = st.session_state.df_tskgrl1["NAME"].tolist()
+            taskl1_options = st.session_state.df_tskgrl1["NAME"].tolist().sort()
             
             # # Per Task Group L1
             initial_task_l1 = None if st.session_state.reset_pending else st.session_state.get('sb_wi_taskl1')
@@ -95,9 +95,10 @@ def insert_workitems(conn):
                 key="sb_wi_taskl1"
             )
             wi_task_l1_code = st.session_state.df_tskgrl1[st.session_state.df_tskgrl1["NAME"]==wi_task_l1]["CODE"].tolist() if wi_task_l1 else []
-
+            st.write(wi_task_l1_code)
+            
             # # Per Task Group L2
-            # taskl2_options = df_tskgrl2["NAME"].tolist()
+            # taskl2_options = st.session_state.df_tskgrl2["NAME"].tolist()
             # initial_task_l2 = None if st.session_state.reset_pending else st.session_state.get('sb_wi_taskl2')
             # wi_task_l2 = st.selectbox(
             #     label=":blue[Task Group L2]", 
@@ -105,7 +106,7 @@ def insert_workitems(conn):
             #     index=None if initial_task_l2 is None else taskl2_options.index(initial_task_l2) if initial_task_l2 in taskl2_options else None, 
             #     key="sb_wi_taskl2"
             # )
-            # wi_task_l2_code = df_tskgrl2[df_tskgrl2["NAME"]==wi_task_l2]["CODE"].tolist() if wi_task_l2 else []
+            # wi_task_l2_code = st.session_state.df_tskgrl2[st.session_state.df_tskgrl2["NAME"]==wi_task_l2]["CODE"].tolist() if wi_task_l2 else []
 
 
         

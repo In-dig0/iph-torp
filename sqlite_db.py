@@ -3,6 +3,7 @@ import streamlit as st
 import pandas as pd
 from typing import Optional, Tuple, Dict, List
 import base64
+from datetime import datetime, date
 
 def open_sqlitecloud_db():
     """ Open a connection to SQLITE database"""
@@ -404,6 +405,7 @@ def load_workitems_data(conn):
         WHERE A.status = 'ACTIVE'
         ORDER BY WOID
         """, conn, parse_dates=["DATE"])
+        df_workitem['DATE'] = df_workitem['DATE'].dt.date
 
     except Exception as errMsg:
         st.error(f"**ERROR load data from TORP_WORKITEMS: \n{errMsg}", icon="🚨")

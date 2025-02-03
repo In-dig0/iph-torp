@@ -86,7 +86,9 @@ def insert_workitems(conn):
         st.subheader(f":orange[New Task]")
         with st.container(border=True, key="Insert Task"):
             
-            taskl1_options = st.session_state.df_tskgrl1["NAME"].tolist().sort()
+            #taskl1_options = st.session_state.df_tskgrl1["NAME"].tolist().sort()
+            taskl1_options = st.session_state.df_tskgrl1["NAME"]
+
             st.write(taskl1_options)
             wi_task_l1 = st.selectbox(
                 label=":blue[Task Group L1]", 

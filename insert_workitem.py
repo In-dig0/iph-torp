@@ -98,7 +98,7 @@ def insert_workitems(conn):
             else:
                 wi_task_l1_code = ""
 
-            if wi_task_l1:
+            if wi_task_l1_code:
                 filtered_wi_task_l2 = st.session_state.df_tskgrl2[st.session_state.df_tskgrl2["CODE"] == wi_task_l1_code]
             else:
                 filtered_wi_task_l2 = st.session_state.df_tskgrl2

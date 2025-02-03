@@ -34,7 +34,7 @@ def insert_workitems(conn):
         'df_workorders': sqlite_db.load_workorders_data,
         'df_woassignedto': sqlite_db.load_woassignedto_data,
         'df_workitems': sqlite_db.load_workitems_data,
-        'df_tskgrl1': sqlite_db.load_tskgrl1_data,
+        'df_tskgrl1': sqlite_db.load_tskgrl1_data, 
         'df_tskgrl2': sqlite_db.load_tskgrl2_data,
     }
 
@@ -85,6 +85,7 @@ def insert_workitems(conn):
         with st.container(border=True, key="Insert Task"):
             
             taskl1_options = st.session_state.df_tskgrl1["NAME"].tolist().sort()
+            st.write(taskl1_options)
             wi_task_l1 = st.selectbox(
                 label=":blue[Task Group L1]", 
                 options=taskl1_options, 

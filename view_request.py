@@ -13,7 +13,36 @@ def view_request(conn) -> None:
     # Inzialise variables
     rc = 0
     req_nr = ""
-   
+    
+    def reset_application_state():
+        """Reset all session state variables and cached data"""
+        
+        "Reload request data into df"
+        st.session_state['df_requests'] = sqlite_db.load_requests_data
+        
+        # Lista delle chiavi di sessione da eliminare
+        keys_to_clear = [
+            'grid_data',
+            'grid_response',
+            'dialog_shown',
+            'need_refresh',
+            'main_grid',  # Chiave della griglia AgGrid
+    #            'Status_value',  # Chiave del filtro status nella sidebar
+            'selected_rows' # Chiave della selezione delle righe
+        ]
+        
+        # Rimuovi tutte le chiavi di sessione specificate
+        for key in keys_to_clear:
+            if key in st.session_state:
+                del st.session_state[key]
+        
+        # Forza il refresh cambiando la chiave 
+        st.session_state.grid_refresh_key = str(time.time())
+        # # Reset the grid response to remove any selected rows 
+        # st.session_state.grid_response
+        # Forza il rerun dell'applicazione        
+        st.rerun()
+
     # Load data into session state if not already present
     session_data = {
         'df_depts': sqlite_db.load_dept_data,
@@ -151,6 +180,11 @@ def view_request(conn) -> None:
             key="main_grid"
         )
 
+    col1, col2, col3 = st.columns([1, 1, 4])
+    with col1:
+        if st.button("🔄 Refresh", type="tertiary"):
+            reset_application_state()
+    
     selected_row = st.session_state.grid_response['selected_rows']
 
     if selected_row is not None and len(selected_row) > 0:

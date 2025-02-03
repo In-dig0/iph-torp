@@ -441,7 +441,7 @@ def save_request(request: dict, conn) -> Tuple[str, int]:
     try:
         cursor = conn.cursor()
         req_year = request["insdate"][0:4]
-        next_reqid = get_next_object_id("REQ", req_year, "", conn)
+        next_reqid = get_next_object_id("REQ", req_year, "", "", conn)
         sql = """
             INSERT INTO TORP_REQUESTS (
                 reqid, status, insdate, dept, requester, user, 

@@ -6,6 +6,7 @@ import time
 from typing import Optional, Tuple, Dict, List
 # Internal app module
 import servant
+import numpy as np
 
 # def insert_workitems(conn):
 

@@ -75,7 +75,7 @@ def insert_workitems(conn):
         st.subheader(f":orange[Task]")
         with st.container(border=True, key="Insert Task"):
             
-            taskl1_options = df_tskgrl1["NAME"].tolist()
+            taskl1_options = st.session_state.df_tskgrl1["NAME"].tolist()
             
             # # Per Task Group L1
             initial_task_l1 = None if st.session_state.reset_pending else st.session_state.get('sb_wi_taskl1')

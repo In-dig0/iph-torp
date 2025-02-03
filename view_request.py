@@ -44,8 +44,8 @@ def view_request(conn) -> None:
         
         # Forza il refresh cambiando la chiave 
         st.session_state.grid_refresh_key = str(time.time())
-        # # Reset the grid response to remove any selected rows 
-        # st.session_state.grid_response
+        # Reset the grid response to remove any selected rows 
+        st.session_state.grid_response
         # Forza il rerun dell'applicazione        
         st.rerun()
 

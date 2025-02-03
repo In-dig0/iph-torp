@@ -590,13 +590,22 @@ def insert_workitems(conn):
         # st.session_state.other_element_value = other_element # Update session state
         
         st.divider()
-        # Filtering Logic for TASKGR2 (MOVED OUTSIDE THE FORM)
-        if st.session_state.get('selected_task_l1'):  # Use get to avoid KeyError
-            wi_task_l1_code = st.session_state.df_tskgrl1[st.session_state.df_tskgrl1["NAME"] == st.session_state.get('selected_task_l1')]["CODE"].tolist()
-            filtered_wi_task_l2 = sorted(st.session_state.df_tskgrl2[st.session_state.df_tskgrl2["CODE"].isin(wi_task_l1_code)]["NAME"].tolist()) if wi_task_l1_code else []
-        else:
-            filtered_wi_task_l2 = sorted(st.session_state.df_tskgrl2["NAME"].tolist())
+        # # Filtering Logic for TASKGR2 (MOVED OUTSIDE THE FORM)
+        # if st.session_state.get('selected_task_l1'):  # Use get to avoid KeyError
+        #     wi_task_l1_code = st.session_state.df_tskgrl1[st.session_state.df_tskgrl1["NAME"] == st.session_state.get('selected_task_l1')]["CODE"].tolist()
+        #     filtered_wi_task_l2 = sorted(st.session_state.df_tskgrl2[st.session_state.df_tskgrl2["CODE"].isin(wi_task_l1_code)]["NAME"].tolist()) if wi_task_l1_code else []
+        # else:
+        #     filtered_wi_task_l2 = sorted(st.session_state.df_tskgrl2["NAME"].tolist())
 
+        def update_taskgr2_options():
+            if st.session_state.get('sb_wi_taskl1'):
+                wi_task_l1_code = st.session_state.df_tskgrl1[st.session_state.df_tskgrl1["NAME"] == st.session_state.get('sb_wi_taskl1')]["CODE"].tolist()
+                st.session_state.filtered_wi_task_l2 = sorted(st.session_state.df_tskgrl2[st.session_state.df_tskgrl2["CODE"].isin(wi_task_l1_code)]["NAME"].tolist()) if wi_task_l1_code else []
+            else:
+                st.session_state.filtered_wi_task_l2 = sorted(st.session_state.df_tskgrl2["NAME"].tolist())
+            st.session_state.sb_wi_taskl2 = None  # Reset TASKGR2 selection when TASKGR1 ch
+        
+        
         st.subheader(f":orange[New Task]")
         with st.form(key='task_form', clear_on_submit=False):
             taskl1_options = st.session_state.df_tskgrl1["NAME"].tolist()
@@ -606,7 +615,8 @@ def insert_workitems(conn):
                 label=":blue[Task Group L1]",
                 options=taskl1_options,
                 index=taskl1_options.index(initial_task_l1) if initial_task_l1 in taskl1_options else None,
-                key="sb_wi_taskl1"
+                key="sb_wi_taskl1",
+                on_change=update_taskgr2_options
             )
 
             wi_task_l1_code = st.session_state.df_tskgrl1[st.session_state.df_tskgrl1["NAME"] == wi_task_l1]["CODE"].tolist() if wi_task_l1 else []
@@ -614,7 +624,15 @@ def insert_workitems(conn):
         # Memorizza il valore di TASKGR1 nella sessione
             st.session_state.selected_task_l1 = wi_task_l1
 
-            wi_task_l1_code = st.session_state.df_tskgrl1[st.session_state.df_tskgrl1["NAME"] == wi_task_l1]["CODE"].tolist() if wi_task_l1 else []
+            filtered_wi_task_l2 = st.session_state.get('filtered_wi_task_l2', sorted(st.session_state.df_tskgrl2["NAME"].tolist())) #Get the filtered list, with a default value
+
+            initial_task_l2 = st.session_state.sb_wi_taskl2 if st.session_state.sb_wi_taskl2 in filtered_wi_task_l2 else None
+            wi_task_l2 = st.selectbox(
+                label=":blue[Task Group L2]",
+                options=filtered_wi_task_l2,  # Use the filtered list
+                index=filtered_wi_task_l2.index(initial_task_l2) if initial_task_l2 in filtered_wi_task_l2 else None,
+                key="sb_wi_taskl2"
+            )
 
             # # Filtra TASKGR2 usando il valore memorizzato nella sessione
             # if st.session_state.selected_task_l1:  # Usa selected_task_l1
@@ -630,13 +648,14 @@ def insert_workitems(conn):
         #         filtered_wi_task_l2 = sorted(st.session_state.df_tskgrl2["NAME"].tolist())
             
 
-            initial_task_l2 = st.session_state.get('sb_wi_taskl2') if st.session_state.get('sb_wi_taskl2') in filtered_wi_task_l2 else None
-            wi_task_l2 = st.selectbox(
-                label=":blue[Task Group L2]",
-                options=filtered_wi_task_l2, # Use the filtered list!
-                index=filtered_wi_task_l2.index(initial_task_l2) if initial_task_l2 in filtered_wi_task_l2 else None,
-                key="sb_wi_taskl2"
-            )
+            # initial_task_l2 = st.session_state.get('sb_wi_taskl2') if st.session_state.get('sb_wi_taskl2') in filtered_wi_task_l2 else None
+            # wi_task_l2 = st.selectbox(
+            #     label=":blue[Task Group L2]",
+            #     options=filtered_wi_task_l2, # Use the filtered list!
+            #     index=filtered_wi_task_l2.index(initial_task_l2) if initial_task_l2 in filtered_wi_task_l2 else None,
+            #     key="sb_wi_taskl2",
+                
+            # )
 
 
             # Per Description

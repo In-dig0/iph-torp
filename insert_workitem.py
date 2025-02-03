@@ -61,7 +61,7 @@ def insert_workitems(conn):
 
 
     # Calcola la data di oggi meno 7 giorni
-    previus_7days = datetime.now() - timedelta(days=7)
+    previus_7days = datetime.datetime.now() - datetime.timedelta(days=7)
     selected_from_date = st.date_input("From date", value=previus_7days, key="di_from", format="DD/MM/YYYY", disable=False)
     # # Stampa la data calcolata
     # print("Oggi meno 7 giorni:", oggi_meno_7_giorni.strftime("%Y-%m-%d"))

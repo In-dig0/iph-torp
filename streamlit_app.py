@@ -36,6 +36,7 @@ def main():
 
 
   page_names_to_funcs = {
+    "🛠️ Insert Workitem": lambda: insert_workitem.insert_workitems(conn),   
     "🔍 View Request ": lambda: view_request.view_request(conn),   
     "ℹ️ App Info": lambda: app_info.display_app_info(APPNAME, APPVERSION),
     #"Connect Database": lambda: sqlite_db.open_sqlitecloud_db()
@@ -43,7 +44,6 @@ def main():
     # "🗂️ Manage Request": manage_request,
     # "📌 Manage Work Orders": manage_wo,
     # "🛠️ Manage Work Items": manage_wi,
-    "🛠️ Insert Workitem": lambda: insert_workitem.insert_workitems(conn)
     # "🔐 Close db": close_sqlitecloud_db,
     # "--> TEST": my_test
 }    

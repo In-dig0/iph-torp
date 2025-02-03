@@ -52,7 +52,7 @@ def insert_workitems(conn):
 
     if selected_username:
         st.session_state.selected_username = True
-        df_selected_usercode = st.session_state.df_users[st.session_state.df_users["USERNAME"]==selected_username]["USERID"]
+        df_selected_usercode = st.session_state.df_users[st.session_state.df_users["NAME"]==selected_username]["CODE"]
         selected_usercode = servant.get_code_from_name(st.session_state.df_users, df_selected_usercode, "CODE")
         wo_woid = st.session_state.df_woassignedto[st.session_state.df_woassignedto['USERNAME'] == selected_username]['WOID']
         unique_woid = wo_woid.unique()

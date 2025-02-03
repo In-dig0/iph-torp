@@ -580,9 +580,9 @@ def insert_workitems(conn):
         if 'other_element_value' not in st.session_state:
             st.session_state.other_element_value = "" # Example for a text input
 
-        # Elements OUTSIDE the form - their state will be preserved
-        other_element = st.text_input("Some other input:", value=st.session_state.other_element_value)
-        st.session_state.other_element_value = other_element # Update session state
+        # # Elements OUTSIDE the form - their state will be preserved
+        # other_element = st.text_input("Some other input:", value=st.session_state.other_element_value)
+        # st.session_state.other_element_value = other_element # Update session state
         
         st.divider()
         
@@ -600,6 +600,35 @@ def insert_workitems(conn):
             )
 
             wi_task_l1_code = st.session_state.df_tskgrl1[st.session_state.df_tskgrl1["NAME"] == wi_task_l1]["CODE"].tolist() if wi_task_l1 else []
+    
+            if wi_task_l1_code:
+                filtered_wi_task_l2 = sorted(st.session_state.df_tskgrl2[st.session_state.df_tskgrl2["CODE"] == wi_task_l1_code]["NAME"].tolist())
+            else:
+                filtered_wi_task_l2 = sorted(st.session_state.df_tskgrl2["NAME"].tolist())
+    
+            # Utilizzo dello stato della sessione per mantenere il valore selezionato di TASKGR2
+            if 'selected_task_l2' not in st.session_state:
+                st.session_state.selected_task_l2 = None
+            
+            wi_task_l2 = st.selectbox(
+                label=":blue[Task Group L2]",
+                options=filtered_wi_task_l2,
+                index=filtered_wi_task_l2.index(st.session_state.selected_task_l2) if st.session_state.selected_task_l2 in filtered_wi_task_l2 else None,
+                key="sb_wi_taskl2_persistent"
+            )
+            
+            # Aggiornamento dello stato della sessione quando TASKGR2 cambia
+            if wi_task_l2 != st.session_state.selected_task_l2:
+                st.session_state.selected_task_l2 = wi_task_l2
+
+
+
+
+
+
+
+
+
 
             st.divider()
             create_wi_button = st.form_submit_button("Create Work Item", type="primary")
@@ -611,7 +640,7 @@ def insert_workitems(conn):
                 st.write(f"Code: {wi_task_l1_code[0]}")
 
         # Example of how to use the other element's value
-        st.write(f"Value of 'Some other input': {st.session_state.other_element_value}")        # #with st.form(key='task_form'):
+        #st.write(f"Value of 'Some other input': {st.session_state.other_element_value}")        # #with st.form(key='task_form'):
         # taskl1_options = st.session_state.df_tskgrl1["NAME"].tolist()
         
         # # Per Task Group L1

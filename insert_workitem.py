@@ -56,15 +56,17 @@ def insert_workitems(conn):
         unique_woid = wo_woid.unique()
         sorted_woid = sorted(unique_woid)
         wo_woid_options = list(sorted_woid)
+        disable_search_button = False
     else:
         wo_woid_options = []
+        disable_search_button = True
 
 
     # Calcola la data di oggi meno 7 giorni
     previus_7days = datetime.datetime.now() - datetime.timedelta(days=7)
     selected_from_date = st.sidebar.date_input(":blue[From date]", value=previus_7days, key="di_datefrom", format="DD/MM/YYYY", disabled=False)
     selected_to_date = st.sidebar.date_input(":blue[To date]", value="today", key="di_dateto", format="DD/MM/YYYY", disabled=False)
-    st.sidebar.button("Search", key="search_button", type="primary", use_container_width=True, on_click=None)
+    st.sidebar.button("Search", key="search_button", type="primary", use_container_width=True, on_click=None, disabled=disable_search_button)
 
 
 

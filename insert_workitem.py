@@ -623,6 +623,14 @@ def insert_workitems(conn):
                 filtered_wi_task_l2 = sorted(st.session_state.df_tskgrl2[st.session_state.df_tskgrl2["CODE"].isin(wi_task_l1_code)]["NAME"].tolist())
             else:
                 filtered_wi_task_l2 = sorted(st.session_state.df_tskgrl2["NAME"].tolist())
+            
+            initial_task_l2 = st.session_state.sb_wi_taskl2 if st.session_state.sb_wi_taskl2 in filtered_wi_task_l2 else None #Keep previous selection if still available.
+            wi_task_l2 = st.selectbox(
+                label=":blue[Task Group L2]",
+                options=filtered_wi_task_l2,
+                index=filtered_wi_task_l2.index(initial_task_l2) if initial_task_l2 in filtered_wi_task_l2 else None,
+                key="sb_wi_taskl2"  # Key for TASKGR2
+            )
 
 
             st.divider()
@@ -635,10 +643,10 @@ def insert_workitems(conn):
         if st.session_state.sb_wi_taskl2:
             st.write(f"Selected Task Group L2: {st.session_state.sb_wi_taskl2}")
 
-        #... (your other code, including the dataframe display)
-        st.subheader(f":orange[List of Work items]")
-        with st.container(border=True, key="Workitem grid"):
-            st.dataframe(data=filtered_workitems, use_container_width=True, hide_index=False)
+        # #... (your other code, including the dataframe display)
+        # st.subheader(f":orange[List of Work items]")
+        # with st.container(border=True, key="Workitem grid"):
+        #     st.dataframe(data=filtered_workitems, use_container_width=True, hide_index=False)
 
         # st.subheader(f":orange[New Task]")
         # with st.form(key='task_form', clear_on_submit=False):

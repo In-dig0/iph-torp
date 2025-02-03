@@ -572,55 +572,72 @@ def insert_workitems(conn):
         st.subheader(f":orange[List of Work items]")
         with st.container(border=True, key="Workitem grid"):
             st.dataframe(data=filtered_workitems, use_container_width=True, hide_index=False)
+        
         st.divider()
         st.subheader(f":orange[New Task]")
 
-# Nella funzione insert_workitems()
-with st.form(key='task_form', clear_on_submit=False):
-    # Preparazione delle opzioni di TASKGR1
-    taskl1_options = sorted(st.session_state.df_tskgrl1["NAME"].tolist())
-    
-    # Utilizzo dello stato della sessione per mantenere il valore selezionato di TASKGR1
-    if 'selected_task_l1' not in st.session_state:
-        st.session_state.selected_task_l1 = None
-    
-    wi_task_l1 = st.selectbox(
-        label=":blue[Task Group L1]",
-        options=taskl1_options,
-        index=taskl1_options.index(st.session_state.selected_task_l1) if st.session_state.selected_task_l1 in taskl1_options else None,
-        key="sb_wi_taskl1_persistent"
-    )
-    
-    # Aggiornamento dello stato della sessione quando TASKGR1 cambia
-    if wi_task_l1 != st.session_state.selected_task_l1:
-        st.session_state.selected_task_l1 = wi_task_l1
-        st.session_state.selected_task_l2 = None  # Reset di TASKGR2 quando TASKGR1 cambia
-    
-    # Preparazione delle opzioni di TASKGR2
-    if wi_task_l1:
-        wi_task_l1_code = servant.get_code_from_name(st.session_state.df_tskgrl1, wi_task_l1, "CODE")
-    else:
-        wi_task_l1_code = ""
-    
-    if wi_task_l1_code:
-        filtered_wi_task_l2 = sorted(st.session_state.df_tskgrl2[st.session_state.df_tskgrl2["CODE"] == wi_task_l1_code]["NAME"].tolist())
-    else:
-        filtered_wi_task_l2 = sorted(st.session_state.df_tskgrl2["NAME"].tolist())
-    
-    # Utilizzo dello stato della sessione per mantenere il valore selezionato di TASKGR2
-    if 'selected_task_l2' not in st.session_state:
-        st.session_state.selected_task_l2 = None
-    
-    wi_task_l2 = st.selectbox(
-        label=":blue[Task Group L2]",
-        options=filtered_wi_task_l2,
-        index=filtered_wi_task_l2.index(st.session_state.selected_task_l2) if st.session_state.selected_task_l2 in filtered_wi_task_l2 else None,
-        key="sb_wi_taskl2_persistent"
-    )
-    
-    # Aggiornamento dello stato della sessione quando TASKGR2 cambia
-    if wi_task_l2 != st.session_state.selected_task_l2:
-        st.session_state.selected_task_l2 = wi_task_l2
-
+        #with st.form(key='task_form'):
+        taskl1_options = st.session_state.df_tskgrl1["NAME"].tolist()
+        
+        # Per Task Group L1
+        initial_task_l1 = None if st.session_state.reset_pending else st.session_state.get('sb_wi_taskl1')
+        wi_task_l1 = st.selectbox(
+            label=":blue[Task Group L1]", 
+            options=taskl1_options, 
+            index=None if initial_task_l1 is None else taskl1_options.index(initial_task_l1) if initial_task_l1 in taskl1_options else None, 
+            key="sb_wi_taskl1"
+        )
+        wi_task_l1_code = st.session_state.df_tskgrl1[df_tskgrl1["NAME"]==wi_task_l1]["CODE"].tolist() if wi_task_l1 else []
     st.divider()
     create_wi_button = st.form_submit_button("Create Work Item", type="primary")
+
+
+# Nella funzione insert_workitems()
+# with st.form(key='task_form', clear_on_submit=False):
+#     # Preparazione delle opzioni di TASKGR1
+#     taskl1_options = sorted(st.session_state.df_tskgrl1["NAME"].tolist())
+    
+#     # Utilizzo dello stato della sessione per mantenere il valore selezionato di TASKGR1
+#     if 'selected_task_l1' not in st.session_state:
+#         st.session_state.selected_task_l1 = None
+    
+#     wi_task_l1 = st.selectbox(
+#         label=":blue[Task Group L1]",
+#         options=taskl1_options,
+#         index=taskl1_options.index(st.session_state.selected_task_l1) if st.session_state.selected_task_l1 in taskl1_options else None,
+#         key="sb_wi_taskl1_persistent"
+#     )
+    
+#     # Aggiornamento dello stato della sessione quando TASKGR1 cambia
+#     if wi_task_l1 != st.session_state.selected_task_l1:
+#         st.session_state.selected_task_l1 = wi_task_l1
+#         st.session_state.selected_task_l2 = None  # Reset di TASKGR2 quando TASKGR1 cambia
+    
+#     # Preparazione delle opzioni di TASKGR2
+#     if wi_task_l1:
+#         wi_task_l1_code = servant.get_code_from_name(st.session_state.df_tskgrl1, wi_task_l1, "CODE")
+#     else:
+#         wi_task_l1_code = ""
+    
+#     if wi_task_l1_code:
+#         filtered_wi_task_l2 = sorted(st.session_state.df_tskgrl2[st.session_state.df_tskgrl2["CODE"] == wi_task_l1_code]["NAME"].tolist())
+#     else:
+#         filtered_wi_task_l2 = sorted(st.session_state.df_tskgrl2["NAME"].tolist())
+    
+#     # # Utilizzo dello stato della sessione per mantenere il valore selezionato di TASKGR2
+#     # if 'selected_task_l2' not in st.session_state:
+#     #     st.session_state.selected_task_l2 = None
+    
+#     # wi_task_l2 = st.selectbox(
+#     #     label=":blue[Task Group L2]",
+#     #     options=filtered_wi_task_l2,
+#     #     index=filtered_wi_task_l2.index(st.session_state.selected_task_l2) if st.session_state.selected_task_l2 in filtered_wi_task_l2 else None,
+#     #     key="sb_wi_taskl2_persistent"
+#     # )
+    
+#     # # Aggiornamento dello stato della sessione quando TASKGR2 cambia
+#     # if wi_task_l2 != st.session_state.selected_task_l2:
+#     #     st.session_state.selected_task_l2 = wi_task_l2
+
+#     st.divider()
+#     create_wi_button = st.form_submit_button("Create Work Item", type="primary")

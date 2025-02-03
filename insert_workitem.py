@@ -36,23 +36,23 @@ def insert_workitems(conn):
     
     st.sidebar.divider()
     st.sidebar.header(f":orange[Filters]")
-    if df_woassignedto is None or df_woassignedto.empty:
+    if st.session_state.df_woassignedto is None or st.session_state.df_woassignedto.empty:
         st.warning("No work order assignment data available. Please check your data source")
         st.stop() # Stop execution of the script
     else:    
-        unique_usernames = df_woassignedto['USERNAME'].unique()
+        unique_usernames = st.session_state.df_woassignedto['USERNAME'].unique()
         sorted_usernames = sorted(unique_usernames)
         wo_username_options = list(sorted_usernames)
     
     selected_username = st.sidebar.selectbox(label=":blue[Tech Deparment Specialist]", options=wo_username_options, index=None)
     #st.write(selected_username)
     
-    df_wo_usercode = df_woassignedto[df_woassignedto['USERNAME'] == selected_username]["USERID"].unique()
+    df_wo_usercode = st.session_state.df_woassignedto[st.session_state.df_woassignedto['USERNAME'] == selected_username]["USERID"].unique()
     wo_usercode = list(df_wo_usercode)
 
     if selected_username:
         st.session_state.selected_username = True
-        wo_woid = df_woassignedto[df_woassignedto['USERNAME'] == selected_username]['WOID']
+        wo_woid = st.session_state.df_woassignedto[st.session_state.df_woassignedto['USERNAME'] == selected_username]['WOID']
         unique_woid = wo_woid.unique()
         sorted_woid = sorted(unique_woid)
         wo_woid_options = list(sorted_woid)

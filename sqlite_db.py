@@ -385,7 +385,7 @@ def load_woassignedto_data(conn):
 
 
 def load_workitems_data(conn):
-    """ Load TORP_WORTORP_WORKITEMS records into df """
+    """ Load TORP_TORP_WORKITEMS records into df """
        
     try:
         df_workitem = pd.read_sql_query("""

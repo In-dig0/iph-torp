@@ -100,9 +100,9 @@ def insert_workitems(conn):
                 wi_task_l1_code = None
 
             if wi_task_l1:
-                filtered_wi_task_l2 = sorted(st.session_state.df_tskgrl2[st.session_state.df_tskgrl2["CODE"] == wi_task_l1_code].tolist())
+                filtered_wi_task_l2 = st.session_state.df_tskgrl2[st.session_state.df_tskgrl2["CODE"] == wi_task_l1_code].to_list()
             else:
-                filtered_wi_task_l2 = sorted(st.session_state.df_tskgrl2.to_list())
+                filtered_wi_task_l2 = st.session_state.df_tskgrl2.to_list()
 
             wi_task_l2 = st.selectbox(
                 label=":blue[Task Group L1]", 

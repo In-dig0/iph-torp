@@ -110,10 +110,10 @@ def insert_workitems(conn):
                 index= None,
                 key="sb_wi_taskl2"
              )
-            if wi_task_l2:
-                wi_task_l2_code = servant.get_code_from_name(st.session_state.df_tskgrl2, wi_task_l2, "CODE")
-            else:
-                wi_task_l2_code = None          
+                if wi_task_l2:
+                    wi_task_l2_code = servant.get_code_from_name(st.session_state.df_tskgrl2, wi_task_l2, "CODE")
+                else:
+                    wi_task_l2_code = None          
 
             # # # Per Task Group L1
             # initial_task_l1 = None if st.session_state.reset_pending else st.session_state.get('sb_wi_taskl1')

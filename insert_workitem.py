@@ -42,7 +42,9 @@ def insert_workitems(conn):
         if key not in st.session_state:
             st.session_state[key] = loader(conn)
 
-    
+    st.write(f"Sessione state stamp:")
+    st.write(st.session_state)
+
     st.sidebar.divider()
     st.sidebar.header(f":orange[Filters]")
     if st.session_state.df_woassignedto is None or st.session_state.df_woassignedto.empty:

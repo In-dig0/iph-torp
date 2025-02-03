@@ -44,7 +44,7 @@ def insert_workitems(conn):
         sorted_usernames = sorted(unique_usernames)
         wo_username_options = list(sorted_usernames)
     
-    selected_username = st.sidebar.selectbox(label=":blue[Tech Deparment Specialist]", options=wo_username_options, index=None)
+    selected_username = st.sidebar.selectbox(label=":blue[Tech Department Specialist]", options=wo_username_options, index=None)
     #st.write(selected_username)
     
     df_wo_usercode = st.session_state.df_woassignedto[st.session_state.df_woassignedto['USERNAME'] == selected_username]["USERID"].unique()
@@ -58,3 +58,13 @@ def insert_workitems(conn):
         wo_woid_options = list(sorted_woid)
     else:
         wo_woid_options = []
+
+
+    # Calcola la data di oggi meno 7 giorni
+    previus_7days = datetime.now() - timedelta(days=7)
+    selected_from_date = st.date_input("From date", value=previus_7days, key="di_from", format="DD/MM/YYYY", disable=False)
+    # # Stampa la data calcolata
+    # print("Oggi meno 7 giorni:", oggi_meno_7_giorni.strftime("%Y-%m-%d"))
+
+
+        

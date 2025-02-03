@@ -403,7 +403,8 @@ def load_workitems_data(conn):
         FROM TORP_WORKITEMS A  
         WHERE A.status = 'ACTIVE'
         ORDER BY WOID
-        """, conn)    
+        """, conn, parse_dates=["DATE"])
+
     except Exception as errMsg:
         st.error(f"**ERROR load data from TORP_WORKITEMS: \n{errMsg}", icon="🚨")
         return None

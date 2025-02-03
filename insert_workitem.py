@@ -86,11 +86,10 @@ def insert_workitems(conn):
         st.subheader(f":orange[New Task]")
         with st.container(border=True, key="Insert Task"):
             
-            taskl1_options = st.session_state.df_tskgrl1["NAME"].tolist()
-            taskl1_options_sorted = sorted(taskl1_options)         
+            taskl1_options = sorted(st.session_state.df_tskgrl1["NAME"].tolist())    
             wi_task_l1 = st.selectbox(
                 label=":blue[Task Group L1]", 
-                options=taskl1_options_sorted, 
+                options=taskl1_options, 
                 index= None,
                 key="sb_wi_taskl1"
              )
@@ -100,9 +99,9 @@ def insert_workitems(conn):
                 wi_task_l1_code = None
 
             if wi_task_l1:
-                filtered_wi_task_l2 = st.session_state.df_tskgrl2[st.session_state.df_tskgrl2["CODE"] == wi_task_l1_code].to_list()
+                filtered_wi_task_l2 = sorted(st.session_state.df_tskgrl2[st.session_state.df_tskgrl2["CODE"] == wi_task_l1_code].tolist())
             else:
-                filtered_wi_task_l2 = st.session_state.df_tskgrl2.to_list()
+                filtered_wi_task_l2 = sorted(st.session_state.df_tskgrl2.tolist())
 
             wi_task_l2 = st.selectbox(
                 label=":blue[Task Group L1]", 

@@ -26,6 +26,9 @@ def view_request(conn) -> None:
     def reset_application_state():
         """Reset all session state variables and cached data"""
         
+        if 'grid_response' not in st.session_state:
+            st.session_state['grid_response'] = None
+
         #Reload request data into df
         st.session_state['df_requests'] = sqlite_db.load_requests_data(conn)
         

@@ -58,9 +58,7 @@ def insert_workitems(conn):
     # Calcola la data di oggi meno 7 giorni
     previus_7days = datetime.datetime.now() - datetime.timedelta(days=7)
     selected_from_date = st.sidebar.date_input(":blue[From date]", value=previus_7days, key="di_datefrom", format="DD/MM/YYYY", disabled=False)
-    st.write(f"{type(selected_from_date)} - {selected_from_date}")
     selected_to_date = st.sidebar.date_input(":blue[To date]", value="today", key="di_dateto", format="DD/MM/YYYY", disabled=False)
-    st.write(f"{type(selected_to_date)} - {selected_to_date}")
 
     search_button = st.sidebar.button("Search", key="search_button", type="primary", use_container_width=True, on_click=None, disabled=disable_search_button)
     if search_button:
@@ -69,7 +67,36 @@ def insert_workitems(conn):
             (st.session_state.df_workitems["DATE"] >= selected_from_date) & 
             (st.session_state.df_workitems["DATE"] <= selected_to_date)]
 
-        st.dataframe(data=filtered_workitems, use_container_width=True, hide_index=False)
+        with st.container("Workitem grid", border=True, key="Workitem grid"):
+            st.dataframe(data=filtered_workitems, use_container_width=True, hide_index=False)
         #st.dataframe(data=None, width=None, height=None, *, use_container_width=False, hide_index=None, column_order=None, column_config=None, key=None, on_select="ignore", selection_mode="multi-row")
+        st.divider()
+        with st.container("Insert Task", border=True, key="Insert Task"):
+            st.subheader(f":orange[Task]")
+
+            #with st.form(key='task_form'):
+            taskl1_options = df_tskgrl1["NAME"].tolist()
+            
+            # Per Task Group L1
+            initial_task_l1 = None if st.session_state.reset_pending else st.session_state.get('sb_wi_taskl1')
+            wi_task_l1 = st.selectbox(
+                label=":blue[Task Group L1]", 
+                options=taskl1_options, 
+                index=None if initial_task_l1 is None else taskl1_options.index(initial_task_l1) if initial_task_l1 in taskl1_options else None, 
+                key="sb_wi_taskl1"
+            )
+            wi_task_l1_code = df_tskgrl1[df_tskgrl1["NAME"]==wi_task_l1]["CODE"].tolist() if wi_task_l1 else []
+
+            # Per Task Group L2
+            taskl2_options = df_tskgrl2["NAME"].tolist()
+            initial_task_l2 = None if st.session_state.reset_pending else st.session_state.get('sb_wi_taskl2')
+            wi_task_l2 = st.selectbox(
+                label=":blue[Task Group L2]", 
+                options=taskl2_options, 
+                index=None if initial_task_l2 is None else taskl2_options.index(initial_task_l2) if initial_task_l2 in taskl2_options else None, 
+                key="sb_wi_taskl2"
+            )
+            wi_task_l2_code = df_tskgrl2[df_tskgrl2["NAME"]==wi_task_l2]["CODE"].tolist() if wi_task_l2 else []
+
 
         

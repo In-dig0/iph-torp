@@ -384,7 +384,7 @@ def load_woassignedto_data(conn):
     return df_woassignedto
 
 
-def load_workitem_data(conn):
+def load_workitems_data(conn):
     """ Load TORP_WORKITEM records into df """
        
     try:

@@ -7,7 +7,7 @@ from typing import Optional, Tuple, Dict, List
 # Internal app module
 import servant
 
-def insert_workitem(conn):
+def insert_workitems(conn):
     
         # Load data into session state if not already present
     session_data = {
@@ -24,9 +24,9 @@ def insert_workitem(conn):
         'df_requests': sqlite_db.load_requests_data,
         'df_reqassignedto': sqlite_db.load_reqassignedto_data,
         'df_attachments': sqlite_db.load_attachments_data,
-        'df_workorder': sqlite_db.load_workorder_data,
+        'df_workorders': sqlite_db.load_workorders_data,
         'df_woassignedto': sqlite_db.load_woassignedto_data,
-        'df_workitem': sqlite_db.load_workitem_data,
+        'df_workitems': sqlite_db.load_workitems_data,
     }
 
     for key, loader in session_data.items():

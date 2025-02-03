@@ -88,7 +88,7 @@ def insert_workitems(conn):
             
             #taskl1_options = st.session_state.df_tskgrl1["NAME"].tolist().sort()
             taskl1_options = st.session_state.df_tskgrl1["NAME"].tolist()
-            taskl1_options_sorted = taskl1_options.sort()
+            taskl1_options_sorted = sorted(taskl1_options)
             st.write(taskl1_options)
             
             wi_task_l1 = st.selectbox(

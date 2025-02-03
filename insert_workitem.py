@@ -615,8 +615,7 @@ def insert_workitems(conn):
                 label=":blue[Task Group L1]",
                 options=taskl1_options,
                 index=taskl1_options.index(initial_task_l1) if initial_task_l1 in taskl1_options else None,
-                key="sb_wi_taskl1",
-                on_change=update_taskgr2_options
+                key="sb_wi_taskl1"
             )
 
             wi_task_l1_code = st.session_state.df_tskgrl1[st.session_state.df_tskgrl1["NAME"] == wi_task_l1]["CODE"].tolist() if wi_task_l1 else []
@@ -634,29 +633,6 @@ def insert_workitems(conn):
                 key="sb_wi_taskl2"
             )
 
-            # # Filtra TASKGR2 usando il valore memorizzato nella sessione
-            # if st.session_state.selected_task_l1:  # Usa selected_task_l1
-            #     filtered_wi_task_l2 = sorted(st.session_state.df_tskgrl2[st.session_state.df_tskgrl2["CODE"].isin(wi_task_l1_code)]["NAME"].tolist())
-            # else:
-            #     filtered_wi_task_l2 = sorted(st.session_state.df_tskgrl2["NAME"].tolist())
-
-
-        # # Filtra TASKGR2 usando isin
-        #     if wi_task_l1_code:
-        #         filtered_wi_task_l2 = sorted(st.session_state.df_tskgrl2[st.session_state.df_tskgrl2["CODE"].isin(wi_task_l1_code)]["NAME"].tolist())
-        #     else:
-        #         filtered_wi_task_l2 = sorted(st.session_state.df_tskgrl2["NAME"].tolist())
-            
-
-            # initial_task_l2 = st.session_state.get('sb_wi_taskl2') if st.session_state.get('sb_wi_taskl2') in filtered_wi_task_l2 else None
-            # wi_task_l2 = st.selectbox(
-            #     label=":blue[Task Group L2]",
-            #     options=filtered_wi_task_l2, # Use the filtered list!
-            #     index=filtered_wi_task_l2.index(initial_task_l2) if initial_task_l2 in filtered_wi_task_l2 else None,
-            #     key="sb_wi_taskl2",
-                
-            # )
-
 
             # Per Description
             initial_description = "" if st.session_state.reset_pending else st.session_state.get('sb_wi_description', "")
@@ -667,31 +643,31 @@ def insert_workitems(conn):
             )
 
 
-            # initial_time_qty = 0.0 if st.session_state.reset_pending else st.session_state.get('sb_wi_time_qty', 0.0)
-            # wi_time_qty = st.number_input(
-            #     label=":blue[Time spent (in hours)(:red[*])]:", 
-            #     value=initial_time_qty,
-            #     min_value=0.0, 
-            #     step=0.5, 
-            #     key="sb_wi_time_qty"
-            # )
-
-            # # Per Time Quantity
-            initial_time_qty = st.session_state.get('sb_wi_time_qty')
-            try:
-                initial_time_qty = float(initial_time_qty) if initial_time_qty else 0.0
-                initial_time_qty = np.float64(initial_time_qty)  # Forza il tipo a float64
-                #st.write(f"Tipo di dato prima del number_input: {type(initial_time_qty)}")
-            except (TypeError, ValueError):
-                initial_time_qty = 0.0
-
+            initial_time_qty = 0.0 if st.session_state.reset_pending else st.session_state.get('sb_wi_time_qty', 0.0)
             wi_time_qty = st.number_input(
-                label=":blue[Time spent (in hours)(:red[*])]:",
-                value=initial_time_qty if initial_time_qty is not None else 0, # Valore iniziale
-                min_value=0.0,
-                step=0.5,
-                key="sb_wi_time_qty",
+                label=":blue[Time spent (in hours)(:red[*])]:", 
+                value=initial_time_qty,
+                min_value=0.0, 
+                step=0.5, 
+                key="sb_wi_time_qty"
             )
+
+            # # # Per Time Quantity
+            # initial_time_qty = st.session_state.get('sb_wi_time_qty')
+            # try:
+            #     initial_time_qty = float(initial_time_qty) if initial_time_qty else 0.0
+            #     initial_time_qty = np.float64(initial_time_qty)  # Forza il tipo a float64
+            #     #st.write(f"Tipo di dato prima del number_input: {type(initial_time_qty)}")
+            # except (TypeError, ValueError):
+            #     initial_time_qty = 0.0
+
+            # wi_time_qty = st.number_input(
+            #     label=":blue[Time spent (in hours)(:red[*])]:",
+            #     value=initial_time_qty if initial_time_qty is not None else 0, # Valore iniziale
+            #     min_value=0.0,
+            #     step=0.5,
+            #     key="sb_wi_time_qty",
+            # )
 
             #st.write(f"Valore di wi_time_qty: {wi_time_qty}")  # Stampa il valore dopo l'input
             

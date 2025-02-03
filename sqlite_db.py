@@ -384,6 +384,32 @@ def load_woassignedto_data(conn):
     return df_woassignedto
 
 
+def load_workitem_data(conn):
+    """ Load TORP_WORKITEM records into df """
+       
+    try:
+        df_workitem = pd.read_sql_query("""
+        SELECT 
+            A.date AS DATE, 
+            A.woid AS WOID, 
+            A.userid AS USERID,
+            A.status AS STATUS, 
+            A.tskgrl1 AS TSKGRL1,
+            A.tskgrl2 AS TSKGRL2,
+            A.description AS DESC,
+            A.note AS NOTE,
+            A.time_qty AS TIME_QTY,
+            A.time_um AS TIME_UM
+        FROM TORP_WORKITEM A  
+        WHERE A.status = 'ACTIVE'
+        ORDER BY WOID
+        """, conn)    
+    except Exception as errMsg:
+        st.error(f"**ERROR load data from TORP_WORKITEM: \n{errMsg}", icon="🚨")
+        return None
+    return df_workitem
+
+
 def get_next_object_id(obj_class, obj_year, obj_pline, obj_parent, conn) -> str:
     """Get next available row ID"""
 

@@ -686,12 +686,49 @@ def insert_workitems(conn):
                 key="sb_wi_note"
             )
 
-            wo_nr = selected_wo
+            #wo_nr = selected_wo
             wi_time_um = "H"
 
 
             st.divider()
-            create_wi_button = st.form_submit_button("Create Work Item", type="primary")
+            create_wi_button_submitted = st.form_submit_button("Create Work Item", type="primary")
+            if create_wi_button_submitted:
+                if wi_date:
+                    wi_date_fmt = wi_date.strftime("%Y-%m-%d")
+                else:
+                    wi_date_fmt = datetime.date.today()    
+                if wi_task_l1_code:
+                    wi_tskgrl1 = wi_task_l1_code[0]
+                else: 
+                    wi_tskgrl1 = ""   
+                if wi_task_l2_code:
+                    wi_tskgrl2 = wi_task_l2_code[0] 
+                else:
+                    wi_tskgrl2 = ""              
+                if wo_usercode:
+                    wi_userid = wo_usercode[0]
+                else:
+                    wi_userid = ""    
+                
+                if wi_time_qty is None or wi_time_qty == 0:
+                    st.error("Please enter a valid time quantity")
+                    st.stop()
+
+                work_item = {
+                    "wi_date": wi_date_fmt, 
+                    "wo_id": wo_nr, 
+                    "wi_userid": wi_userid, 
+                    "wi_status": ACTIVE_STATUS, 
+                    "wi_tskgrl1": wi_tskgrl1, 
+                    "wi_tskgrl2": wi_tskgrl2,  
+                    "wi_desc": wi_description, 
+                    "wi_note": wi_note,            
+                    "wi_time_qty": wi_time_qty, 
+                    "wi_time_um": wi_time_um
+                }
+                st.write(work_item)
+
+
 
 
             # Display selected values (outside the form)

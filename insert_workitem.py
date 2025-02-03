@@ -86,11 +86,8 @@ def insert_workitems(conn):
         st.subheader(f":orange[New Task]")
         with st.container(border=True, key="Insert Task"):
             
-            #taskl1_options = st.session_state.df_tskgrl1["NAME"].tolist().sort()
             taskl1_options = st.session_state.df_tskgrl1["NAME"].tolist()
-            taskl1_options_sorted = sorted(taskl1_options)
-            st.write(taskl1_options)
-            
+            taskl1_options_sorted = sorted(taskl1_options)         
             wi_task_l1 = st.selectbox(
                 label=":blue[Task Group L1]", 
                 options=taskl1_options_sorted, 
@@ -101,7 +98,22 @@ def insert_workitems(conn):
                 wi_task_l1_code = servant.get_code_from_name(st.session_state.df_tskgrl1, wi_task_l1, "CODE")
             else:
                 wi_task_l1_code = None
-            # st.write(wi_task_l1_code)            
+
+
+            if wi_task_l1_code:
+                taskl2_options = st.session_state.df_tskgrl2[st.session_state.df_tskgrl2==wi_task_l1_code]["NAME"].tolist()
+                taskl2_options_sorted = sorted(taskl2_options) 
+
+                wi_task_l2 = st.selectbox(
+                label=":blue[Task Group L2]", 
+                options=taskl2_options_sorted, 
+                index= None,
+                key="sb_wi_taskl2"
+             )
+            if wi_task_l2:
+                wi_task_l2_code = servant.get_code_from_name(st.session_state.df_tskgrl2, wi_task_l2, "CODE")
+            else:
+                wi_task_l2_code = None          
 
             # # # Per Task Group L1
             # initial_task_l1 = None if st.session_state.reset_pending else st.session_state.get('sb_wi_taskl1')

@@ -96,16 +96,17 @@ def insert_workitems(conn):
             if wi_task_l1:
                 wi_task_l1_code = servant.get_code_from_name(st.session_state.df_tskgrl1, wi_task_l1, "CODE")
             else:
-                wi_task_l1_code = None
+                wi_task_l1_code = ""
 
             if wi_task_l1:
-                filtered_wi_task_l2 = sorted(st.session_state.df_tskgrl2[st.session_state.df_tskgrl2["CODE"] == wi_task_l1_code].tolist())
+                filtered_wi_task_l2 = st.session_state.df_tskgrl2[st.session_state.df_tskgrl2["CODE"] == wi_task_l1_code]
             else:
-                filtered_wi_task_l2 = sorted(st.session_state.df_tskgrl2.tolist())
+                filtered_wi_task_l2 = st.session_state.df_tskgrl2
+
 
             wi_task_l2 = st.selectbox(
                 label=":blue[Task Group L1]", 
-                options=filtered_wi_task_l2, 
+                options=filtered_wi_task_l2.tolist(), 
                 index= None,
                 key="sb_wi_taskl2"
              )

@@ -585,17 +585,8 @@ def insert_workitems(conn):
         if 'other_element_value' not in st.session_state:
             st.session_state.other_element_value = "" # Example for a text input
 
-        # # Elements OUTSIDE the form - their state will be preserved
-        # other_element = st.text_input("Some other input:", value=st.session_state.other_element_value)
-        # st.session_state.other_element_value = other_element # Update session state
-        
+       
         st.divider()
-        # # Filtering Logic for TASKGR2 (MOVED OUTSIDE THE FORM)
-        # if st.session_state.get('selected_task_l1'):  # Use get to avoid KeyError
-        #     wi_task_l1_code = st.session_state.df_tskgrl1[st.session_state.df_tskgrl1["NAME"] == st.session_state.get('selected_task_l1')]["CODE"].tolist()
-        #     filtered_wi_task_l2 = sorted(st.session_state.df_tskgrl2[st.session_state.df_tskgrl2["CODE"].isin(wi_task_l1_code)]["NAME"].tolist()) if wi_task_l1_code else []
-        # else:
-        #     filtered_wi_task_l2 = sorted(st.session_state.df_tskgrl2["NAME"].tolist())
 
         def update_taskgr2_options():
             if st.session_state.get('sb_wi_taskl1'):
@@ -652,24 +643,6 @@ def insert_workitems(conn):
                 key="sb_wi_time_qty"
             )
 
-            # # # Per Time Quantity
-            # initial_time_qty = st.session_state.get('sb_wi_time_qty')
-            # try:
-            #     initial_time_qty = float(initial_time_qty) if initial_time_qty else 0.0
-            #     initial_time_qty = np.float64(initial_time_qty)  # Forza il tipo a float64
-            #     #st.write(f"Tipo di dato prima del number_input: {type(initial_time_qty)}")
-            # except (TypeError, ValueError):
-            #     initial_time_qty = 0.0
-
-            # wi_time_qty = st.number_input(
-            #     label=":blue[Time spent (in hours)(:red[*])]:",
-            #     value=initial_time_qty if initial_time_qty is not None else 0, # Valore iniziale
-            #     min_value=0.0,
-            #     step=0.5,
-            #     key="sb_wi_time_qty",
-            # )
-
-            #st.write(f"Valore di wi_time_qty: {wi_time_qty}")  # Stampa il valore dopo l'input
             
             #Per Date
             initial_date = st.session_state.get('sb_wi_date') or datetime.date.today()  # Use session value or today
@@ -735,54 +708,3 @@ def insert_workitems(conn):
                 st.write(f"Selected Task Group L1: {st.session_state.sb_wi_taskl1}")
             if st.session_state.sb_wi_taskl2:
                 st.write(f"Selected Task Group L2: {st.session_state.sb_wi_taskl2}")
-
-        # #... (your other code, including the dataframe display)
-        # st.subheader(f":orange[List of Work items]")
-        # with st.container(border=True, key="Workitem grid"):
-        #     st.dataframe(data=filtered_workitems, use_container_width=True, hide_index=False)
-
-        # st.subheader(f":orange[New Task]")
-        # with st.form(key='task_form', clear_on_submit=False):
-        #     taskl1_options = st.session_state.df_tskgrl1["NAME"].tolist()
-
-        #     # Use session state for initial value and key
-        #     initial_task_l1 = st.session_state.sb_wi_taskl1
-        #     wi_task_l1 = st.selectbox(
-        #         label=":blue[Task Group L1]",
-        #         options=taskl1_options,
-        #         index=taskl1_options.index(initial_task_l1) if initial_task_l1 in taskl1_options else None,
-        #         key="sb_wi_taskl1"  # Important: Key must be consistent
-        #     )
-
-        #     wi_task_l1_code = st.session_state.df_tskgrl1[st.session_state.df_tskgrl1["NAME"] == wi_task_l1]["CODE"].tolist() if wi_task_l1 else []
-        #     st.write(wi_task_l1_code)
-
-        #     if wi_task_l1_code:
-        #         filtered_wi_task_l2 = sorted(st.session_state.df_tskgrl2[st.session_state.df_tskgrl2["CODE"] == wi_task_l1_code]["NAME"].tolist())
-        #     else:
-        #         filtered_wi_task_l2 = sorted(st.session_state.df_tskgrl2["NAME"].tolist())
-    
-        #     # Utilizzo dello stato della sessione per mantenere il valore selezionato di TASKGR2
-        #     if 'selected_task_l2' not in st.session_state:
-        #         st.session_state.selected_task_l2 = None
-            
-        #     wi_task_l2 = st.selectbox(
-        #         label=":blue[Task Group L2]",
-        #         options=filtered_wi_task_l2,
-        #         index=filtered_wi_task_l2.index(st.session_state.selected_task_l2) if st.session_state.selected_task_l2 in filtered_wi_task_l2 else None,
-        #         key="sb_wi_taskl2_persistent"
-        #     )
-            
-        #     # Aggiornamento dello stato della sessione quando TASKGR2 cambia
-        #     if wi_task_l2 != st.session_state.selected_task_l2:
-        #         st.session_state.selected_task_l2 = wi_task_l2
-
-
-
-
-
-
-
-
-
-

@@ -5,6 +5,7 @@ import sqlite_db
 import datetime
 import time
 from typing import Optional, Tuple, Dict, List
+from st_aggrid import AgGrid, GridOptionsBuilder, GridUpdateMode, DataReturnMode, JsCode, ColumnsAutoSizeMode
 # Internal app module
 import servant
 import sqlite_db
@@ -610,7 +611,7 @@ def manage_request(conn):
 
     # Initialize session state
     if "grid_data" not in st.session_state:
-        st.session_state.grid_data = df_requests.copy()
+        st.session_state.grid_data = st.session_state.df_requests.copy()
     if "grid_response" not in st.session_state:
         st.session_state.grid_response = None
     if "grid_refresh_key" not in st.session_state: 

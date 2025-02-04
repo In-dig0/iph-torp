@@ -9,7 +9,7 @@ from typing import Optional, Tuple, Dict, List
 import servant
 import sqlite_db
 
-def manage_request():
+def manage_request(conn):
     """
     Handle request assignments and management through a Streamlit interface.
     Includes request filtering, display, and assignment management functionality.

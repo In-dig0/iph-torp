@@ -54,7 +54,9 @@ def open_sqlitecloud_db():
             st.error(f"**ERROR connecting to database: \n{errMsg}", icon="🚨")
             return None
         
-        finally: cursor.close()  
+        finally: 
+            if cursor:
+                cursor.close() # Close the cursor in a finally block 
         
         return conn
     else:
@@ -588,7 +590,9 @@ def save_attachments(req_id: str, attachments_list: list, conn) -> bool:
         return False
     
     finally:
-        cursor.close()
+        if cursor:
+            cursor.close() # Close the cursor in a finally block
+    
     return True        
 
 def view_attachments(reqid: str, conn)-> None:
@@ -632,9 +636,11 @@ def view_attachments(reqid: str, conn)-> None:
         st.error(f"Errore nel caricamento degli allegati: {e}")
         import traceback
         st.error(traceback.format_exc())
+        return False
     finally:
-        cursor.close() # Close the cursor in a finally block
-
+        if cursor:
+            cursor.close() # Close the cursor in a finally block
+    return True
 
     # Database update functions
 def update_request(reqid: str, new_status: str, new_note_td: str, new_woid: str = "", new_tdtl: list=[], conn=""):
@@ -695,7 +701,8 @@ def update_request(reqid: str, new_status: str, new_note_td: str, new_woid: str 
         return False
 
     finally:
-        cursor.close() # Close the cursor in a finally block
+        if cursor:
+            cursor.close() # Close the cursor in a finally block
     
     return True
 
@@ -751,7 +758,8 @@ def save_workorder(wo: dict, conn): # Pass connection and cursor
         return "", False
 
     finally:
-        cursor.close() # Close the cursor in a finally block
+        if cursor:
+            cursor.close() # Close the cursor in a finally block
 
     return wo["woid"], True
 
@@ -793,6 +801,7 @@ def save_workorder_assignments(woid, assigned_users, df_users, df_woassignedto, 
         return False
     
     finally:
-        cursor.close() # Close the cursor in a finally block
+        if cursor:
+            cursor.close() # Close the cursor in a finally block
 
     return True

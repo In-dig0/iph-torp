@@ -309,7 +309,7 @@ def load_reqassignedto_data(conn):
             A.status AS STATUS,
             B.name AS USERNAME 
         FROM TORP_REQASSIGNEDTO A
-        INNER JOIN TORP_USERS B ON B.code = A.userid
+        INNER JOIN TORP_USERS B ON B.code = A.tdtlid
         WHERE A.status = 'ACTIVE'
         ORDER BY USERID desc
         """, conn)

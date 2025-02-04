@@ -390,7 +390,7 @@ def manage_request(conn):
 
             # Handle save action
             #st.write(f"{woid} - {req_tdtl_code} - {wo_assignedto}")
-            st.write(f"{st.session_state.df_user}")
+            #st.write(f"{st.session_state.df_user}")
             st.write(f"{st.df_woassignedt.df_user}")
             time.sleep(5)
             if st.button("Save", type="primary", disabled=disable_save_button, key="wo_save_button"):

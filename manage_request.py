@@ -394,6 +394,8 @@ def manage_request(conn):
                 wo = {"woid":woid, "tdtlid": req_tdtl_code, "type": wo_type, "title": selected_row["TITLE"][0], "description": req_description_default, "time_qty": wo_time_qty, "time_um": wo_time_um, "status": ACTIVE_STATUS, "startdate": wo_startdate, "enddate": wo_enddate, "reqid": reqid}
                 wo_idrow, success = sqlite_db.save_workorder(wo, conn)
                 if success:
+                    st.write(f"{woid} - {req_tdtl_code} - {wo_assignedto}- {st.session_state.df_user} - {st.session_state.df_woassignedt}")
+                    time.sleep(5)
                     success = sqlite_db.save_workorder_assignments(woid, req_tdtl_code, wo_assignedto, st.session_state.df_users, st.session_state.df_woassignedto, conn)
                     success = sqlite_db.update_request(reqid, "ASSIGNED", req_note_td, "", [], conn)
                     if success:
@@ -402,7 +404,7 @@ def manage_request(conn):
                         st.success(f"Work order {woid} created successfully!")
                     
                     st.session_state.need_refresh = True
-                    time.sleep(6)
+                    time.sleep(10)
                     reset_application_state()
                     st.rerun()
 

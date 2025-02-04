@@ -393,7 +393,6 @@ def load_workitems_data(conn):
         SELECT 
             A.refdate AS REFDATE, 
             A.woid AS WOID, 
-            A.tdtlid AS TDTLID,
             A.tdspid AS TDSPID,
             A.status AS STATUS, 
             A.tskgrl1 AS TSKGRL1,

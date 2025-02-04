@@ -777,6 +777,7 @@ def save_workorder_assignments(woid, tdtl_code, assigned_users, df_users, df_woa
             # Add new assignments
             for user_name in assigned_users:
                 user_code = df_users[df_users["NAME"] == user_name]["CODE"].iloc[0]
+                st.write(f"{woid} - {tdtl_code} - {user_code} -")
                 existing_assignment = df_woassignedto[
                     (df_woassignedto['WOID'] == woid) & 
                     (df_woassignedto['TDTLID'] == tdtl_code) &
@@ -794,7 +795,7 @@ def save_workorder_assignments(woid, tdtl_code, assigned_users, df_users, df_woa
                         (ACTIVE_STATUS, woid, tdtl_code, user_code)
                     )
             
-            conn.commit()
+                conn.commit()
 
     
     except Exception as e:

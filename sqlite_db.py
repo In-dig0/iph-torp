@@ -404,7 +404,7 @@ def load_workitems_data(conn):
         FROM TORP_WORKITEMS A  
         WHERE A.status = 'ACTIVE'
         ORDER BY WOID
-        """, conn, parse_dates=["DATE"])
+        """, conn, parse_dates=["REFDATE"])
         df_workitem['REFDATE'] = df_workitem['REFDATE'].dt.date
 
     except Exception as errMsg:

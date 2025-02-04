@@ -390,6 +390,9 @@ def manage_request(conn):
 
             # Handle save action
             #st.write(f"{woid} - {req_tdtl_code} - {wo_assignedto}")
+            st.write(f"{st.session_state.df_user}")
+            st.write(f"{st.df_woassignedt.df_user}")
+            time.sleep(5)
             if st.button("Save", type="primary", disabled=disable_save_button, key="wo_save_button"):
                 wo = {"woid":woid, "tdtlid": req_tdtl_code, "type": wo_type, "title": selected_row["TITLE"][0], "description": req_description_default, "time_qty": wo_time_qty, "time_um": wo_time_um, "status": ACTIVE_STATUS, "startdate": wo_startdate, "enddate": wo_enddate, "reqid": reqid}
                 wo_idrow, success = sqlite_db.save_workorder(wo, conn)
@@ -650,9 +653,9 @@ def manage_request(conn):
                         # Modifica anche la funzione show_request_dialog per gestire il DataFrame
                         show_workorder_dialog(
                             selected_rows,
-                            df_workorders, 
-                            df_woassignedto, 
-                            df_users,
+                            st.session_state.df_workorders, 
+                            st.session_state.df_woassignedto, 
+                            st.session_state.df_users,
                             ACTIVE_STATUS, 
                             DEFAULT_DEPT_CODE,
                             REQ_STATUS_OPTIONS,

@@ -650,9 +650,9 @@ def manage_request(conn):
                         # Modifica anche la funzione show_request_dialog per gestire il DataFrame
                         show_workorder_dialog(
                             selected_rows,
-                            st.session_state.df_workorders, 
-                            st.session_state.df_woassignedto, 
-                            st.session_state.df_users,
+                            df_workorders, 
+                            df_woassignedto, 
+                            df_users,
                             ACTIVE_STATUS, 
                             DEFAULT_DEPT_CODE,
                             REQ_STATUS_OPTIONS,

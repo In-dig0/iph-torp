@@ -763,7 +763,7 @@ def save_workorder(wo: dict, conn): # Pass connection and cursor
 
     return wo["woid"], True
 
-def save_workorder_assignments(woid, assigned_users, df_users, df_woassignedto, conn):
+def save_workorder_assignments(woid, tdtl_code, assigned_users, df_users, df_woassignedto, conn):
     try:
         # Disable existing assignments
         with conn:
@@ -783,13 +783,13 @@ def save_workorder_assignments(woid, assigned_users, df_users, df_woassignedto, 
                 
                 if existing_assignment.empty:
                     cursor.execute(
-                        "INSERT INTO TORP_WOASSIGNEDTO (woid, tdtlid, status) VALUES (?, ?, ?)",
-                        (user_code, woid, ACTIVE_STATUS)
+                        "INSERT INTO TORP_WOASSIGNEDTO (woid, tdtlid, tdsp, status) VALUES (?, ?, ?, ?)",
+                        (woid, tdtl_code, user_code, ACTIVE_STATUS)
                     )
                 else:
                     cursor.execute(
-                        "UPDATE TORP_WOASSIGNEDTO SET status = ? WHERE woid = ? AND tdtlid = ?",
-                        (ACTIVE_STATUS, woid, user_code)
+                        "UPDATE TORP_WOASSIGNEDTO SET status = ? WHERE woid = ? AND tdtlid = ? AND tdspid = ?",
+                        (ACTIVE_STATUS, woid, tdtl_code, user_code)
                     )
             
             conn.commit()

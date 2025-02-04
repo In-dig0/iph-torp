@@ -304,8 +304,8 @@ def load_reqassignedto_data(conn):
     try:
         df_reqassignedto = pd.read_sql_query("""
         SELECT 
-            A.userid AS USERID, 
             A.reqid AS REQID,
+            A.tdtlid AS TDTLID, 
             A.status AS STATUS,
             B.name AS USERNAME 
         FROM TORP_REQASSIGNEDTO A
@@ -370,8 +370,9 @@ def load_woassignedto_data(conn):
     try:
         df_woassignedto = pd.read_sql_query("""
         SELECT 
-            A.userid AS USERID, 
             A.woid AS WOID, 
+            A.tdtlid AS TDTLID, 
+            A.tdspid AS TDSPID,
             A.status AS STATUS, 
             B.name AS USERNAME 
         FROM TORP_WOASSIGNEDTO A
@@ -393,7 +394,7 @@ def load_workitems_data(conn):
         SELECT 
             A.date AS DATE, 
             A.woid AS WOID, 
-            A.userid AS USERID,
+            A.tdspid AS TDSPID,
             A.status AS STATUS, 
             A.tskgrl1 AS TSKGRL1,
             A.tskgrl2 AS TSKGRL2,
@@ -497,11 +498,11 @@ def save_request(request: dict, conn) -> Tuple[str, int]:
         for tdtl in request["tdtl_list"]: 
             sql = """
                 INSERT INTO TORP_REQASSIGNEDTO (
-                    userid, reqid, status
+                    reqid, tdtlid, status
                 ) VALUES (?, ?, ?)
             """
             values = (
-                tdtl, next_reqid, "ACTIVE"
+                next_reqid, tdtl, "ACTIVE"
 
             )
         

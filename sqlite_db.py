@@ -613,7 +613,8 @@ def view_attachments(reqid: str, conn)-> None:
                             label=f" Download PDF",
                             data=pdf_data,
                             file_name=file_name,
-                            mime="application/pdf"
+                            mime="application/pdf",
+                            icon="📥"
                         )
                         # Visualizzazione PDF (con controllo visibilità)
                         if st.checkbox("Mostra anteprima", key=f"preview_{title}"): # Checkbox univoco per ogni anteprima

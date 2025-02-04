@@ -320,7 +320,8 @@ def view_requests(conn) -> None:
                 mime="application/pdf",
                 key="download-pdf",
                 help="Click qui per scaricare la tabella in formato PDF",
-                type="primary"
+                type="primary",
+                icon="📥"
             )
                     # REQUEST ATTACHMENT SECTION
         if attachments_string :

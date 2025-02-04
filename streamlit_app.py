@@ -14,6 +14,7 @@ import insert_request
 import view_request
 import view_workitem
 import insert_workitem
+import manage_request
 
 # 3th party packages
 import streamlit as st
@@ -41,10 +42,10 @@ def main():
     #"Connect Database": lambda: sqlite_db.open_sqlitecloud_db()
     "📄 Create Request": lambda: insert_request.insert_request(conn),    
     "🔍 View Request ": lambda: view_request.view_requests(conn),       
-    # "🗂️ Manage Request": manage_request,
+    "🗂️ Manage Request": lambda: manage_request.manage_request(conn),
     # "📌 Manage Work Orders": manage_wo,
-    "🛠️ Insert Workitem": lambda: insert_workitem.create_workitem(conn),
-    "🛠️ View Workitem": lambda: view_workitem.view_workitems(conn)
+    "🎯 Insert Workitem": lambda: insert_workitem.create_workitem(conn),
+    "📅 View Workitem": lambda: view_workitem.view_workitems(conn)
     # "🔐 Close db": close_sqlitecloud_db,
     # "--> TEST": my_test
 }    

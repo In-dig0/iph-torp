@@ -372,11 +372,10 @@ def load_woassignedto_data(conn):
         SELECT 
             A.woid AS WOID, 
             A.tdtlid AS TDTLID, 
-            A.tdspid AS TDSPID,
             A.status AS STATUS, 
             B.name AS USERNAME 
         FROM TORP_WOASSIGNEDTO A
-        INNER JOIN TORP_USERS B ON B.code = A.userid    
+        INNER JOIN TORP_USERS B ON B.code = A.tdtlid    
         WHERE A.status = 'ACTIVE'
         ORDER BY WOID
         """, conn)    
@@ -394,6 +393,7 @@ def load_workitems_data(conn):
         SELECT 
             A.date AS DATE, 
             A.woid AS WOID, 
+            A.tdtlid AS TDTLID,
             A.tdspid AS TDSPID,
             A.status AS STATUS, 
             A.tskgrl1 AS TSKGRL1,

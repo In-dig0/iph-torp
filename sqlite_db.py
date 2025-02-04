@@ -391,7 +391,7 @@ def load_workitems_data(conn):
     try:
         df_workitem = pd.read_sql_query("""
         SELECT 
-            A.date AS DATE, 
+            A.refdate AS REFDATE, 
             A.woid AS WOID, 
             A.tdtlid AS TDTLID,
             A.tdspid AS TDSPID,
@@ -406,7 +406,7 @@ def load_workitems_data(conn):
         WHERE A.status = 'ACTIVE'
         ORDER BY WOID
         """, conn, parse_dates=["DATE"])
-        df_workitem['DATE'] = df_workitem['DATE'].dt.date
+        df_workitem['REFDATE'] = df_workitem['REFDATE'].dt.date
 
     except Exception as errMsg:
         st.error(f"**ERROR load data from TORP_WORKITEMS: \n{errMsg}", icon="🚨")

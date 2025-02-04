@@ -350,11 +350,6 @@ def manage_request(conn):
                     except ValueError:
                         # Gestisci il caso in cui il nome predefinito non è presente nelle opzioni
                         st.warning(f"Il Team Leader '{name}' non trovato nella lista di opzioni.", icon="⚠️")
-                        # Puoi scegliere di ignorare questo nome o di usare un valore di default.
-                        # Per esempio, per usare il primo elemento come default in questo caso:
-                        # default_indices.append(0) #Aggiungi 0 solo se vuoi che in questo caso prenda il primo elemento della lista.
-                # Se default_indices è vuota, vuol dire che nessuno dei nomi di default è presente nella lista.
-                # In questo caso, puoi lasciare che Streamlit mostri il primo elemento di default, oppure puoi settare un valore di default esplicito, come fatto nei precedenti esempi.
             else:
                 default_indices = []
 
@@ -564,13 +559,6 @@ def manage_request(conn):
         key='Pline_value'
     )
 
-    # req_tdtl_options = df_lk_pline_tdtl['USER_NAME'].drop_duplicates().sort_values()
-    # tdtl_filter = st.sidebar.selectbox(
-    #     "Select a Tech Dep. Team Leader:", 
-    #     req_tdtl_options, 
-    #     index=None,
-    #     key='Tdtl_value'
-    # )
 
     # Apply filters 
     filtered_data = df_requests_grid.copy() 

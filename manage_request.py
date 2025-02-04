@@ -93,7 +93,7 @@ def manage_request(conn):
             reqid = selected_row["REQID"][0]
             # Display Product Line
             selected_pline_name = selected_row['PRLINE_NAME'][0]
-            selected_pline_code = st.sessione_stat.df_pline[df_pline["NAME"] == selected_pline_name]["CODE"].values[0]
+            selected_pline_code = st.session_state.df_pline[df_pline["NAME"] == selected_pline_name]["CODE"].values[0]
             st.text_input(label="Product line", value=selected_pline_name, disabled=True)
            
             # Display request details
@@ -124,17 +124,17 @@ def manage_request(conn):
             # Display Title
             st.text_input(label="Title", value=selected_row['TITLE'][0], disabled=True)
             # Display Description
-            description = st.sessione_stat.df_requests[st.sessione_stat.df_requests["REQID"] == reqid]["DESCRIPTION"].values[0]
+            description = st.session_state.df_requests[st.session_state.df_requests["REQID"] == reqid]["DESCRIPTION"].values[0]
             st.text_area(label="Description", value=description, disabled=True)
 
             st.divider()
-            tdtl_usercode = st.sessione_stat.df_lk_pline_tdtl["USER_CODE"].drop_duplicates().sort_values().tolist() #conversione in lista
-            tdtl_username_list = st.sessione_stat.df_users[st.sessione_stat.df_users["CODE"].isin(tdtl_usercode)]["NAME"].tolist()
+            tdtl_usercode = st.session_state.df_lk_pline_tdtl["USER_CODE"].drop_duplicates().sort_values().tolist() #conversione in lista
+            tdtl_username_list = st.session_state.df_users[st.session_state.df_users["CODE"].isin(tdtl_usercode)]["NAME"].tolist()
 
-            tdtl_default_codes = st.sessione_stat.df_reqassignedto[st.sessione_stat.df_reqassignedto["REQID"] == reqid]["USERID"].tolist()
+            tdtl_default_codes = st.session_state.df_reqassignedto[st.session_state.df_reqassignedto["REQID"] == reqid]["USERID"].tolist()
 
             if tdtl_default_codes:
-                tdtl_option = st.sessione_stat.df_users[st.sessione_stat.df_users["CODE"].isin(tdtl_default_codes)]
+                tdtl_option = st.session_state.df_users[st.session_state.df_users["CODE"].isin(tdtl_default_codes)]
                 default_tdtl_name = tdtl_option["NAME"].tolist()
             else:
                 default_tdtl_name = []
@@ -148,7 +148,7 @@ def manage_request(conn):
             )
 
             if req_tdtl_name:
-                req_tdtl_code = st.sessione_stat.df_users[st.sessione_stat.df_users["NAME"].isin(req_tdtl_name)]["CODE"].tolist()
+                req_tdtl_code = st.session_state.df_users[st.session_state.df_users["NAME"].isin(req_tdtl_name)]["CODE"].tolist()
             else:
                 req_tdtl_code = []
 
@@ -170,7 +170,7 @@ def manage_request(conn):
             req_status = st.selectbox(label=":blue[Status](:red[*])", options=req_status_options, index=idx_status, disabled=False, key="status_selectbox")
             
             # Display Tech Dept Note
-            default_note_td = str(st.sessione_stat.df_requests[st.sessione_stat.df_requests["REQID"] == reqid]["NOTE_TD"].values[0])
+            default_note_td = str(st.session_state.df_requests[st.session_state.df_requests["REQID"] == reqid]["NOTE_TD"].values[0])
             req_note_td = st.text_area(label=":blue[Tech Department Notes]", value=default_note_td, disabled=False)
 
 
@@ -250,14 +250,14 @@ def manage_request(conn):
             st.text_input(label="Product Line", value=selected_row['PRLINE_NAME'][0], disabled=True)
             st.text_input(label="Request title", value=selected_row['TITLE'][0], disabled=True)
             
-            req_description = st.sessione_stat.df_requests[st.sessione_stat.df_requests["REQID"]==reqid]["DESCRIPTION"]
+            req_description = st.session_state.df_requests[st.session_state.df_requests["REQID"]==reqid]["DESCRIPTION"]
             if not req_description.empty:
                 req_description_default = req_description.values[0]
             else:
                 req_description_default = ""
             st.text_input(label="Request description", value=req_description_default, disabled=True)
 
-            req_note_td = st.sessione_stat.df_requests[st.sessione_stat.df_requests["REQID"]==reqid]["NOTE_TD"]
+            req_note_td = st.session_state.df_requests[st.session_state.df_requests["REQID"]==reqid]["NOTE_TD"]
             if not req_note_td.empty:
                 req_note_td_default = req_note_td.values[0]
             else:
@@ -266,29 +266,29 @@ def manage_request(conn):
             st.divider()
             st.subheader(f"Work Order {woid}")
 
-            wo_nr = st.sessione_stat.df_workorders[st.sessione_stat.df_workorders["REQID"] == reqid]["WOID"]
+            wo_nr = st.session_state.df_workorders[st.session_state.df_workorders["REQID"] == reqid]["WOID"]
 
             wo_type_options=["Standard", "APQP Project"]  #APQP -> ADVANCED PRODUCT QUALITY PLANNING"  
-            wo_type_filtered = st.sessione_stat.df_workorders[st.sessione_stat.df_workorders["WOID"] == woid]["TYPE"]
+            wo_type_filtered = st.session_state.df_workorders[st.session_state.df_workorders["WOID"] == woid]["TYPE"]
             if not wo_type_filtered.empty:
                 wo_type_default = wo_type_filtered.values[0]
                 wo_type_index = wo_type_options.index(wo_type_default)
             else:
                 wo_type_index = 0  
 
-            wo_startdate_filtered = st.sessione_stat.df_workorders[st.sessione_stat.df_workorders["WOID"] == woid]["STARTDATE"]
+            wo_startdate_filtered = st.session_state.df_workorders[st.session_state.df_workorders["WOID"] == woid]["STARTDATE"]
             if not wo_startdate_filtered.empty:
                 wo_startdate_default = wo_startdate_filtered.values[0]
             else:
                 wo_startdate_default = None  # O un valore di default appropriato
 
-            wo_enddate_filtered = st.sessione_stat.df_workorders[st.sessione_stat.df_workorders["WOID"] == woid]["ENDDATE"]
+            wo_enddate_filtered = st.session_state.df_workorders[st.session_state.df_workorders["WOID"] == woid]["ENDDATE"]
             if not wo_enddate_filtered.empty:
                 wo_enddate_default = wo_enddate_filtered.values[0]
             else:
                 wo_enddate_default = None  # O un valore di default appropriato
 
-            wo_timeqty_filtered = st.sessione_stat.df_workorders[st.sessione_stat.df_workorders["WOID"] == woid]["TIME_QTY"]
+            wo_timeqty_filtered = st.session_state.df_workorders[st.session_state.df_workorders["WOID"] == woid]["TIME_QTY"]
             if not wo_timeqty_filtered.empty:
                 wo_timeqty_default = float(wo_timeqty_filtered.iloc[0])  # Converti a float!
                 min_value = 0.0 # Valore minimo predefinito come float
@@ -299,10 +299,10 @@ def manage_request(conn):
             df_tdusers = df_users[df_users["DEPTCODE"] == default_dept_code]
             
             # Lista dei possibili nomi dei Team Leader
-            tdtl_usercode = st.sessione_stat.df_lk_pline_tdtl["USER_CODE"].drop_duplicates().sort_values().tolist() #conversione in lista
-            tdtl_username_list = st.sessione_stat.df_users[st.sessione_stat.df_users["CODE"].isin(tdtl_usercode)]["NAME"].tolist()
+            tdtl_usercode = st.session_state.df_lk_pline_tdtl["USER_CODE"].drop_duplicates().sort_values().tolist() #conversione in lista
+            tdtl_username_list = st.session_state.df_users[st.session_state.df_users["CODE"].isin(tdtl_usercode)]["NAME"].tolist()
 
-            tdtl_default_codes = st.sessione_stat.df_reqassignedto[st.sessione_stat.df_reqassignedto["REQID"] == reqid]["USERID"].tolist()
+            tdtl_default_codes = st.session_state.df_reqassignedto[st.session_state.df_reqassignedto["REQID"] == reqid]["USERID"].tolist()
 
             if tdtl_default_codes:
                 tdtl_option = df_users[df_users["CODE"].isin(tdtl_default_codes)]

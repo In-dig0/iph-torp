@@ -395,7 +395,7 @@ def manage_request(conn):
                 if success:
 #                    st.success(f"Work order W{str(wo_idrow).zfill(4)} created successfully!")
                     success = save_workorder_assignments(woid, wo_assignedto, df_users, df_woassignedto)
-                    success = update_request(reqid, "ASSIGNED", req_note_td, "", [])
+                    success = sqlite_db.update_request(reqid, "ASSIGNED", req_note_td, "", [], conn)
                     if success:
                         st.session_state.grid_refresh = True
                         st.session_state.grid_response = None
@@ -629,7 +629,7 @@ def manage_request(conn):
                         show_request_dialog(
                             selected_rows, 
                             REQ_STATUS_OPTIONS,
-                            update_request
+                            sqlite_db.update_request
                         )
      
         with col3:

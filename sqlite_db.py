@@ -666,34 +666,39 @@ def update_request(reqid: str, new_status: str, new_note_td: str, new_woid: str 
     try:
         if new_tdtl: # Check if the list is not empty
         # 1. Disable existing assignments (important to do this *before* inserting new ones)
-            cursor.execute("UPDATE TORP_REQASSIGNEDTO SET status = ? WHERE reqid = ?", (DISABLED_STATUS, reqid))
-            conn.commit()
+            with conn:  # Use a context manager for the connection
+                cursor.execute("UPDATE TORP_REQASSIGNEDTO SET status = ? WHERE reqid = ?", (DISABLED_STATUS, reqid))
+                conn.commit()
             # 2. Insert new assignments
-            for tdtl in new_tdtl:
-                try:
-                    # Check if the record already exists in the table
-                    cursor.execute("SELECT 1 FROM TORP_REQASSIGNEDTO WHERE reqid = ? AND tdtlid = ?", (reqid, tdtl))
-                    existing_record = cursor.fetchone()
-                    if existing_record:
-                        # Update the existing record
-                        cursor.execute("UPDATE TORP_REQASSIGNEDTO SET status = ? WHERE reqid = ? AND tdtlid = ?", (ACTIVE_STATUS, reqid, tdtl))
-                    else:
-                        # Insert a new record
-                        cursor.execute("INSERT INTO TORP_REQASSIGNEDTO (reqid, tdtlid, status) VALUES (?, ?, ?)", (reqid, tdtl, ACTIVE_STATUS))
-                    conn.commit()
-                except Exception as e:
-                    conn.rollback()
-                    st.error(f"Error inserting/updating REQASSIGNEDTO for {tdtl}: {str(e)}", icon="🚨")
-                    return False
-        # else:
-        #     st.warning("Nessun Team Leader fornito per l'aggiornamento di REQASSIGNEDTO", icon="⚠️")
+                for tdtl in new_tdtl:
+                    try:
+                        # Check if the record already exists in the table
+                        cursor.execute("SELECT 1 FROM TORP_REQASSIGNEDTO WHERE reqid = ? AND tdtlid = ?", (reqid, tdtl))
+                        existing_record = cursor.fetchone()
+                        if existing_record:
+                            # Update the existing record
+                            cursor.execute("UPDATE TORP_REQASSIGNEDTO SET status = ? WHERE reqid = ? AND tdtlid = ?", (ACTIVE_STATUS, reqid, tdtl))
+                        else:
+                            # Insert a new record
+                            cursor.execute("INSERT INTO TORP_REQASSIGNEDTO (reqid, tdtlid, status) VALUES (?, ?, ?)", (reqid, tdtl, ACTIVE_STATUS))
+                        conn.commit()
+                    except Exception as e:
+                        conn.rollback()
+                        st.error(f"Error inserting/updating REQASSIGNEDTO for {tdtl}: {str(e)}", icon="🚨")
+                        return False
+        else:
+            st.warning("Nessun Team Leader fornito per l'aggiornamento di REQASSIGNEDTO", icon="⚠️")
 
     except Exception as e:
         conn.rollback()
         st.error(f"Error updating REQASSIGNEDTO (disabling): {str(e)}", icon="🚨")
         return False
 
+    finally:
+        cursor.close() # Close the cursor in a finally block
+    
     return True
+
 
 def save_workorder(wo: dict, conn): # Pass connection and cursor
     
@@ -722,7 +727,6 @@ def save_workorder(wo: dict, conn): # Pass connection and cursor
                 cursor.execute(sql, values)
                 conn.commit()
                 #st.success(f"Workorder {wo['woid']} updated successfully.") # feedback for the user
-                return wo["woid"], True
 
             else:
                 # INSERT
@@ -740,45 +744,55 @@ def save_workorder(wo: dict, conn): # Pass connection and cursor
                 cursor.execute(sql, values)
                 conn.commit()
                 #st.success(f"Workorder {wo['woid']} created successfully.") # feedback for the user
-                return wo["woid"], True
 
     except Exception as e:
         conn.rollback() # important to rollback in case of error!
         st.error(f"**ERROR saving workorder: \n{e}", icon="🚨")
         return "", False
 
-def save_workorder_assignments(woid, assigned_users, df_users, df_woassignedto):
+    finally:
+        cursor.close() # Close the cursor in a finally block
+
+    return wo["woid"], True
+
+def save_workorder_assignments(woid, assigned_users, df_users, df_woassignedto, conn):
     try:
         # Disable existing assignments
-        cursor.execute(
-            "UPDATE TORP_WOASSIGNEDTO SET status = ? WHERE woid = ?",
-            (DISABLED_STATUS, woid)
-        )
-        
-        # Add new assignments
-        for user_name in assigned_users:
-            user_code = df_users[df_users["NAME"] == user_name]["CODE"].iloc[0]
-            existing_assignment = df_woassignedto[
-                (df_woassignedto['WOID'] == woid) & 
-                (df_woassignedto['TDTLID'] == user_code)
-            ]
+        with conn:
+            conn.cursor()
+            cursor.execute(
+                "UPDATE TORP_WOASSIGNEDTO SET status = ? WHERE woid = ?",
+                (DISABLED_STATUS, woid)
+            )
             
-            if existing_assignment.empty:
-                cursor.execute(
-                    "INSERT INTO TORP_WOASSIGNEDTO (woid, tdtlid, status) VALUES (?, ?, ?)",
-                    (user_code, woid, ACTIVE_STATUS)
-                )
-            else:
-                cursor.execute(
-                    "UPDATE TORP_WOASSIGNEDTO SET status = ? WHERE woid = ? AND tdtlid = ?",
-                    (ACTIVE_STATUS, woid, user_code)
-                )
-        
-        conn.commit()
-        return True
+            # Add new assignments
+            for user_name in assigned_users:
+                user_code = df_users[df_users["NAME"] == user_name]["CODE"].iloc[0]
+                existing_assignment = df_woassignedto[
+                    (df_woassignedto['WOID'] == woid) & 
+                    (df_woassignedto['TDTLID'] == user_code)
+                ]
+                
+                if existing_assignment.empty:
+                    cursor.execute(
+                        "INSERT INTO TORP_WOASSIGNEDTO (woid, tdtlid, status) VALUES (?, ?, ?)",
+                        (user_code, woid, ACTIVE_STATUS)
+                    )
+                else:
+                    cursor.execute(
+                        "UPDATE TORP_WOASSIGNEDTO SET status = ? WHERE woid = ? AND tdtlid = ?",
+                        (ACTIVE_STATUS, woid, user_code)
+                    )
+            
+            conn.commit()
+
+    
     except Exception as e:
         st.error(f"Error updating TORP_WOASSIGNEDTO: {str(e)}", icon="🚨")
         conn.rollback()
         return False
+    
+    finally:
+        cursor.close() # Close the cursor in a finally block
 
-
+    return True

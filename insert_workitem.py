@@ -7,48 +7,8 @@ from typing import Optional, Tuple, Dict, List
 # Internal app module
 import servant
 
-def create_work_item(conn):
-    # Load data from session state
-    df_users = st.session_state['df_users']
-    df_workorders = st.session_state['df_workorders'] 
-    df_tskgrl1 = st.session_state['df_tskgrl1']
-    df_tskgrl2 = st.session_state['df_tskgrl2']
-
-    # TD Specialist dropdown
-    td_specialists = df_users['USERNAME'].unique()
-    selected_td_specialist = st.sidebar.selectbox("TD Specialist", td_specialists)
-
-    # Work Order Number dropdown 
-    wo_numbers = df_workorders['WOID'].unique()
-    selected_wo_number = st.sidebar.selectbox("Work Order Number", wo_numbers)
-
-    # Task Group Level 1 dropdown
-    tskgrl1_options = df_tskgrl1['TSKGRL1'].unique()
-    selected_tskgrl1 = st.sidebar.selectbox("Task Group Level 1", tskgrl1_options)
-
-    # Task Group Level 2 dropdown (dependent on Level 1)
-    tskgrl2_options = df_tskgrl2[df_tskgrl2['TSKGRL1'] == selected_tskgrl1]['TSKGRL2'].unique()
-    selected_tskgrl2 = st.sidebar.selectbox("Task Group Level 2", tskgrl2_options)
-
-    # Execution Date
-    execution_date = st.sidebar.date_input("Execution Date", value=datetime.datetime.now(), format="DD/MM/YYYY")
-
-    # Quantity
-    quantity = st.sidebar.number_input("Quantity", min_value=0.0, step=0.5, value=0.0)
-
-    # Notes
-    notes = st.sidebar.text_area("Notes")
-
-    # Save button
-    if st.sidebar.button("Save"):
-        # Code to save the new work item goes here
-        st.success("New work item created!")
-
-def insert_workitems(conn):
-    # Initialize session state if not already set
-    if 'reset_pending' not in st.session_state:
-        st.session_state.reset_pending = False
-
+def create_workitem(conn)-> None:
+   
     # Load data only once and store in session state
     session_data = {
         'df_depts': sqlite_db.load_dept_data,
@@ -75,278 +35,123 @@ def insert_workitems(conn):
         if key not in st.session_state:
             st.session_state[key] = loader(conn)
 
-    st.sidebar.divider()
-    st.sidebar.header(f":orange[Filters]")
-    if st.session_state.df_woassignedto is None or st.session_state.df_woassignedto.empty:
-        st.warning("No work order assignment data available. Please check your data source")
-        st.stop()  # Stop execution of the script
-    else:
-        unique_usernames = st.session_state.df_woassignedto['USERNAME'].unique()
-        sorted_usernames = sorted(unique_usernames)
-        wo_username_options = list(sorted_usernames)
-
-    # Select username with dynamic filtering
-    selected_username = st.sidebar.selectbox(
-        label=":blue[Tech Department Specialist]", 
-        options=wo_username_options, 
-        index=None,
-        key="username_selectbox"
-    )
-    
+    # st.subheader(":orange[Last Workitem]")
+    # with st.container():
     # Calculate date 7 days ago
     previus_7days = datetime.datetime.now() - datetime.timedelta(days=7)
-    selected_from_date = st.sidebar.date_input(
-        ":blue[From date]", 
-        value=previus_7days, 
-        key="di_datefrom", 
-        format="DD/MM/YYYY"
-    )
-    selected_to_date = st.sidebar.date_input(
-        ":blue[To date]", 
-        value=datetime.datetime.now(), 
-        key="di_dateto", 
-        format="DD/MM/YYYY"
-    )
+    today = datetime.datetime.now()
 
-    # Check if a username is selected
-    if selected_username:
-        selected_usercode = servant.get_code_from_name(st.session_state.df_users, selected_username, "CODE")
-        
-        # Filter workitems dynamically
-        filtered_workitems = st.session_state.df_workitems[
-            (st.session_state.df_workitems["USERID"] == selected_usercode) &
-            (st.session_state.df_workitems["DATE"] >= selected_from_date) &
-            (st.session_state.df_workitems["DATE"] <= selected_to_date)
-        ]
+    # Convert DATE column to datetime objects (if it's not already)
+    if st.session_state.df_workitems['DATE'].dtype != 'datetime64[ns]':  # Check the data type
+        st.session_state.df_workitems['DATE'] = pd.to_datetime(st.session_state.df_workitems['DATE'])        
+      
+    # Filter workitems dynamically
+    filtered_workitems = st.session_state.df_workitems
+    [
+#            (st.session_state.df_workitems["USERID"] == selected_usercode) &
+        (st.session_state.df_workitems["DATE"] >= previus_7days) &
+        (st.session_state.df_workitems["DATE"] <= today)
+    ]
 
-        # Add radio button for view selection
-        view_option = st.sidebar.radio(
-            ":blue[View Options]", 
-            ["Detail View", "Grouped by Work Order"]
+    df = pd.DataFrame(filtered_workitems)
+    st.session_state.df = df
+        #st.dataframe(df, use_container_width=True, hide_index=True)
+    
+    
+#    st.subheader()
+
+    with st.container(border=True):
+        with st.expander(label=":orange[New Workitem]", expanded=False):
+            # TD Specialist dropdown
+            td_specialists = st.session_state.df_woassignedto['USERNAME'].unique()
+            sorted_td_specialist = sorted(td_specialists)
+            td_specialist_options = list(sorted_td_specialist)
+            selected_td_specialist = st.selectbox(label=":blue[TD Specialist]", options=td_specialist_options, index=None, key="sb_tds")
+            selected_td_specialist_code = servant.get_code_from_name(st.session_state.df_users, selected_td_specialist, "CODE")
+
+            # Work Order Number dropdown 
+            workorders = st.session_state.df_woassignedto['WOID'].unique()
+            sorted_workorders = sorted(workorders)
+            workorders_option = list(sorted_workorders)
+            selected_workorder = st.selectbox(label=":blue[Work Order]", options=workorders_option, index=None, key="sb_wo")
+
+            # Task Group Level 1 dropdown
+            tskgrl1_options = st.session_state.df_tskgrl1["NAME"].tolist()
+            selected_tskgrl1 = st.selectbox(label=":blue[TaskGroup L1]", options=tskgrl1_options, index=None, key="sb_tskgrl1")
+            selected_tskgrl1_code = servant.get_code_from_name(st.session_state.df_tskgrl1, selected_tskgrl1, "CODE")
+
+            # Task Group Level 2 dropdown (dependent on Level 1)
+            tskgrl2_options = st.session_state.df_tskgrl2[st.session_state.df_tskgrl2['PCODE'] == selected_tskgrl1_code]['NAME'].unique()
+            selected_tskgrl2 = st.selectbox(label=":blue[TaskGroup L2]", options=tskgrl2_options, index=None, key="sb_tskgrl2")
+            selected_tskgrl2_code = servant.get_code_from_name(st.session_state.df_tskgrl2, selected_tskgrl2, "CODE")
+
+            # Execution Date
+            execution_date = st.date_input(label=":blue[Execution Date]", value=datetime.datetime.now(), format="DD/MM/YYYY")
+
+            # Quantity
+            quantity = st.number_input(label=":blue[Time]", min_value=0.0, step=0.5, value=0.0, key="in_time_qty")
+
+            # Description
+            desc = st.text_input(label=":blue[Description]", key="ti_description")
+
+            # Note
+            note = st.text_area(label=":blue[Notes]", key="ta_note")
+
+            # Save button
+            if st.button("Save"):
+                # Code to save the new work item goes here
+                st.success("New workitem created!")
+
+                today = datetime.datetime.now().strftime("%Y-%m-%d")
+                df_new = pd.DataFrame(
+                    [
+                        {
+                            "DATE": execution_date,
+                            "WOID": selected_workorder,
+                            "USERID": selected_td_specialist_code,
+                            "STATUS": "ACTIVE",
+                            "TSKGRL1": selected_tskgrl1_code,
+                            "TSKGR21": selected_tskgrl2_code,
+                            "DESC": desc,
+                            "NOTE": note,
+                            "TIME_QTY": quantity,
+                            "TIME_UM": "H"
+                        }
+                    ]
+                )
+                st.dataframe(df_new, use_container_width=True, hide_index=True)
+                st.session_state.df = pd.concat([df_new, st.session_state.df], axis=0)
+
+    st.header("Last Workitems")
+    with st.container():
+        st.write(f"Number of workitems: `{len(st.session_state.df)}`")
+
+# st.info(
+#     "You can edit the tickets by double clicking on a cell. Note how the plots below "
+#     "update automatically! You can also sort the table by clicking on the column headers.",
+#     icon="✍️",
+# )
+
+# Show the tickets dataframe with `st.data_editor`. This lets the user edit the table
+# cells. The edited data is returned as a new dataframe.
+        edited_df = st.data_editor(
+            st.session_state.df,
+            use_container_width=True,
+            hide_index=True,
+            # column_config={
+            #     "Status": st.column_config.SelectboxColumn(
+            #         "Status",
+            #         help="Ticket status",
+            #         options=["Open", "In Progress", "Closed"],
+            #         required=True,
+            #     ),
+            #     "Priority": st.column_config.SelectboxColumn(
+            #         "Priority",
+            #         help="Priority",
+            #         options=["High", "Medium", "Low"],
+            #         required=True,
+            #     ),
+            #},
+            # Disable editing the ID and Date Submitted columns.
+            disabled=["WOID"],
         )
-
-        st.subheader(f":orange[List of Work items]")
-        with st.container(border=True, key="Workitem grid"):
-            if view_option == "Detail View":
-                st.dataframe(data=filtered_workitems, use_container_width=True, hide_index=False)
-            else:
-                # Group by WOID and sum TIME_QTY
-                grouped_workitems = filtered_workitems.groupby(["WOID", "TIME_UM"])["TIME_QTY"].sum().reset_index()
-                grouped_workitems = grouped_workitems[["WOID", "TIME_QTY", "TIME_UM"]]
-                st.dataframe(data=grouped_workitems, use_container_width=True, hide_index=False)
-    
-    
-    
-    else:
-        # If no username is selected, show an empty or default state
-        st.info("Please select a Tech Department Specialist to view work items")
-
-    # # Initialize other session state variables
-    # if 'sb_wi_taskl1' not in st.session_state:
-    #     st.session_state.sb_wi_taskl1 = None
-    # if 'sb_wi_taskl2' not in st.session_state:
-    #     st.session_state.sb_wi_taskl2 = None
-    # if 'other_element_value' not in st.session_state:
-    #     st.session_state.other_element_value = ""
-
-    # st.divider()
-# def insert_workitems(conn):
-#     # Initialize session state if not already set
-#     if 'reset_pending' not in st.session_state:
-#         st.session_state.reset_pending = False
-
-#     # Load data only once and store in session state
-#     session_data = {
-#         'df_depts': sqlite_db.load_dept_data,
-#         'df_users': sqlite_db.load_users_data,
-#         'df_pline': sqlite_db.load_pline_data,
-#         'df_pfamily': sqlite_db.load_pfamily_data,
-#         'df_category': sqlite_db.load_category_data,
-#         'df_type': sqlite_db.load_type_data,
-#         'df_lk_type_category': sqlite_db.load_lk_type_category_data,
-#         'df_lk_category_detail': sqlite_db.load_lk_category_detail_data,
-#         'df_lk_pline_tdtl': sqlite_db.load_lk_pline_tdtl_data,
-#         'df_detail': sqlite_db.load_detail_data,
-#         'df_requests': sqlite_db.load_requests_data,
-#         'df_reqassignedto': sqlite_db.load_reqassignedto_data,
-#         'df_attachments': sqlite_db.load_attachments_data,
-#         'df_workorders': sqlite_db.load_workorders_data,
-#         'df_woassignedto': sqlite_db.load_woassignedto_data,
-#         'df_workitems': sqlite_db.load_workitems_data,
-#         'df_tskgrl1': sqlite_db.load_tskgrl1_data,
-#         'df_tskgrl2': sqlite_db.load_tskgrl2_data,
-#     }
-
-#     for key, loader in session_data.items():
-#         if key not in st.session_state:
-#             st.session_state[key] = loader(conn)
-
-#     st.sidebar.divider()
-#     st.sidebar.header(f":orange[Filters]")
-#     if st.session_state.df_woassignedto is None or st.session_state.df_woassignedto.empty:
-#         st.warning("No work order assignment data available. Please check your data source")
-#         st.stop()  # Stop execution of the script
-#     else:
-#         unique_usernames = st.session_state.df_woassignedto['USERNAME'].unique()
-#         sorted_usernames = sorted(unique_usernames)
-#         wo_username_options = list(sorted_usernames)
-
-#     selected_username = st.sidebar.selectbox(label=":blue[Tech Department Specialist]", options=wo_username_options, index=None)
-#     selected_usercode = servant.get_code_from_name(st.session_state.df_users, selected_username, "CODE")
-
-#     if selected_username:
-#         st.session_state.selected_username = True
-#         disable_search_button = False
-#     else:
-#         disable_search_button = True
-
-#     # Calculate date 7 days ago
-#     previus_7days = datetime.datetime.now() - datetime.timedelta(days=7)
-#     selected_from_date = st.sidebar.date_input(":blue[From date]", value=previus_7days, key="di_datefrom", format="DD/MM/YYYY", disabled=False)
-#     selected_to_date = st.sidebar.date_input(":blue[To date]", value=datetime.datetime.now(), key="di_dateto", format="DD/MM/YYYY", disabled=False)
-
-#     search_button = st.sidebar.button("Search", key="search_button", type="primary", use_container_width=True, on_click=None, disabled=disable_search_button)
-#     if search_button:
-#         filtered_workitems = st.session_state.df_workitems[
-#             (st.session_state.df_workitems["USERID"] == selected_usercode) &
-#             (st.session_state.df_workitems["DATE"] >= selected_from_date) &
-#             (st.session_state.df_workitems["DATE"] <= selected_to_date)]
-
-#         st.subheader(f":orange[List of Work items]")
-#         with st.container(border=True, key="Workitem grid"):
-#             st.dataframe(data=filtered_workitems, use_container_width=True, hide_index=False)
-        
-
-#                 # Initialize session state variables if they don't exist
-#         if 'sb_wi_taskl1' not in st.session_state:
-#             st.session_state.sb_wi_taskl1 = None  # Or a default value
-#                 # Initialize session state variables if they don't exist
-#         if 'sb_wi_taskl2' not in st.session_state:
-#             st.session_state.sb_wi_taskl2 = None  # Or a default value            
-            
-#         if 'other_element_value' not in st.session_state:
-#             st.session_state.other_element_value = "" # Example for a text input
-
-       
-#         st.divider()
-
-        # def update_taskgr2_options():
-        #     if st.session_state.get('sb_wi_taskl1'):
-        #         wi_task_l1_code = st.session_state.df_tskgrl1[st.session_state.df_tskgrl1["NAME"] == st.session_state.get('sb_wi_taskl1')]["CODE"].tolist()
-        #         st.session_state.filtered_wi_task_l2 = sorted(st.session_state.df_tskgrl2[st.session_state.df_tskgrl2["CODE"].isin(wi_task_l1_code)]["NAME"].tolist()) if wi_task_l1_code else []
-        #     else:
-        #         st.session_state.filtered_wi_task_l2 = sorted(st.session_state.df_tskgrl2["NAME"].tolist())
-        #     st.session_state.sb_wi_taskl2 = None  # Reset TASKGR2 selection when TASKGR1 ch
-        
-        
-        # st.subheader(f":orange[New Task]")
-        # with st.form(key='task_form', clear_on_submit=False):
-        #     taskl1_options = st.session_state.df_tskgrl1["NAME"].tolist()
-
-        #     initial_task_l1 = st.session_state.sb_wi_taskl1
-        #     wi_task_l1 = st.selectbox(
-        #         label=":blue[Task Group L1]",
-        #         options=taskl1_options,
-        #         index=taskl1_options.index(initial_task_l1) if initial_task_l1 in taskl1_options else None,
-        #         key="sb_wi_taskl1"
-        #     )
-
-        #     wi_task_l1_code = st.session_state.df_tskgrl1[st.session_state.df_tskgrl1["NAME"] == wi_task_l1]["CODE"].tolist() if wi_task_l1 else []
-
-        # # Memorizza il valore di TASKGR1 nella sessione
-        #     st.session_state.selected_task_l1 = wi_task_l1
-
-        #     filtered_wi_task_l2 = st.session_state.get('filtered_wi_task_l2', sorted(st.session_state.df_tskgrl2["NAME"].tolist())) #Get the filtered list, with a default value
-
-        #     initial_task_l2 = st.session_state.sb_wi_taskl2 if st.session_state.sb_wi_taskl2 in filtered_wi_task_l2 else None
-        #     wi_task_l2 = st.selectbox(
-        #         label=":blue[Task Group L2]",
-        #         options=filtered_wi_task_l2,  # Use the filtered list
-        #         index=filtered_wi_task_l2.index(initial_task_l2) if initial_task_l2 in filtered_wi_task_l2 else None,
-        #         key="sb_wi_taskl2"
-        #     )
-
-
-        #     # Per Description
-        #     initial_description = "" if st.session_state.reset_pending else st.session_state.get('sb_wi_description', "")
-        #     wi_description = st.text_input(
-        #         label=":blue[Task description]", 
-        #         value=initial_description, 
-        #         key="sb_wi_description"
-        #     )
-
-
-        #     initial_time_qty = 0.0 if st.session_state.reset_pending else st.session_state.get('sb_wi_time_qty', 0.0)
-        #     wi_time_qty = st.number_input(
-        #         label=":blue[Time spent (in hours)(:red[*])]:", 
-        #         value=initial_time_qty,
-        #         min_value=0.0, 
-        #         step=0.5, 
-        #         key="sb_wi_time_qty"
-        #     )
-
-            
-        #     #Per Date
-        #     initial_date = st.session_state.get('sb_wi_date') or datetime.date.today()  # Use session value or today
-        #     wi_date = st.date_input(
-        #         label=":blue[Date of execution(:red[*])]",
-        #         value=initial_date,
-        #         format="DD/MM/YYYY",
-        #         key="sb_wi_date"
-        #     )
-
-        #     # Per Note
-        #     initial_note = "" if st.session_state.reset_pending else st.session_state.get('sb_wi_note', "")
-        #     wi_note = st.text_area(
-        #         ":blue[Note]", 
-        #         value=initial_note,
-        #         key="sb_wi_note"
-        #     )
-
-        #     #wo_nr = selected_wo
-        #     wi_time_um = "H"
-
-
-        #     st.divider()
-        #     def callback():
-        #         if wi_date:
-        #             wi_date_fmt = wi_date.strftime("%Y-%m-%d")
-        #         else:
-        #             wi_date_fmt = datetime.date.today()    
-        #         if wi_task_l1_code:
-        #             wi_tskgrl1 = wi_task_l1_code[0]
-        #         else: 
-        #             wi_tskgrl1 = ""   
-        #         if wi_task_l2_code:
-        #             wi_tskgrl2 = wi_task_l2_code[0] 
-        #         else:
-        #             wi_tskgrl2 = ""              
-        #         if wo_usercode:
-        #             wi_userid = wo_usercode[0]
-        #         else:
-        #             wi_userid = ""                   
-
-        #         work_item = {
-        #             "wi_date": wi_date_fmt, 
-        #             "wo_id": wo_nr, 
-        #             "wi_userid": wi_userid, 
-        #             "wi_status": ACTIVE_STATUS, 
-        #             "wi_tskgrl1": wi_tskgrl1, 
-        #             "wi_tskgrl2": wi_tskgrl2,  
-        #             "wi_desc": wi_description, 
-        #             "wi_note": wi_note,            
-        #             "wi_time_qty": wi_time_qty, 
-        #             "wi_time_um": wi_time_um
-        #         }
-        #         st.success(work_item)
-
-        #     create_wi_button_submitted = st.form_submit_button("Create Work Item", type="primary", on_click=callback)
-
-
-
-
-        #     # Display selected values (outside the form)
-        #     if st.session_state.sb_wi_taskl1:
-        #         st.write(f"Selected Task Group L1: {st.session_state.sb_wi_taskl1}")
-        #     if st.session_state.sb_wi_taskl2:
-        #         st.write(f"Selected Task Group L2: {st.session_state.sb_wi_taskl2}")

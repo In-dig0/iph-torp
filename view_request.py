@@ -1,27 +1,22 @@
-# Python built-in packages
-import os
-import time
-
 # 3th party packages
 import streamlit as st
 import pandas as pd
 import sqlite_db
 from st_aggrid import AgGrid, GridOptionsBuilder, GridUpdateMode, DataReturnMode, JsCode, ColumnsAutoSizeMode
+# Built-in packages
 import re
-
-# Internal app modules
+import os
+import time
+# Internal app module
 import servant
+import sqlite_db
 
 
-
-def view_request(conn) -> None:
+def view_requests(conn) -> None:
 
     # Inzialise variables
     rc = 0
     req_nr = ""
-    
-    if 'grid_response' not in st.session_state:
-        st.session_state['grid_response'] = None
 
     def reset_application_state():
         """Reset all session state variables and cached data"""
@@ -134,7 +129,7 @@ def view_request(conn) -> None:
     grid_builder.configure_selection(
     selection_mode='single',     # Enable multiple row selection
     use_checkbox=False,             # Show checkboxes for selection
-    header_checkbox=False
+    header_checkbox=True
     )
     grid_options = grid_builder.build()
     # List of available themes
@@ -167,7 +162,7 @@ def view_request(conn) -> None:
     else:
         st.session_state.grid_data = df_requests_grid.copy() # Mostra tutti i dati se il filtro è None
 
-    st.subheader("Request list:") 
+    st.subheader(":orange[Request list]") 
     # Creazione/Aggiornamento della griglia (UNA SOLA VOLTA per ciclo di esecuzione)
     if st.session_state.grid_response is None:
         st.session_state.grid_response = AgGrid(
@@ -197,7 +192,6 @@ def view_request(conn) -> None:
     with col1:
         if st.button("🔄 Refresh", type="tertiary"):
             reset_application_state()
-    
     selected_row = st.session_state.grid_response['selected_rows']
 
     if selected_row is not None and len(selected_row) > 0:
@@ -297,7 +291,7 @@ def view_request(conn) -> None:
             </style>
             """, unsafe_allow_html=True)
             
-        st.subheader("Request details:")
+        st.subheader(":orange[Request details]")
         with st.container(border=True):
             st.write(html_table, unsafe_allow_html=True)
 
@@ -317,14 +311,21 @@ def view_request(conn) -> None:
             #st.dataframe(df_display, hide_index=True)
 
             # Aggiungi il pulsante di download
+            file_name = f"{reqid}_details.pdf"
             pdf_buffer = servant.create_pdf_buffer(df_out)
             st.download_button(
                 label="Download PDF",
                 data=pdf_buffer,
-                file_name="request_details.pdf",
+                file_name=file_name,
                 mime="application/pdf",
                 key="download-pdf",
                 help="Click qui per scaricare la tabella in formato PDF",
                 type="primary"
             )
+                    # REQUEST ATTACHMENT SECTION
+        if attachments_string :
+            st.subheader(":orange[Attachments]")        
+            with st.container(border=True):
+                sqlite_db.view_attachments(reqid, conn)
+  
 

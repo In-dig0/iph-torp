@@ -583,4 +583,47 @@ def save_attachments(req_id: str, attachments_list: list, conn) -> bool:
     
     finally:
         cursor.close()
-    return True         
+    return True        
+
+def view_attachments(reqid: str, conn)-> None:
+    """Visualizza gli allegati PDF."""
+
+    try:
+        with conn:  # Use a context manager for the connection
+            cursor = conn.cursor()
+
+            sql = """
+                SELECT title, data 
+                FROM TORP_ATTACHMENTS 
+                WHERE reqid = :1 
+            """
+            cursor.execute(sql, [reqid])
+            attachments = cursor.fetchall()
+
+            if not attachments:
+                st.info(f"Nessun allegato trovato per la richiesta {reqid}")
+                return
+
+            for title, pdf_data in attachments:
+                if pdf_data:
+                    #st.subheader(title)
+                    file_name = f"{reqid}_details.pdf"
+                    with st.expander(title):  # Expander per ogni allegato
+                        st.download_button(
+                            label=f" Download PDF",
+                            data=pdf_data,
+                            file_name=file_name,
+                            mime="application/pdf"
+                        )
+                        # Visualizzazione PDF (con controllo visibilità)
+                        if st.checkbox("Mostra anteprima", key=f"preview_{title}"): # Checkbox univoco per ogni anteprima
+                            base64_pdf = base64.b64encode(pdf_data).decode('utf-8')
+                            pdf_display = f'<iframe src="data:application/pdf;base64,{base64_pdf}" width="700" height="1000"></iframe>'
+                            st.markdown(pdf_display, unsafe_allow_html=True)
+
+    except Exception as e:
+        st.error(f"Errore nel caricamento degli allegati: {e}")
+        import traceback
+        st.error(traceback.format_exc())
+    finally:
+        cursor.close() # Close the cursor in a finally block

@@ -144,7 +144,7 @@ def insert_request(conn)-> None:
                 st.session_state[key] = loader(conn)
 
         # REQUESTER INFO SECTION
-        st.header(":orange[Requester]")
+        st.subheader(":orange[Requester section]")
         with st.container(border=True):
             # 'Department' selection
             department = st.selectbox(
@@ -168,7 +168,7 @@ def insert_request(conn)-> None:
             requester_code = servant.get_code_from_name(st.session_state.df_users, requester, "CODE")
 
         # PRODUCT INFO SECTION
-        st.header(":orange[Product group]")
+        st.subheader(":orange[Product section]")
         with st.container(border=True):
            
             # 'Product line' selection
@@ -193,7 +193,7 @@ def insert_request(conn)-> None:
             pfamily_code = servant.get_code_from_name(st.session_state.df_pfamily, pfamily, "CODE")
 
         # REQUEST INFO SECTION
-        st.header(":orange[Request]")
+        st.subheader(":orange[Request section]")
         with st.container(border=True):
     
             # 'Priority' selection
@@ -252,7 +252,7 @@ def insert_request(conn)-> None:
             fix_user = "RB"
 
         # REQUEST ATTACHMENT SECTION
-        st.header(":orange[Attachments]")        
+        st.subheader(":orange[Attachments section]")        
         with st.container(border=True):
             file_upload_on = st.toggle("Activate File upload", key="tg_attach")
             if file_upload_on:

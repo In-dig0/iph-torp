@@ -5,6 +5,12 @@ from typing import Optional, Tuple, Dict, List
 import base64
 from datetime import datetime, date
 
+# Global constants
+ACTIVE_STATUS = "ACTIVE"
+DISABLED_STATUS = "DISABLED"
+DEFAULT_DEPT_CODE = "DTD"
+REQ_STATUS_OPTIONS = ['NEW', 'PENDING', 'ASSIGNED', 'WIP', 'COMPLETED', 'DELETED']
+
 def open_sqlitecloud_db():
     """ Open a connection to SQLITE database"""
     db_link = ""

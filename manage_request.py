@@ -402,7 +402,7 @@ def manage_request(conn):
                         st.success(f"Work order {woid} created successfully!")
                     
                     st.session_state.need_refresh = True
-                    time.sleep(3)
+                    time.sleep(6)
                     reset_application_state()
                     st.rerun()
 

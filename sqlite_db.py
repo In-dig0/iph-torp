@@ -783,7 +783,7 @@ def save_workorder_assignments(woid, tdtl_code, assigned_users, df_users, df_woa
                 
                 if existing_assignment.empty:
                     cursor.execute(
-                        "INSERT INTO TORP_WOASSIGNEDTO (woid, tdtlid, tdsp, status) VALUES (?, ?, ?, ?)",
+                        "INSERT INTO TORP_WOASSIGNEDTO (woid, tdtlid, tdspid, status) VALUES (?, ?, ?, ?)",
                         (woid, tdtl_code, user_code, ACTIVE_STATUS)
                     )
                 else:

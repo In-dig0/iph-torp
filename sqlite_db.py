@@ -311,7 +311,7 @@ def load_reqassignedto_data(conn):
         FROM TORP_REQASSIGNEDTO A
         INNER JOIN TORP_USERS B ON B.code = A.tdtlid
         WHERE A.status = 'ACTIVE'
-        ORDER BY USERID desc
+        ORDER BY REQID desc
         """, conn)
     except Exception as errMsg:
         st.error(f"**ERROR load data from TORP_REQASSIGNEDTO: \n{errMsg}", icon="🚨")

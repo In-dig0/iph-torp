@@ -22,6 +22,34 @@ def manage_request(conn):
     Includes request filtering, display, and assignment management functionality.
     """
     
+        # Load data only once and store in session state
+    session_data = {
+        'df_depts': sqlite_db.load_dept_data,
+        'df_users': sqlite_db.load_users_data,
+        'df_pline': sqlite_db.load_pline_data,
+        'df_pfamily': sqlite_db.load_pfamily_data,
+        'df_category': sqlite_db.load_category_data,
+        'df_type': sqlite_db.load_type_data,
+        'df_lk_type_category': sqlite_db.load_lk_type_category_data,
+        'df_lk_category_detail': sqlite_db.load_lk_category_detail_data,
+        'df_lk_pline_tdtl': sqlite_db.load_lk_pline_tdtl_data,
+        'df_detail': sqlite_db.load_detail_data,
+        'df_requests': sqlite_db.load_requests_data,
+        'df_reqassignedto': sqlite_db.load_reqassignedto_data,
+        'df_attachments': sqlite_db.load_attachments_data,
+        'df_workorders': sqlite_db.load_workorders_data,
+        'df_woassignedto': sqlite_db.load_woassignedto_data,
+        'df_workitems': sqlite_db.load_workitems_data,
+        'df_tskgrl1': sqlite_db.load_tskgrl1_data,
+        'df_tskgrl2': sqlite_db.load_tskgrl2_data,
+    }
+
+    for key, loader in session_data.items():
+        if key not in st.session_state:
+            st.session_state[key] = loader(conn)
+
+
+
     def reset_application_state():
         """Reset all session state variables and cached data"""
         # Lista delle chiavi di sessione da eliminare
@@ -454,31 +482,6 @@ def manage_request(conn):
         return builder.build()
 
     # Load data from database
-    # Load data only once and store in session state
-    session_data = {
-        'df_depts': sqlite_db.load_dept_data,
-        'df_users': sqlite_db.load_users_data,
-        'df_pline': sqlite_db.load_pline_data,
-        'df_pfamily': sqlite_db.load_pfamily_data,
-        'df_category': sqlite_db.load_category_data,
-        'df_type': sqlite_db.load_type_data,
-        'df_lk_type_category': sqlite_db.load_lk_type_category_data,
-        'df_lk_category_detail': sqlite_db.load_lk_category_detail_data,
-        'df_lk_pline_tdtl': sqlite_db.load_lk_pline_tdtl_data,
-        'df_detail': sqlite_db.load_detail_data,
-        'df_requests': sqlite_db.load_requests_data,
-        'df_reqassignedto': sqlite_db.load_reqassignedto_data,
-        'df_attachments': sqlite_db.load_attachments_data,
-        'df_workorders': sqlite_db.load_workorders_data,
-        'df_woassignedto': sqlite_db.load_woassignedto_data,
-        'df_workitems': sqlite_db.load_workitems_data,
-        'df_tskgrl1': sqlite_db.load_tskgrl1_data,
-        'df_tskgrl2': sqlite_db.load_tskgrl2_data,
-    }
-
-    for key, loader in session_data.items():
-        if key not in st.session_state:
-            st.session_state[key] = loader(conn)
 
 
 

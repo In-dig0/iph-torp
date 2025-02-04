@@ -711,7 +711,7 @@ def save_workorder(wo: dict, conn): # Pass connection and cursor
     
     try:
         with conn:
-            conn.cursor()
+            cursor = conn.cursor()
             # Check if a workorder with the given woid already exists
             cursor.execute("SELECT 1 FROM TORP_WORKORDERS WHERE woid = ? AND tdtlid = ?", (wo["woid"],wo["tdtlid"]))
             existing_workorder = cursor.fetchone()
@@ -767,7 +767,7 @@ def save_workorder_assignments(woid, assigned_users, df_users, df_woassignedto, 
     try:
         # Disable existing assignments
         with conn:
-            conn.cursor()
+            cursor = conn.cursor()
             cursor.execute(
                 "UPDATE TORP_WOASSIGNEDTO SET status = ? WHERE woid = ?",
                 (DISABLED_STATUS, woid)

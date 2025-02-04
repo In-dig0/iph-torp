@@ -47,7 +47,8 @@ def manage_request(conn):
     for key, loader in session_data.items():
         if key not in st.session_state:
             st.session_state[key] = loader(conn)
-
+    
+    st.write(f"{st.session_state.df_users}")
 
 
     def reset_application_state():

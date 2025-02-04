@@ -93,7 +93,7 @@ def manage_request(conn):
             reqid = selected_row["REQID"][0]
             # Display Product Line
             selected_pline_name = selected_row['PRLINE_NAME'][0]
-            selected_pline_code = st.session_state.df_pline[df_pline["NAME"] == selected_pline_name]["CODE"].values[0]
+            selected_pline_code = st.session_state.df_pline[st.session_state.df_pline["NAME"] == selected_pline_name]["CODE"].values[0]
             st.text_input(label="Product line", value=selected_pline_name, disabled=True)
            
             # Display request details

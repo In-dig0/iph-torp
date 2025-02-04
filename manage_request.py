@@ -389,9 +389,9 @@ def manage_request(conn):
                     disable_save_button = False
 
             # Handle save action
-            #st.write(f"{woid} - {req_tdtl_code} - {wo_assignedto}")
-            #st.write(f"{st.session_state.df_user}")
-            st.write(f"{st.df_woassignedt.df_user}")
+            st.write(f"{woid} - {req_tdtl_code} - {wo_assignedto}")
+            st.write(f"{st.session_state.df_user}")
+            #st.write(f"{st.df_woassignedt.df_user}")
             time.sleep(5)
             if st.button("Save", type="primary", disabled=disable_save_button, key="wo_save_button"):
                 wo = {"woid":woid, "tdtlid": req_tdtl_code, "type": wo_type, "title": selected_row["TITLE"][0], "description": req_description_default, "time_qty": wo_time_qty, "time_um": wo_time_um, "status": ACTIVE_STATUS, "startdate": wo_startdate, "enddate": wo_enddate, "reqid": reqid}
@@ -479,6 +479,8 @@ def manage_request(conn):
     for key, loader in session_data.items():
         if key not in st.session_state:
             st.session_state[key] = loader(conn)
+
+
 
     # Initialize session state
     if "grid_data" not in st.session_state:

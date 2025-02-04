@@ -48,7 +48,7 @@ def create_workitem(conn)-> None:
     # Filter workitems dynamically
     filtered_workitems = st.session_state.df_workitems
     [
-#            (st.session_state.df_workitems["USERID"] == selected_usercode) &
+#            (st.session_state.df_workitems["TDSPID"] == selected_usercode) &
         (st.session_state.df_workitems["DATE"] >= previus_7days) &
         (st.session_state.df_workitems["DATE"] <= today)
     ]
@@ -108,7 +108,7 @@ def create_workitem(conn)-> None:
                         {
                             "DATE": execution_date,
                             "WOID": selected_workorder,
-                            "USERID": selected_td_specialist_code,
+                            "TDSPID": selected_td_specialist_code,
                             "STATUS": "ACTIVE",
                             "TSKGRL1": selected_tskgrl1_code,
                             "TSKGR21": selected_tskgrl2_code,

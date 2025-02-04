@@ -4,18 +4,10 @@ import sqlite_db
 import datetime
 import time
 from typing import Optional, Tuple, Dict, List
-# from xhtml2pdf import pisa
 import io
 import re
-#from weasyprint import HTML
-#import pdfkit
 import os
 import pandas as pd
-# from reportlab.lib import colors
-# from reportlab.lib.pagesizes import letter
-# from reportlab.platypus import SimpleDocTemplate, Table, TableStyle
-# from fpdf import FPDF
-
 from reportlab.lib import colors
 from reportlab.lib.pagesizes import letter
 from reportlab.platypus import SimpleDocTemplate, Table, TableStyle

@@ -220,7 +220,7 @@ def view_requests(conn) -> None:
         description = st.session_state.df_requests[st.session_state.df_requests["REQID"] == reqid]["DESCRIPTION"].values[0]
         note_td = st.session_state.df_requests[st.session_state.df_requests["REQID"] == reqid]["NOTE_TD"].values[0]
 
-        tdtl_code_list = st.session_state.df_reqassignedto[st.session_state.df_reqassignedto["REQID"] == reqid]["USERID"]
+        tdtl_code_list = st.session_state.df_reqassignedto[st.session_state.df_reqassignedto["REQID"] == reqid]["TDTLID"]
         #tdtl_name_list = get_description_from_code(df_users, tdtl_code_list, "NAME")
         tdtl_name_list = [servant.get_description_from_code(st.session_state.df_users, code, "NAME") for code in tdtl_code_list]
         tdtl_name_string = "-".join(tdtl_name_list)

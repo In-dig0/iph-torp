@@ -77,7 +77,7 @@ def view_workitems(conn) -> None :
         
         # Filter workitems dynamically
         filtered_workitems = st.session_state.df_workitems[
-            (st.session_state.df_workitems["USERID"] == selected_usercode) &
+            (st.session_state.df_workitems["TDSPID"] == selected_usercode) &
             (st.session_state.df_workitems["DATE"] >= selected_from_date) &
             (st.session_state.df_workitems["DATE"] <= selected_to_date)
         ]

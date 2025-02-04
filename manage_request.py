@@ -131,7 +131,7 @@ def manage_request(conn):
             tdtl_usercode = st.session_state.df_lk_pline_tdtl["USER_CODE"].drop_duplicates().sort_values().tolist() #conversione in lista
             tdtl_username_list = st.session_state.df_users[st.session_state.df_users["CODE"].isin(tdtl_usercode)]["NAME"].tolist()
 
-            tdtl_default_codes = st.session_state.df_reqassignedto[st.session_state.df_reqassignedto["REQID"] == reqid]["USERID"].tolist()
+            tdtl_default_codes = st.session_state.df_reqassignedto[st.session_state.df_reqassignedto["REQID"] == reqid]["TDTLID"].tolist()
 
             if tdtl_default_codes:
                 tdtl_option = st.session_state.df_users[st.session_state.df_users["CODE"].isin(tdtl_default_codes)]
@@ -302,7 +302,7 @@ def manage_request(conn):
             tdtl_usercode = st.session_state.df_lk_pline_tdtl["USER_CODE"].drop_duplicates().sort_values().tolist() #conversione in lista
             tdtl_username_list = st.session_state.df_users[st.session_state.df_users["CODE"].isin(tdtl_usercode)]["NAME"].tolist()
 
-            tdtl_default_codes = st.session_state.df_reqassignedto[st.session_state.df_reqassignedto["REQID"] == reqid]["USERID"].tolist()
+            tdtl_default_codes = st.session_state.df_reqassignedto[st.session_state.df_reqassignedto["REQID"] == reqid]["TDTLID"].tolist()
 
             if tdtl_default_codes:
                 tdtl_option = df_users[df_users["CODE"].isin(tdtl_default_codes)]
@@ -445,14 +445,14 @@ def manage_request(conn):
                 for tdtl in new_tdtl:
                     try:
                         # Check if the record already exists in the table
-                        cursor.execute("SELECT 1 FROM TORP_REQASSIGNEDTO WHERE reqid = ? AND userid = ?", (reqid, tdtl))
+                        cursor.execute("SELECT 1 FROM TORP_REQASSIGNEDTO WHERE reqid = ? AND tdtlid = ?", (reqid, tdtl))
                         existing_record = cursor.fetchone()
                         if existing_record:
                             # Update the existing record
-                            cursor.execute("UPDATE TORP_REQASSIGNEDTO SET status = ? WHERE reqid = ? AND userid = ?", (ACTIVE_STATUS, reqid, tdtl))
+                            cursor.execute("UPDATE TORP_REQASSIGNEDTO SET status = ? WHERE reqid = ? AND tdtlid = ?", (ACTIVE_STATUS, reqid, tdtl))
                         else:
                             # Insert a new record
-                            cursor.execute("INSERT INTO TORP_REQASSIGNEDTO (reqid, userid, status) VALUES (?, ?, ?)", (reqid, tdtl, ACTIVE_STATUS))
+                            cursor.execute("INSERT INTO TORP_REQASSIGNEDTO (reqid, tdtlid, status) VALUES (?, ?, ?)", (reqid, tdtl, ACTIVE_STATUS))
                         conn.commit()
                     except Exception as e:
                         conn.rollback()
@@ -530,17 +530,17 @@ def manage_request(conn):
                 user_code = df_users[df_users["NAME"] == user_name]["CODE"].iloc[0]
                 existing_assignment = df_woassignedto[
                     (df_woassignedto['WOID'] == woid) & 
-                    (df_woassignedto['USERID'] == user_code)
+                    (df_woassignedto['TDTLID'] == user_code)
                 ]
                 
                 if existing_assignment.empty:
                     cursor.execute(
-                        "INSERT INTO TORP_WOASSIGNEDTO (userid, woid, status) VALUES (?, ?, ?)",
+                        "INSERT INTO TORP_WOASSIGNEDTO (woid, tdtlid, status) VALUES (?, ?, ?)",
                         (user_code, woid, ACTIVE_STATUS)
                     )
                 else:
                     cursor.execute(
-                        "UPDATE TORP_WOASSIGNEDTO SET status = ? WHERE woid = ? AND userid = ?",
+                        "UPDATE TORP_WOASSIGNEDTO SET status = ? WHERE woid = ? AND tdtlid = ?",
                         (ACTIVE_STATUS, woid, user_code)
                     )
             

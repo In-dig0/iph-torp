@@ -137,6 +137,6 @@ def view_workitems(conn) -> None :
     
     
     
-    else:
-        # If no username is selected, show an empty or default state
-        st.info("Please select a Tech Department Specialist to view work items")
+    # else:
+    #     # If no username is selected, show an empty or default state
+    #     st.info("Please select a Tech Department Specialist to view work items")

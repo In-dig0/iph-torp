@@ -827,7 +827,7 @@ def save_workitem(witem: dict, conn) ->  bool:
             ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         """
         values = (
-            witem["wi_date"], witem["wo_id"], witem["wi_userid"], witem["wi_status"],
+            witem["wi_refdate"], witem["wo_woid"], witem["wi_tdspid"], witem["wi_status"],
             witem["wi_tskgrl1"], witem["wi_tskgrl2"], witem["wi_desc"], witem["wi_note"], 
             witem["wi_time_qty"], witem["wi_time_um"]
         )

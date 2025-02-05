@@ -155,16 +155,16 @@ def create_workitem(conn)-> None:
             if st.button("Save Work Item", disabled=save_button_disabled):
                 # Code to save the new work item goes here
                 witem = {
-                            "REFDATE": execution_date,
-                            "WOID": selected_workorder,
-                            "TDSPID": selected_td_specialist_form_code,
-                            "STATUS": "ACTIVE",
-                            "TSKGRL1": selected_tskgrl1_code,
-                            "TSKGRL2": selected_tskgrl2_code,
-                            "DESC": desc,
-                            "NOTE": note,
-                            "TIME_QTY": quantity,
-                            "TIME_UM": "H"
+                            "wi_refdate": execution_date,
+                            "wo_woid": selected_workorder,
+                            "wi_tdspid": selected_td_specialist_form_code,
+                            "wi_status": "ACTIVE",
+                            "wi_tskgrl1": selected_tskgrl1_code,
+                            "wi_tskgrl2": selected_tskgrl2_code,
+                            "wi_desc": desc,
+                            "wi_note": note,
+                            "wi_time_qty": quantity,
+                            "wi_time_um": "H"
                         }
                 success = sqlite_db.save_workitem(witem, conn)        
                 if success:

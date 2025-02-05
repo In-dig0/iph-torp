@@ -474,7 +474,7 @@ def manage_request(conn):
         update_mode=GridUpdateMode.MODEL_CHANGED,
         data_return_mode=DataReturnMode.AS_INPUT,
         key="main_grid",
-        custom_css={"root": {"height": "100%"}} # This might be redundant but good to include
+        custom_css={"root": {"height": "50%"}} # This might be redundant but good to include
 
     )
     # selected_rows = st.session_state.grid_response['selected_rows']

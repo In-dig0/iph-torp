@@ -51,8 +51,10 @@ def create_workitem(conn)-> None:
     else:
         selected_tdsp_code = None # o un valore di default che preferisci 
 
+    st.session_state["selected_tdsp_name"] = selected_tdsp_name
+    
     # Check if a username is selected
-    if selected_tdsp_name:       
+    if  st.session_state.selected_tdsp_name:       
         # Filter workitems dynamically
         filtered_workitems = st.session_state.df_workitems[
             (st.session_state.df_workitems["TDSPID"] == selected_tdsp_code) #&
@@ -76,21 +78,15 @@ def create_workitem(conn)-> None:
 
     with st.container(border=True):
         with st.expander(label=":orange[New Workitem]", expanded=False):
-            # TD Specialist dropdown
-            # if selected_tdsp_name: 
-            #     tdsp_index = tdsp_woassignedto_names.index(selected_tdsp_name)
-            # else:
-            #     tdsp_index = None
-            # st.write(tdsp_index)        
-            # selected_td_specialist = st.selectbox(label=":blue[TD Specialist](:red[*])", options=tdsp_woassignedto_names, index=tdsp_index, key="tdsp_form")
-            # selected_td_specialist_code = servant.get_code_from_name(st.session_state.df_users, selected_td_specialist, "CODE")
-
+            st.write(tdsp_woassignedto_names)
+            st.write(st.session_state["selected_tdsp_name"])
+            st.write(tdsp_woassignedto_names.index(st.session_state["selected_tdsp_name"])
             # TD Specialist Dropdown (Form) - Use the VALUE directly
             if selected_tdsp_name:
                 selected_td_specialist_form = st.selectbox(
                     label=":blue[TD Specialist](:red[*])",
                     options=tdsp_woassignedto_names,
-                    value=selected_tdsp_name,  # Set value directly
+                    index=tdsp_woassignedto_names.index(st.session_state["selected_tdsp_name"])
                     key="tdsp_form"
                 )
             else:

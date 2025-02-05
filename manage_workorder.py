@@ -17,4 +17,4 @@ DEFAULT_DEPT_CODE = "DTD"
 REQ_STATUS_OPTIONS = ['NEW', 'PENDING', 'ASSIGNED', 'WIP', 'COMPLETED', 'DELETED']
 
 def manage_workorder(conn):
-    return true
+    return True

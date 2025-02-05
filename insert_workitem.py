@@ -94,6 +94,7 @@ def create_workitem(conn)-> None:
                 selected_td_specialist_form = st.selectbox(
                     label=":blue[TD Specialist](:red[*])",
                     options=tdsp_woassignedto_names,
+                    index=None
                     key="tdsp_form"
                 )
 

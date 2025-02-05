@@ -75,8 +75,6 @@ def create_workitem(conn)-> None:
 #    st.subheader()
 
     with st.container(border=True):
-        if selected_tdsp_name:
-            st.write(selected_tdsp_name)
         with st.expander(label=":orange[New Workitem]", expanded=False):
             # TD Specialist dropdown
             if selected_tdsp_name: 
@@ -84,18 +82,40 @@ def create_workitem(conn)-> None:
             else:
                 tdsp_index = None
             st.write(tdsp_index)        
-            selected_td_specialist = st.selectbox(label=":blue[TD Specialist](:red[*])", options=tdsp_woassignedto_names, index=tdsp_index, key="sb_tds")
+            selected_td_specialist = st.selectbox(label=":blue[TD Specialist](:red[*])", options=tdsp_woassignedto_names, index=tdsp_index, key="tdspname_selectbox")
             selected_td_specialist_code = servant.get_code_from_name(st.session_state.df_users, selected_td_specialist, "CODE")
 
-            # Work Order Number dropdown 
+            # # Work Order Number dropdown 
+            # if selected_td_specialist:
+            #     st.write(selected_td_specialist_code)
+            #     filtered_workorder_df = st.session_state.df_woassignedto[st.session_state.df_woassignedto["TDSPID"]==selected_td_specialist_code]
+            #     filtered_workorder_list = list(filtered_workorder_df)
+            #     filtered_workorder = sorted(filtered_workorder_list)
+            # else:
+            #     filtered_workorder = []
+            # selected_workorder = st.selectbox(label=":blue[Work Order]", options=filtered_workorder, index=None, key="tdsp_name")
+
             if selected_td_specialist:
-                st.write(selected_td_specialist_code)
-                filtered_workorder_df = st.session_state.df_woassignedto[st.session_state.df_woassignedto["TDSPID"]==selected_td_specialist_code]
-                filtered_workorder_list = list(filtered_workorder_df)
-                filtered_workorder = sorted(filtered_workorder_list)
+                # Correctly filter and extract Work Order IDs
+                filtered_workorder_df = st.session_state.df_woassignedto[
+                    st.session_state.df_woassignedto["TDSPID"] == selected_td_specialist_code
+                ]
+                
+                if not filtered_workorder_df.empty:  # Check if the DataFrame is not empty
+                    filtered_workorder_list = sorted(filtered_workorder_df["WOID"].tolist())  # Extract WOIDs and convert to a sorted list
+                else:
+                    filtered_workorder_list = []  # Handle the case where no work orders are found
+
             else:
-                filtered_workorder = []
-            selected_workorder = st.selectbox(label=":blue[Work Order]", options=filtered_workorder, index=None, key="sb_wo")
+                filtered_workorder_list = []
+
+            selected_workorder = st.selectbox(
+                label=":blue[Work Order]", 
+                options=filtered_workorder_list, 
+                index=None, 
+                key="sb_wo"
+            )
+
 
             # Task Group Level 1 dropdown
             tskgrl1_options = st.session_state.df_tskgrl1["NAME"].tolist()

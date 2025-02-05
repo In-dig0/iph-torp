@@ -350,15 +350,16 @@ def create_workitem(conn)-> None:
                 success = sqlite_db.save_workitem(witem, conn)
                 if success:
                     st.success("New workitem created!")
+                    time.sleep(3)
 
-                    # Reset the form fields
-                    st.session_state.tdsp_form = None  # Or a default value
-                    st.session_state.sb_wo = None  # Or a default value
-                    st.session_state.sb_tskgrl1 = None  # Or a default value
-                    st.session_state.sb_tskgrl2 = None  # Or a default value
-                    st.session_state.in_time_qty = 0.0  # Or a default value
-                    st.session_state.ti_description = ""  # Or a default value
-                    st.session_state.ta_note = ""  # Or a default value
+                    # # Reset the form fields
+                    # st.session_state.tdsp_form = None  # Or a default value
+                    # st.session_state.sb_wo = None  # Or a default value
+                    # st.session_state.sb_tskgrl1 = None  # Or a default value
+                    # st.session_state.sb_tskgrl2 = None  # Or a default value
+                    # st.session_state.in_time_qty = 0.0  # Or a default value
+                    # st.session_state.ti_description = ""  # Or a default value
+                    # st.session_state.ta_note = ""  # Or a default value
 
                     # Force a rerun to update the grid
                     st.rerun()

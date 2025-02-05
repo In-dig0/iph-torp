@@ -66,11 +66,14 @@ def view_workitems(conn) -> None :
         (st.session_state.df_woassignedto['TDTLID'] == selected_tdtl_code)
     ]  # Usa isin()            
     
+    st.write(filtered_tdsp_woassignedto)
+    
     tdsp_woassignedto_names = []  # Lista per i nomi predefiniti
     for code in filtered_tdsp_woassignedto["TDSPID"]: # Itero sui codici
         name = servant.get_description_from_code(st.session_state.df_users, code, "NAME")
         tdsp_woassignedto_names.append(name)
 
+    st.write(tdsp_woassignedto_names)
     # Select TD Specialist Name with dynamic filtering
     selected_tdsp_name = st.sidebar.selectbox(
         label=":blue[Tech Dept Specialist]", 

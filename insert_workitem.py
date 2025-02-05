@@ -43,7 +43,7 @@ def create_workitem(conn)-> None:
 
     # Convert DATE column to datetime objects (if it's not already)
     if st.session_state.df_workitems['REFDATE'].dtype != 'datetime64[ns]':  # Check the data type
-        st.session_state.df_workitems['REFDATE'] = pd.to_datetime(st.session_state.df_workitems['DATE'])        
+        st.session_state.df_workitems['REFDATE'] = pd.to_datetime(st.session_state.df_workitems['REFDATE'])        
       
     # Filter workitems dynamically
     filtered_workitems = st.session_state.df_workitems

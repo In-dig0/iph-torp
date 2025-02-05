@@ -198,7 +198,7 @@ def create_workitem(conn)-> None:
 
     st.header("🎯Last Workitems")
     with st.container():
-        st.write(f"Number of workitems: `{len(st.session_state.df)}`")
+        st.write(f"Number of workitems: `{len(st.session_state.df_out)}`")
 
 # st.info(
 #     "You can edit the tickets by double clicking on a cell. Note how the plots below "

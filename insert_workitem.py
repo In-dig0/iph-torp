@@ -34,7 +34,9 @@ def create_workitem(conn)-> None:
     for key, loader in session_data.items():
         if key not in st.session_state:
             st.session_state[key] = loader(conn)
-
+    
+    st.sessione_state.df_out = t.sessione_state.df_workitems
+    
     tdsp_woassignedto_names_df = st.session_state.df_users[st.session_state.df_users["DEPTCODE"]=="DTD"]["NAME"]
     tdsp_woassignedto_names_list = list(tdsp_woassignedto_names_df)
     tdsp_woassignedto_names = sorted(tdsp_woassignedto_names_list)
@@ -171,35 +173,21 @@ def create_workitem(conn)-> None:
                             "wi_time_qty": quantity,
                             "wi_time_um": "H"
                         }
+
+                columns_name = ["REFDATE","WOID","TDSPID","STATUS","TSKGRL1","TSKGRL2","DESC","NOTE","TIME_QTY", "TIME_UM"]
+                df_new = pd.DataFrame(
+                    [witem],
+                    columns=columns_name
+                )
+                st.session_state.df_out = pd.concat([df_new, st.session_state.df_out], axis=0)        
                 success = sqlite_db.save_workitem(witem, conn)        
                 if success:
                     st.success("New workitem created!")
-                    
-                    #today = datetime.datetime.now().strftime("%Y-%m-%d")
-                    columns_name = ["REFDATE","WOID","TDSPID","STATUS","TSKGRL1","TSKGRL2","DESC","NOTE","TIME_QTY", "TIME_UM"]
-                    df_new = pd.DataFrame(
-                        [witem
-                            # {
-                            #     "REFDATE": execution_date,
-                            #     "WOID": selected_workorder,
-                            #     "TDSPID": selected_td_specialist_form_code,
-                            #     "STATUS": "ACTIVE",
-                            #     "TSKGRL1": selected_tskgrl1_code,
-                            #     "TSKGRL2": selected_tskgrl2_code,
-                            #     "DESC": desc,
-                            #     "NOTE": note,
-                            #     "TIME_QTY": quantity,
-                            #     "TIME_UM": "H"
-                            # }
-                        ], columns=columns_name
-                    )
-
-                    st.session_state.df_out = pd.concat([df_new, st.session_state.df_out], axis=0)
 
     st.header("🎯Last Workitems")
     with st.container():
-        st.write(f"Number of workitems: `{len(st.session_state.df_out)}`")
-        st.dataframe(data=st.session_state.df_out, use_container_width=True, hide_index=True)
+        st.write(f"Number of workitems: `{len(df_out)}`")
+        st.dataframe(df_out, use_container_width=True, hide_index=True)
 
 # st.info(
 #     "You can edit the tickets by double clicking on a cell. Note how the plots below "

@@ -251,10 +251,7 @@ def show_workorder_dialog(selected_row_dict,  # Passa un dizionario
 
         if req_tdtl_name: #se è stato selezionato un TL
             req_tdtl_code = df_users[df_users["NAME"] == req_tdtl_name]["CODE"].iloc[0] #Recupero il codice del TL
-            #st.write(f"Team Leader selezionato (nome): {req_tdtl_name}")
-            #st.write(f"Team Leader selezionato (codice): {req_tdtl_code}")
         else:
-            #st.write("Nessun Team Leader selezionato.")
             req_tdtl_code = None # o un valore di default che preferisci            
 
         wo_type = st.selectbox(label="Type(:red[*])", options=wo_type_options, index=wo_type_index, disabled=False)
@@ -266,27 +263,15 @@ def show_workorder_dialog(selected_row_dict,  # Passa un dizionario
         )  
         wo_time_um = "H" 
 
-        # Tech Dept Specialist assignment selection
-        # filtered_woassignedto = df_woassignedto[
-        #     (df_woassignedto["WOID"] == woid) & 
-        #     (df_woassignedto["STATUS"] == active_status)
-        # ]
-
         filtered_woassignedto = df_woassignedto[
           (df_woassignedto['WOID'] == woid) & 
           (df_woassignedto['TDTLID'] == req_tdtl_code)
         ]  # Usa isin()
-        
-        
-        # wo_assignedto_default_code = filtered_woassignedto["TDSPID"]
-        # wo_assignedto_default_name = servant.get_description_from_code(df_tdusers, wo_assignedto_default_code, "NAME")
-        # wo_assignedto_default_name_list = list(wo_assignedto_default_name)
-        
+               
         wo_assignedto_default_names = []  # Lista per i nomi predefiniti
         for code in filtered_woassignedto["TDSPID"]: # Itero sui codici
             name = servant.get_description_from_code(df_tdusers, code, "NAME")
             wo_assignedto_default_names.append(name)
-
 
         wo_assignedto_option = list(df_tdusers["NAME"])
         wo_assignedto_title = "Tech Department Specialists assigned to (:red[*]):"
@@ -367,7 +352,7 @@ def manage_request(conn):
     df_requests_grid['INSDATE'] = st.session_state.df_requests['INSDATE']
 #    df_requests_grid['DEPTNAME'] = df_requests['DEPT'].apply(lambda dept_code: get_description_from_code(df_depts, dept_code, "NAME"))
     df_requests_grid['PRIORITY'] = st.session_state.df_requests['PRIORITY']
-    df_requests_grid['SEQUENCE'] = st.session_state.df_requests['SEQUENCE']
+
     df_requests_grid['PRLINE_NAME'] = st.session_state.df_requests['PR_LINE'].apply(lambda pline_code: servant.get_description_from_code(st.session_state.df_pline, pline_code, "NAME"))
     df_requests_grid['TITLE'] = st.session_state.df_requests['TITLE']
     df_requests_grid['REQUESTER_NAME'] = st.session_state.df_requests['REQUESTER'].apply(lambda requester_code: servant.get_description_from_code(st.session_state.df_users, requester_code, "NAME"))
@@ -431,7 +416,6 @@ def manage_request(conn):
         index=None,
         key='Pline_value'
     )
-
 
     # Apply filters 
     filtered_data = df_requests_grid.copy() 

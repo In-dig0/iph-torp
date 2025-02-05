@@ -415,7 +415,7 @@ def load_workitems_data(conn):
         WHERE A.status = 'ACTIVE'
         ORDER BY WOID
         """, conn, parse_dates=["REFDATE"])
-        df_workitem['REFDATE'] = df_workitem['REFDATE'].dt.date
+        df['REFDATE'] = pd.to_datetime(df['REFDATE']) 
 
     except Exception as errMsg:
         st.error(f"**ERROR load data from TORP_WORKITEMS: \n{errMsg}", icon="🚨")

@@ -199,6 +199,7 @@ def create_workitem(conn)-> None:
     st.header("🎯Last Workitems")
     with st.container():
         st.write(f"Number of workitems: `{len(st.session_state.df_out)}`")
+        st.dataframe(data=st.session_state.df_out, use_container_width=True, hide_index=True)
 
 # st.info(
 #     "You can edit the tickets by double clicking on a cell. Note how the plots below "
@@ -208,24 +209,24 @@ def create_workitem(conn)-> None:
 
 # Show the tickets dataframe with `st.data_editor`. This lets the user edit the table
 # cells. The edited data is returned as a new dataframe.
-        edited_df = st.data_editor(
-            st.session_state.df_out,
-            use_container_width=True,
-            hide_index=True,
-            # column_config={
-            #     "Status": st.column_config.SelectboxColumn(
-            #         "Status",
-            #         help="Ticket status",
-            #         options=["Open", "In Progress", "Closed"],
-            #         required=True,
-            #     ),
-            #     "Priority": st.column_config.SelectboxColumn(
-            #         "Priority",
-            #         help="Priority",
-            #         options=["High", "Medium", "Low"],
-            #         required=True,
-            #     ),
-            #},
-            # Disable editing the ID and Date Submitted columns.
-            disabled=["WOID"],
-        )
+        # edited_df = st.data_editor(
+        #     st.session_state.df_out,
+        #     use_container_width=True,
+        #     hide_index=True,
+        #     # column_config={
+        #     #     "Status": st.column_config.SelectboxColumn(
+        #     #         "Status",
+        #     #         help="Ticket status",
+        #     #         options=["Open", "In Progress", "Closed"],
+        #     #         required=True,
+        #     #     ),
+        #     #     "Priority": st.column_config.SelectboxColumn(
+        #     #         "Priority",
+        #     #         help="Priority",
+        #     #         options=["High", "Medium", "Low"],
+        #     #         required=True,
+        #     #     ),
+        #     #},
+        #     # Disable editing the ID and Date Submitted columns.
+        #     disabled=["WOID"],
+        # )

@@ -411,7 +411,8 @@ def load_workitems_data(conn):
             A.time_qty AS TIME_QTY,
             A.time_um AS TIME_UM
         FROM TORP_WORKITEMS A  
-        WHERE A.status IN ['ACTIVE', 'DISABLED']
+        WHERE A.status = 'ACTIVE'
+        OR A.status = 'DISABLED'
         ORDER BY WOID
         """, conn, parse_dates=["REFDATE"])
         df_workitem['REFDATE'] = df_workitem['REFDATE'].dt.date

@@ -143,15 +143,18 @@ def create_workitem(conn)-> None:
             # Note
             note = st.text_area(label=":blue[Notes]", key="ta_note")
 
+            save_button_disabled = not [
+                execution_date and 
+                selected_td_specialist_form_code and 
+                selected_workorder and 
+                selected_tskgrl1_code and 
+                selected_tskgrl2_code and 
+                quantity
+                ]
             # Save button
-            if st.button("Save"):
+            if st.button("Save Work Item", disabled=save_button_disabled):
                 # Code to save the new work item goes here
-                st.success("New workitem created!")
-
-                today = datetime.datetime.now().strftime("%Y-%m-%d")
-                df_new = pd.DataFrame(
-                    [
-                        {
+                witem = {
                             "REFDATE": execution_date,
                             "WOID": selected_workorder,
                             "TDSPID": selected_td_specialist_form_code,
@@ -163,8 +166,27 @@ def create_workitem(conn)-> None:
                             "TIME_QTY": quantity,
                             "TIME_UM": "H"
                         }
-                    ]
-                )
+                success = save_workitem(witem, conn)        
+                if success:
+                    st.success("New workitem created!")
+                    
+                    #today = datetime.datetime.now().strftime("%Y-%m-%d")
+                    df_new = pd.DataFrame(
+                        [witem
+                            # {
+                            #     "REFDATE": execution_date,
+                            #     "WOID": selected_workorder,
+                            #     "TDSPID": selected_td_specialist_form_code,
+                            #     "STATUS": "ACTIVE",
+                            #     "TSKGRL1": selected_tskgrl1_code,
+                            #     "TSKGRL2": selected_tskgrl2_code,
+                            #     "DESC": desc,
+                            #     "NOTE": note,
+                            #     "TIME_QTY": quantity,
+                            #     "TIME_UM": "H"
+                            # }
+                        ]
+                    )
                 #st.dataframe(df_new, use_container_width=True, hide_index=True)
                 st.session_state.df = pd.concat([df_new, st.session_state.df], axis=0)
 

@@ -812,6 +812,40 @@ def save_workorder_assignments(woid, tdtl_code, assigned_users, df_users, df_woa
 
     return True
 
+
+def save_workitem(witem: dict, conn) ->  bool:
+    """Save request to database and return request number and status"""
+    try:
+        with conn:
+            cursor = conn.cursor()        
+
+        sql = """
+            INSERT INTO TORP_WORKITEMS (
+                refdate, woid, tdspid, status, 
+                tskgrl1, tskgrl2, description, note, 
+                time_qty, time_um
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        """
+        values = (
+            witem["wi_date"], witem["wo_id"], witem["wi_userid"], witem["wi_status"],
+            witem["wi_tskgrl1"], witem["wi_tskgrl2"], witem["wi_desc"], witem["wi_note"], 
+            witem["wi_time_qty"], witem["wi_time_um"]
+        )
+        cursor.execute(sql, values)
+        conn.commit()
+        return True
+    
+    except Exception as e:
+        st.error(f"**ERROR inserting data in table TORP_WORKITEM: \n{e}", icon="🚨")
+        conn.rollback()
+        return False
+
+    finally:
+        if cursor:
+            cursor.close() # Close the cursor in a finally block
+
+    return True
+
 def initialize_session_state(conn): #passo la connessione
         # Load data only once and store in session state
     session_data = {

@@ -75,12 +75,15 @@ def create_workitem(conn)-> None:
 #    st.subheader()
 
     with st.container(border=True):
+        if selected_tdsp_name:
+            st.write(selected_tdsp_name)
         with st.expander(label=":orange[New Workitem]", expanded=False):
             # TD Specialist dropdown
             if selected_tdsp_name: 
                 tdsp_index = tdsp_woassignedto_names.index(selected_tdsp_name)
             else:
-                tdsp_index = None    
+                tdsp_index = None
+            st.write(tdsp_index)        
             selected_td_specialist = st.selectbox(label=":blue[TD Specialist](:red[*])", index=tdsp_index, options=tdsp_woassignedto_names, key="sb_tds")
             selected_td_specialist_code = servant.get_code_from_name(st.session_state.df_users, selected_td_specialist, "CODE")
 

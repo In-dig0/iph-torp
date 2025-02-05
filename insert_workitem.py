@@ -156,6 +156,7 @@ def create_workitem(conn)-> None:
             # Save button
             if st.button("Save Work Item", disabled=save_button_disabled):
                 # Code to save the new work item goes here
+
                 witem = {
                             "wi_refdate": execution_date,
                             "wo_woid": selected_workorder,
@@ -173,6 +174,7 @@ def create_workitem(conn)-> None:
                     st.success("New workitem created!")
                     
                     #today = datetime.datetime.now().strftime("%Y-%m-%d")
+                    columns_name = ["REFDATE","WOID","TDSPID","STATUS","TSKGRL1","TSKGRL1","DESC","NOTE","TIME_QTY", "TIME_UM"]
                     df_new = pd.DataFrame(
                         [witem
                             # {
@@ -187,7 +189,7 @@ def create_workitem(conn)-> None:
                             #     "TIME_QTY": quantity,
                             #     "TIME_UM": "H"
                             # }
-                        ]
+                        ], columns=columns_name
                     )
 
                     st.session_state.df = pd.concat([df_new, st.session_state.df], axis=0)

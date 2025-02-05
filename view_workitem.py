@@ -71,7 +71,9 @@ def view_workitems(conn) -> None :
     tdsp_woassignedto_names = []  # Lista per i nomi predefiniti
     for code in filtered_tdsp_woassignedto["TDSPID"]: # Itero sui codici
         name = servant.get_description_from_code(st.session_state.df_users, code, "NAME")
-        tdsp_woassignedto_names.append(name)
+        if name not in tdsp_woassignedto_names:
+            tdsp_woassignedto_names.append(name)
+        sorted(tdsp_woassignedto_names)    
 
     st.write(tdsp_woassignedto_names)
     # Select TD Specialist Name with dynamic filtering

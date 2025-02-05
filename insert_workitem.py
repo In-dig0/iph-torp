@@ -90,7 +90,7 @@ def create_workitem(conn)-> None:
                 filtered_workorder_list = list(filtered_workorder_df)
                 filtered_workorder = sorted(filtered_workorder_list)
             else:
-                filtered_wo = []
+                filtered_workorder = []
             selected_workorder = st.selectbox(label=":blue[Work Order]", options=filtered_workorder, index=None, key="sb_wo")
 
             # Task Group Level 1 dropdown

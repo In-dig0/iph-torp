@@ -77,7 +77,8 @@ def create_workitem(conn)-> None:
     with st.container(border=True):
         with st.expander(label=":orange[New Workitem]", expanded=False):
             # TD Specialist dropdown
-            selected_td_specialist = st.selectbox(label=":blue[TD Specialist]", options=tdsp_woassignedto_names, index=None, key="sb_tds")
+            tdsp_index = tdsp_woassignedto_names.index(selected_tdsp_name)
+            selected_td_specialist = st.selectbox(label=":blue[TD Specialist]", index=tdsp_index, options=tdsp_woassignedto_names, index=None, key="sb_tds")
             selected_td_specialist_code = servant.get_code_from_name(st.session_state.df_users, selected_td_specialist, "CODE")
 
             # Work Order Number dropdown 
@@ -122,7 +123,7 @@ def create_workitem(conn)-> None:
                             "TDSPID": selected_td_specialist_code,
                             "STATUS": "ACTIVE",
                             "TSKGRL1": selected_tskgrl1_code,
-                            "TSKGR21": selected_tskgrl2_code,
+                            "TSKGRL2": selected_tskgrl2_code,
                             "DESC": desc,
                             "NOTE": note,
                             "TIME_QTY": quantity,

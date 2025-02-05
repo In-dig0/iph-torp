@@ -433,7 +433,7 @@ def manage_request(conn):
             overflow: auto; /* Optional: Add scroll if content overflows */
         }}
         #grid-container .ag-root {{ /* Target the AgGrid root element */
-            height: 100%; /* Ensure AgGrid fills the container */
+            height: 50%; /* Ensure AgGrid fills the container */
         }}
 
         </style>

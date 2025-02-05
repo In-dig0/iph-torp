@@ -35,7 +35,7 @@ def create_workitem(conn)-> None:
         if key not in st.session_state:
             st.session_state[key] = loader(conn)
 
-    tdsp_woassignedto_names = session_state.df_users[session_state.df_users["DEPT"]=="DTD"]["NAME"]
+    tdsp_woassignedto_names = st.session_state.df_users[st.session_state.df_users["DEPTCODE"]=="DTD"]["NAME"]
     st.write(tdsp_woassignedto_names)
 
     selected_tdsp_name = st.sidebar.selectbox(

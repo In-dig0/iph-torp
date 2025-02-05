@@ -183,6 +183,50 @@ def create_workitem(conn)-> None:
     #     st.write(f"Number of workitems: `{len(st.session_state.df_out)}`")
     #     st.dataframe(st.session_state.df_out, use_container_width=True, hide_index=True) # Access df_out from session state
 
+            # if st.button("Save Work Item", disabled=save_button_disabled):
+            #     witem = {
+            #         "wi_refdate": execution_date,
+            #         "wo_woid": selected_workorder,
+            #         "wi_tdspid": selected_td_specialist_form_code,
+            #         "wi_status": "ACTIVE",
+            #         "wi_tskgrl1": selected_tskgrl1_code,
+            #         "wi_tskgrl2": selected_tskgrl2_code,
+            #         "wi_desc": desc,
+            #         "wi_note": note,
+            #         "wi_time_qty": quantity,
+            #         "wi_time_um": "H"
+            #     }
+                
+            #     columns_name = ["REFDATE","WOID","TDSPID","STATUS","TSKGRL1","TSKGRL2","DESC","NOTE","TIME_QTY", "TIME_UM"]
+            #     df_new = pd.DataFrame([witem], columns=columns_name)
+                
+            #     # Aggiorna sia df_out che df_workitems sorgente
+            #     st.session_state.df_out = pd.concat([df_new, st.session_state.df_out], axis=0, ignore_index=True)
+            #     st.session_state.df_workitems = pd.concat([df_new, st.session_state.df_workitems], axis=0, ignore_index=True)
+                
+            #     success = sqlite_db.save_workitem(witem, conn)
+            #     if success:
+            #         st.success("New workitem created!")
+                    
+            #         # Reset dei campi del form rimuovendo le chiavi dalla session state
+            #         chiavi_form = [
+            #             "tdsp_form",
+            #             "sb_wo",
+            #             "sb_tskgrl1",
+            #             "sb_tskgrl2",
+            #             "in_time_qty",
+            #             "ti_description",
+            #             "ta_note"
+            #         ]
+                    
+            #         for chiave in chiavi_form:
+            #             if chiave in st.session_state:
+            #                 del st.session_state[chiave]
+                    
+            #         # Forza il refresh dopo una breve pausa
+            #         time.sleep(1)
+            #         st.rerun()
+
             if st.button("Save Work Item", disabled=save_button_disabled):
                 witem = {
                     "wi_refdate": execution_date,
@@ -197,35 +241,30 @@ def create_workitem(conn)-> None:
                     "wi_time_um": "H"
                 }
                 
-                columns_name = ["REFDATE","WOID","TDSPID","STATUS","TSKGRL1","TSKGRL2","DESC","NOTE","TIME_QTY", "TIME_UM"]
-                df_new = pd.DataFrame([witem], columns=columns_name)
-                
-                # Aggiorna sia df_out che df_workitems sorgente
-                st.session_state.df_out = pd.concat([df_new, st.session_state.df_out], axis=0, ignore_index=True)
-                st.session_state.df_workitems = pd.concat([df_new, st.session_state.df_workitems], axis=0, ignore_index=True)
-                
                 success = sqlite_db.save_workitem(witem, conn)
                 if success:
                     st.success("New workitem created!")
-                    
-                    # Reset dei campi del form rimuovendo le chiavi dalla session state
-                    chiavi_form = [
-                        "tdsp_form",
-                        "sb_wo",
-                        "sb_tskgrl1",
-                        "sb_tskgrl2",
-                        "in_time_qty",
-                        "ti_description",
-                        "ta_note"
-                    ]
-                    
-                    for chiave in chiavi_form:
-                        if chiave in st.session_state:
-                            del st.session_state[chiave]
-                    
-                    # Forza il refresh dopo una breve pausa
+                    # Imposta un flag nella session state per indicare che è necessario ricaricare
+                    st.session_state.reload_needed = True
+                    # Imposta i valori default per i campi
+                    st.session_state.form_reset = True
                     time.sleep(1)
                     st.rerun()
+
+            # All'inizio della funzione, dopo aver caricato i dati iniziali
+            if 'reload_needed' in st.session_state and st.session_state.reload_needed:
+                st.session_state.df_workitems = sqlite_db.load_workitems_data(conn)
+                del st.session_state.reload_needed
+
+            if 'form_reset' in st.session_state and st.session_state.form_reset:
+                st.session_state.tdsp_form = st.session_state.tdsp_sidebar
+                st.session_state.sb_wo = None
+                st.session_state.sb_tskgrl1 = None
+                st.session_state.sb_tskgrl2 = None
+                st.session_state.in_time_qty = 0.0
+                st.session_state.ti_description = ""
+                st.session_state.ta_note = ""
+                del st.session_state.form_reset
 
         st.header("🎯Last Workitems")
         with st.container():

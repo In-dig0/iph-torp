@@ -425,14 +425,14 @@ def manage_request(conn):
     # Display grid
     st.subheader("Request list:")
     # Display grid with height setting
-    st.markdown(
-        f"""
-        <div id="grid-container" style="height: 500px; width: 100%; border: 1px solid #ccc; overflow: auto;">
-            <div id="grid-root" style="height: 100%;"></div> 
-        </div>
-        """,
-        unsafe_allow_html=True,
-    )
+    # st.markdown(
+    #     f"""
+    #     <div id="grid-container" style="height: 500px; width: 100%; border: 1px solid #ccc; overflow: auto;">
+    #         <div id="grid-root" style="height: 100%;"></div> 
+    #     </div>
+    #     """,
+    #     unsafe_allow_html=True,
+    # )
     # # Creazione/Aggiornamento della griglia (UNA SOLA VOLTA per ciclo di esecuzione)
     # if st.session_state.grid_response is None:
     #     st.session_state.grid_response = AgGrid(
@@ -469,7 +469,7 @@ def manage_request(conn):
         data_return_mode=DataReturnMode.AS_INPUT,
         key="main_grid",
         # Important: target the inner div for rendering
-        dom_id='grid-root'
+        #dom_id='grid-root'
     )
     # selected_rows = st.session_state.grid_response['selected_rows']
     # modify_request_button_disable = not (selected_rows is not None and isinstance(selected_rows, pd.DataFrame) and not selected_rows.empty)

@@ -242,7 +242,7 @@ def show_workorder_dialog(selected_row_dict,  # Passa un dizionario
             default_indices = []
 
         req_tdtl_name = st.selectbox(
-            label=":blue[Tech Department Team Leader](:red[*])",
+            label=":orange[Tech Department Team Leader](:red[*])",
             options=tdtl_username_list,
             index=default_indices[0] if default_indices else None,  # Usa il primo indice se presente, altrimenti None
             key="sb_tdtl_reqmanage2",
@@ -415,7 +415,7 @@ def manage_request(conn):
 
 
     # Sidebar controls - Filters
-    st.sidebar.header(":blue[Filters]")
+    st.sidebar.header(":orange[Filters]")
     req_status_options = list(df_requests_grid['STATUS'].drop_duplicates().sort_values())
     status_filter = st.sidebar.selectbox(
         ":orange[Status]", 

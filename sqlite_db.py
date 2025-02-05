@@ -379,7 +379,8 @@ def load_woassignedto_data(conn):
         df_woassignedto = pd.read_sql_query("""
         SELECT 
             A.woid AS WOID, 
-            A.tdtlid AS TDTLID, 
+            A.tdtlid AS TDTLID,
+            A.tdspid AS TDSPID,
             A.status AS STATUS, 
             B.name AS USERNAME 
         FROM TORP_WOASSIGNEDTO A
@@ -777,12 +778,13 @@ def save_workorder_assignments(woid, tdtl_code, assigned_users, df_users, df_woa
             # Add new assignments
             for user_name in assigned_users:
                 user_code = df_users[df_users["NAME"] == user_name]["CODE"].iloc[0]
-                st.write(f"{woid} - {tdtl_code} - {user_code} -")
+                #st.write(f"{woid} - {tdtl_code} - {user_code} -")
+
                 existing_assignment = df_woassignedto[
                     (df_woassignedto['WOID'] == woid) & 
                     (df_woassignedto['TDTLID'] == tdtl_code) &
-                    (df_woassignedto['TDSPID'] == user_code)
-                ]
+                    df_woassignedto['TDSPID'].isin([user_code])
+                  ]  # Usa isin()
                 
                 if existing_assignment.empty:
                     cursor.execute(
@@ -808,3 +810,37 @@ def save_workorder_assignments(woid, tdtl_code, assigned_users, df_users, df_woa
             cursor.close() # Close the cursor in a finally block
 
     return True
+
+def initialize_session_state(conn): #passo la connessione
+        # Load data only once and store in session state
+    session_data = {
+        'df_depts': load_dept_data,
+        'df_users': load_users_data,
+        'df_pline': load_pline_data,
+        'df_pfamily': load_pfamily_data,
+        'df_category': load_category_data,
+        'df_type': load_type_data,
+        'df_lk_type_category': load_lk_type_category_data,
+        'df_lk_category_detail': load_lk_category_detail_data,
+        'df_lk_pline_tdtl': load_lk_pline_tdtl_data,
+        'df_detail': load_detail_data,
+        'df_requests': load_requests_data,
+        'df_reqassignedto': load_reqassignedto_data,
+        'df_attachments': load_attachments_data,
+        'df_workorders': load_workorders_data,
+        'df_woassignedto': load_woassignedto_data,
+        'df_workitems': load_workitems_data,
+        'df_tskgrl1': load_tskgrl1_data,
+        'df_tskgrl2': load_tskgrl2_data,
+    }
+
+    # for key, loader in session_data.items():
+    #     if key not in st.session_state:
+    #         st.session_state[key] = loader(conn)
+    for key, loader in session_data.items():
+        if key not in st.session_state or st.session_state[key] is None:  # Controllo più robusto
+            try:
+                st.session_state[key] = loader(conn)
+            except Exception as e:  # Gestione errori
+                st.error(f"Errore caricamento dati per {key}: {e}")
+                st.stop()  # Importante: ferma l'esecuzione se il caricamento fallisce

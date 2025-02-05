@@ -40,7 +40,7 @@ def reset_application_state():
     st.session_state.grid_refresh_key = str(time.time())     
     st.rerun()
 
-def show_request_dialog(selected_row_dict, req_status_options, update_request_fn):  # Passa un dizionario
+def show_request_dialog(selected_row_dict, req_status_options, update_request_fn, conn):  # Passa un dizionario
     """Visualizza e gestisci la finestra di dialogo di modifica della richiesta."""
 
     popup_title = f'Richiesta {selected_row_dict["REQID"]}'  # Accedi a REQID direttamente
@@ -56,18 +56,62 @@ def show_request_dialog(selected_row_dict, req_status_options, update_request_fn
         description = st.session_state.df_requests.loc[st.session_state.df_requests["REQID"] == reqid, "DESCRIPTION"].values[0]
         st.text_area(label="Descrizione", value=description, disabled=True)
 
-        # ... (Resto del contenuto del dialogo)
+        st.divider()
+        tdtl_usercode = st.session_state.df_lk_pline_tdtl["USER_CODE"].drop_duplicates().sort_values().tolist() #conversione in lista
+        tdtl_username_list = st.session_state.df_users[st.session_state.df_users["CODE"].isin(tdtl_usercode)]["NAME"].tolist()
+
+        tdtl_default_codes = st.session_state.df_reqassignedto[st.session_state.df_reqassignedto["REQID"] == reqid]["TDTLID"].tolist()
+
+        if tdtl_default_codes:
+            tdtl_option = st.session_state.df_users[st.session_state.df_users["CODE"].isin(tdtl_default_codes)]
+            default_tdtl_name = tdtl_option["NAME"].tolist()
+        else:
+            default_tdtl_name = []
+
+        req_tdtl_name = st.multiselect(
+            label=":blue[Tech Department Team Leader](:red[*])",
+            options=tdtl_username_list,
+            default=default_tdtl_name,
+            key="sb_tdtl_reqmanage",
+            disabled=False
+        )
+
+        if req_tdtl_name:
+            req_tdtl_code = st.session_state.df_users[st.session_state.df_users["NAME"].isin(req_tdtl_name)]["CODE"].tolist()
+        else:
+            req_tdtl_code = []
+
+        idx_status = req_status_options.index(selected_row_dict['STATUS'])  # Usa selected_row_dict
+        req_status = st.selectbox(label=":blue[Status](:red[*])", options=req_status_options, index=idx_status, disabled=False, key="status_selectbox")
+        
+        # Display Tech Dept Note
+        default_note_td = str(st.session_state.df_requests[st.session_state.df_requests["REQID"] == reqid]["NOTE_TD"].values[0])
+        req_note_td = st.text_area(label=":blue[Tech Department Notes]", value=default_note_td, disabled=False)
+
+        if (req_note_td == default_note_td) and (selected_row_dict['STATUS'] == req_status) and (req_tdtl_name == default_tdtl_name): #Usa selected_row_dict
+            disable_save_button = True
+        else:
+            disable_save_button = False   
 
         if st.button("Salva", type="primary", disabled=disable_save_button, key="req_save_button"):
             success = update_request_fn(reqid, req_status, req_note_td, 0, req_tdtl_code, conn)
-            # ... (Resto della tua logica di salvataggio)
+            if success:
+              st.session_state.grid_refresh = True
+              st.session_state.grid_response = None
+              st.success(f"Request {reqid} updated successfully!")
+              st.session_state.df_requests = sqlite_db.load_requests_data(conn)  # Ricarica i dati dal database
+              st.session_state.need_refresh = True
+              time.sleep(3)
+              reset_application_state()
+              st.rerun()
+
 
     return dialog_content()
 
 def show_workorder_dialog(selected_row_dict,  # Passa un dizionario
                          df_workorders, df_woassignedto, df_users, active_status, 
                          default_dept_code, req_status_options, save_workorder_fn, 
-                         save_woassignments_fn):
+                         save_woassignments_fn, conn):
     """Visualizza e gestisci la finestra di dialogo dell'ordine di lavoro."""
 
     popup_title = f'Richiesta {selected_row_dict["REQID"]}' # Accedi a REQID direttamente
@@ -101,15 +145,29 @@ def show_workorder_dialog(selected_row_dict,  # Passa un dizionario
             unsafe_allow_html=True,
         )
 
+        # Caricamento lazy e controllo esplicito *QUI*
+        if "df_user" not in st.session_state or st.session_state.df_user is None:
+            try:
+                st.session_state.df_user = sqlite_db.load_users_data(conn)  # Carica *solo* se necessario
+            except Exception as e:
+                st.error(f"Errore caricamento dati df_user: {e}")
+                st.stop()
+
+        # Caricamento lazy e controllo esplicito *QUI*
+        if "df_woassignedto" not in st.session_state or st.session_state.df_woassignedto is None:
+            try:
+                st.session_state.df_woassignedto = sqlite_db.load_woassignedto_data(conn)
+            except Exception as e:
+                st.error(f"Errore caricamento dati df_woassignedto: {e}")
+                st.stop()
 
         reqid = selected_row_dict["REQID"]  # Usa direttamente il dizionario
         woid = "W" + selected_row_dict["REQID"][1:]
 
         # ... (Resto del contenuto del dialogo, usando selected_row_dict)
         # Display request details
-        st.text_input(label="Product Line", value=selected_row['PRLINE_NAME'][0], disabled=True)
-        st.text_input(label="Request title", value=selected_row['TITLE'][0], disabled=True)
-
+        st.text_input(label="Product Line", value=selected_row_dict['PRLINE_NAME'], disabled=True)  # Usa selected_row_dict
+        st.text_input(label="Request title", value=selected_row_dict['TITLE'], disabled=True)       # Usa selected_row_dict
         req_description = st.session_state.df_requests.loc[st.session_state.df_requests["REQID"] == reqid, "DESCRIPTION"]
         if not req_description.empty:
             req_description_default = req_description.values[0]
@@ -209,17 +267,33 @@ def show_workorder_dialog(selected_row_dict,  # Passa un dizionario
         wo_time_um = "H" 
 
         # Tech Dept Specialist assignment selection
+        # filtered_woassignedto = df_woassignedto[
+        #     (df_woassignedto["WOID"] == woid) & 
+        #     (df_woassignedto["STATUS"] == active_status)
+        # ]
+
         filtered_woassignedto = df_woassignedto[
-            (df_woassignedto["WOID"] == woid) & 
-            (df_woassignedto["STATUS"] == active_status)
-        ]
-        wo_assignedto_default = list(filtered_woassignedto["USERNAME"])
+          (df_woassignedto['WOID'] == woid) & 
+          (df_woassignedto['TDTLID'] == req_tdtl_code)
+        ]  # Usa isin()
+        
+        
+        # wo_assignedto_default_code = filtered_woassignedto["TDSPID"]
+        # wo_assignedto_default_name = servant.get_description_from_code(df_tdusers, wo_assignedto_default_code, "NAME")
+        # wo_assignedto_default_name_list = list(wo_assignedto_default_name)
+        
+        wo_assignedto_default_names = []  # Lista per i nomi predefiniti
+        for code in filtered_woassignedto["TDSPID"]: # Itero sui codici
+            name = servant.get_description_from_code(df_tdusers, code, "NAME")
+            wo_assignedto_default_names.append(name)
+
+
         wo_assignedto_option = list(df_tdusers["NAME"])
         wo_assignedto_title = "Tech Department Specialists assigned to (:red[*]):"
         wo_assignedto = st.multiselect(
             label=wo_assignedto_title, 
             options=wo_assignedto_option, 
-            default=wo_assignedto_default, 
+            default=wo_assignedto_default_names, 
             max_selections=3,
             disabled=False
         )
@@ -228,7 +302,7 @@ def show_workorder_dialog(selected_row_dict,  # Passa un dizionario
         wo_enddate = None     
 
         if not wo_nr.empty:
-            if (wo_type == wo_type_default and wo_assignedto == wo_assignedto_default and wo_time_qty == wo_timeqty_default):
+            if (wo_type == wo_type_default and wo_assignedto == wo_assignedto_default_names and wo_time_qty == wo_timeqty_default):
                 disable_save_button = True
             else:
                 disable_save_button = False    
@@ -242,53 +316,39 @@ def show_workorder_dialog(selected_row_dict,  # Passa un dizionario
         if st.button("Salva", type="primary", disabled=disable_save_button, key="wo_save_button"):
             # ... (Resto della tua logica di salvataggio)
 
-            wo = {"woid":woid, "tdtlid": req_tdtl_code, "type": wo_type, "title": selected_row["TITLE"][0], "description": req_description_default, "time_qty": wo_time_qty, "time_um": wo_time_um, "status": ACTIVE_STATUS, "startdate": wo_startdate, "enddate": wo_enddate, "reqid": reqid}
+#            wo = {"woid":woid, "tdtlid": req_tdtl_code, "type": wo_type, "title": selected_row["TITLE"][0], "description": req_description_default, "time_qty": wo_time_qty, "time_um": wo_time_um, "status": ACTIVE_STATUS, "startdate": wo_startdate, "enddate": wo_enddate, "reqid": reqid}
+            wo = {
+                "woid": woid,
+                "tdtlid": req_tdtl_code,
+                "type": wo_type,
+                "title": selected_row_dict['TITLE'],  # Usa selected_row_dict
+                "description": req_description_default,
+                "time_qty": wo_time_qty,
+                "time_um": wo_time_um,
+                "status": ACTIVE_STATUS,
+                "startdate": wo_startdate,
+                "enddate": wo_enddate,
+                "reqid": reqid
+            }
             wo_idrow, success = sqlite_db.save_workorder(wo, conn)
             if success:
-                st.write(f"{woid} - {req_tdtl_code} - {wo_assignedto}- {st.session_state.df_user} - {st.session_state.df_woassignedt}")
-                time.sleep(5)
+                #st.write(f"{woid} - {req_tdtl_code} - {wo_assignedto}- {st.session_state.df_user} - {st.session_state.df_woassignedto}")
                 success = sqlite_db.save_workorder_assignments(woid, req_tdtl_code, wo_assignedto, st.session_state.df_users, st.session_state.df_woassignedto, conn)
-                success = sqlite_db.update_request(reqid, "ASSIGNED", req_note_td, "", [], conn)
+                success = sqlite_db.update_request(reqid, "ASSIGNED", req_note_td, "", [req_tdtl_code], conn)
                 if success:
                     st.session_state.grid_refresh = True
                     st.session_state.grid_response = None
                     st.success(f"Work order {woid} created successfully!")
-                
-                st.session_state.need_refresh = True
-                time.sleep(10)
-                reset_application_state()
-                st.rerun()
+                    st.session_state.df_requests = sqlite_db.load_requests_data(conn)  # Ricarica i dati dal database
+                    st.session_state.need_refresh = True
+                    time.sleep(3)
+                    reset_application_state()
+                    st.rerun()
 
     return dialog_content()
 
 
 def manage_request(conn):
-
-        # Load data only once and store in session state
-    session_data = {
-        'df_depts': sqlite_db.load_dept_data,
-        'df_users': sqlite_db.load_users_data,
-        'df_pline': sqlite_db.load_pline_data,
-        'df_pfamily': sqlite_db.load_pfamily_data,
-        'df_category': sqlite_db.load_category_data,
-        'df_type': sqlite_db.load_type_data,
-        'df_lk_type_category': sqlite_db.load_lk_type_category_data,
-        'df_lk_category_detail': sqlite_db.load_lk_category_detail_data,
-        'df_lk_pline_tdtl': sqlite_db.load_lk_pline_tdtl_data,
-        'df_detail': sqlite_db.load_detail_data,
-        'df_requests': sqlite_db.load_requests_data,
-        'df_reqassignedto': sqlite_db.load_reqassignedto_data,
-        'df_attachments': sqlite_db.load_attachments_data,
-        'df_workorders': sqlite_db.load_workorders_data,
-        'df_woassignedto': sqlite_db.load_woassignedto_data,
-        'df_workitems': sqlite_db.load_workitems_data,
-        'df_tskgrl1': sqlite_db.load_tskgrl1_data,
-        'df_tskgrl2': sqlite_db.load_tskgrl2_data,
-    }
-
-    for key, loader in session_data.items():
-        if key not in st.session_state:
-            st.session_state[key] = loader(conn)
 
     # Initialize session state
     if "grid_data" not in st.session_state:
@@ -300,11 +360,14 @@ def manage_request(conn):
 
 
     df_requests_grid = pd.DataFrame()
+    if 'SEQUENCE' not in st.session_state.df_requests.columns:
+        st.session_state.df_requests['SEQUENCE'] = None
     df_requests_grid['REQID'] = st.session_state.df_requests['REQID']
     df_requests_grid['STATUS'] = st.session_state.df_requests['STATUS']
     df_requests_grid['INSDATE'] = st.session_state.df_requests['INSDATE']
 #    df_requests_grid['DEPTNAME'] = df_requests['DEPT'].apply(lambda dept_code: get_description_from_code(df_depts, dept_code, "NAME"))
     df_requests_grid['PRIORITY'] = st.session_state.df_requests['PRIORITY']
+    df_requests_grid['SEQUENCE'] = st.session_state.df_requests['SEQUENCE']
     df_requests_grid['PRLINE_NAME'] = st.session_state.df_requests['PR_LINE'].apply(lambda pline_code: servant.get_description_from_code(st.session_state.df_pline, pline_code, "NAME"))
     df_requests_grid['TITLE'] = st.session_state.df_requests['TITLE']
     df_requests_grid['REQUESTER_NAME'] = st.session_state.df_requests['REQUESTER'].apply(lambda requester_code: servant.get_description_from_code(st.session_state.df_users, requester_code, "NAME"))
@@ -333,7 +396,8 @@ def manage_request(conn):
     # Enalble pagination
     grid_builder.configure_pagination(paginationAutoPageSize=False, paginationPageSize=12)
     grid_builder.configure_grid_options(domLayout='normal')
-    grid_builder.configure_column("REQID", cellStyle=cellStyle)   
+    grid_builder.configure_column("REQID", cellStyle=cellStyle)
+    grid_builder.configure_column("SEQUENCE", editable=True)  # Rend   
     grid_builder.configure_selection(
     selection_mode='single',     # Enable multiple row selection
     use_checkbox=True,             # Show checkboxes for selection
@@ -406,19 +470,29 @@ def manage_request(conn):
 
 
     selected_rows = st.session_state.grid_response['selected_rows']
+    modify_request_button_disable = not (selected_rows is not None and isinstance(selected_rows, pd.DataFrame) and not selected_rows.empty)
+    workorder_button_disable = not (selected_rows is not None and isinstance(selected_rows, pd.DataFrame) and not selected_rows.empty)
 
     # ... (Pulsanti e chiamate di dialogo)
-
+    col1, col2, col3 = st.columns(3)
+    with col1:
+        if st.button("🔄 Refresh data", type="secondary"):
+            reset_application_state()
+            st.session_state.df_requests = sqlite_db.load_requests_data(conn)  # Ricarica i dati dal database
+    
     with col2:
-        if st.button("✏️ Modifica", type="secondary", disabled=modify_request_button_disable):
-            if selected_rows:  # Controlla se selected_rows non è vuoto
-                selected_row_dict = selected_rows[0]  # Ottieni la riga selezionata come dizionario
-                show_request_dialog(selected_row_dict, REQ_STATUS_OPTIONS, sqlite_db.update_request)
-
+        if st.button("✏️ Modifica Request", type="secondary", disabled=modify_request_button_disable):
+            if st.session_state.grid_response and st.session_state.grid_response['selected_rows'] is not None and not st.session_state.grid_response['selected_rows'].empty:
+                selected_rows_df = st.session_state.grid_response['selected_rows']
+                selected_row_dict = selected_rows_df.iloc[0].to_dict() #oppure selected_rows_df.to_dict('records')[0]
+                show_request_dialog(selected_row_dict, REQ_STATUS_OPTIONS, sqlite_db.update_request, conn)
+            # else:
+            #     st.warning("Please select a request from the grid first.", icon="⚠️")
     with col3:
-        if st.button(" Ordine di Lavoro", type="secondary", disabled=workorder_button_disable):
-            if selected_rows:  # Controlla se selected_rows non è vuoto
-                selected_row_dict = selected_rows[0]  # Ottieni la riga selezionata come dizionario
-                show_workorder_dialog(selected_row_dict, st.session_state.df_workorders, st.session_state.df_woassignedto, st.session_state.df_users, ACTIVE_STATUS, DEFAULT_DEPT_CODE, REQ_STATUS_OPTIONS, sqlite_db.save_workorder, sqlite_db.save_workorder_assignments)
-
-# ... (Resto del tuo codice)
+        if st.button("📌 Create Worko Oder", type="secondary", disabled=workorder_button_disable):
+            if st.session_state.grid_response and st.session_state.grid_response['selected_rows'] is not None and not st.session_state.grid_response['selected_rows'].empty:
+                selected_rows_df = st.session_state.grid_response['selected_rows']
+                selected_row_dict = selected_rows_df.iloc[0].to_dict()  # oppure selected_rows_df.to_dict('records')[0]
+                show_workorder_dialog(selected_row_dict, st.session_state.df_workorders, st.session_state.df_woassignedto, st.session_state.df_users, ACTIVE_STATUS, DEFAULT_DEPT_CODE, REQ_STATUS_OPTIONS, sqlite_db.save_workorder, sqlite_db.save_workorder_assignments, conn)
+            # else:
+            #     st.warning("Please select a request from the grid first.", icon="⚠️")  # Avvisa l'utent# ... (Resto del tuo codice)

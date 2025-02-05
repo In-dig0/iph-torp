@@ -424,19 +424,12 @@ def manage_request(conn):
 
     # Display grid
     st.subheader("Request list:")
+    # Display grid with height setting
     st.markdown(
         f"""
-        <div id="grid-container" style="height: 500px; width: 100%;">  </div>  
-        <style>
-        #grid-container {{
-            border: 1px solid #ccc; /* Optional: Add a border */
-            overflow: auto; /* Optional: Add scroll if content overflows */
-        }}
-        #grid-container .ag-root {{ /* Target the AgGrid root element */
-            height: 50%; /* Ensure AgGrid fills the container */
-        }}
-
-        </style>
+        <div id="grid-container" style="height: 500px; width: 100%; border: 1px solid #ccc; overflow: auto;">
+            <div id="grid-root" style="height: 100%;"></div> 
+        </div>
         """,
         unsafe_allow_html=True,
     )
@@ -465,6 +458,7 @@ def manage_request(conn):
     #     )
 
     # IMPORTANT:  Render the AgGrid within the designated container
+    # IMPORTANT: Render the AgGrid within the designated container
     grid_response = AgGrid(
         st.session_state.grid_data,
         gridOptions=grid_options,
@@ -474,8 +468,8 @@ def manage_request(conn):
         update_mode=GridUpdateMode.MODEL_CHANGED,
         data_return_mode=DataReturnMode.AS_INPUT,
         key="main_grid",
-        custom_css={"root": {"height": "50%"}} # This might be redundant but good to include
-
+        # Important: target the inner div for rendering
+        dom_id='grid-root'
     )
     # selected_rows = st.session_state.grid_response['selected_rows']
     # modify_request_button_disable = not (selected_rows is not None and isinstance(selected_rows, pd.DataFrame) and not selected_rows.empty)

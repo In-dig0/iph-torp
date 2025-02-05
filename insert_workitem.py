@@ -53,16 +53,16 @@ def create_workitem(conn)-> None:
     if selected_tdsp_name:       
         # Filter workitems dynamically
         filtered_workitems = st.session_state.df_workitems[
-            (st.session_state.df_workitems["TDSPID"] == selected_tdsp_name) &
-            (st.session_state.df_workitems["REFDATE"] >= selected_from_date) &
-            (st.session_state.df_workitems["REFDATE"] <= selected_to_date)
+            (st.session_state.df_workitems["TDSPID"] == selected_tdsp_code) #&
+            #(st.session_state.df_workitems["REFDATE"] >= selected_from_date) &
+            #(st.session_state.df_workitems["REFDATE"] <= selected_to_date)
         ]
     else:
         # Filter workitems dynamically
-        filtered_workitems = st.session_state.df_workitems[
-            (st.session_state.df_workitems["REFDATE"] >= selected_from_date) &
-            (st.session_state.df_workitems["REFDATE"] <= selected_to_date)
-        ]
+        filtered_workitems = st.session_state.df_workitems#[
+            #(st.session_state.df_workitems["REFDATE"] >= selected_from_date) &
+            #(st.session_state.df_workitems["REFDATE"] <= selected_to_date)
+        #]
 
 
     df = pd.DataFrame(filtered_workitems)

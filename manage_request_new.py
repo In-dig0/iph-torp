@@ -345,8 +345,6 @@ def manage_request(conn):
 
 
     df_requests_grid = pd.DataFrame()
-    if 'SEQUENCE' not in st.session_state.df_requests.columns:
-        st.session_state.df_requests['SEQUENCE'] = None
     df_requests_grid['REQID'] = st.session_state.df_requests['REQID']
     df_requests_grid['STATUS'] = st.session_state.df_requests['STATUS']
     df_requests_grid['INSDATE'] = st.session_state.df_requests['INSDATE']

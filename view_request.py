@@ -182,7 +182,7 @@ def view_requests(conn) -> None:
             if st.button("🔄 Refresh", type="tertiary"):
                 reset_application_state()
    
-   selected_row = st.session_state.grid_response['selected_rows']
+    selected_row = st.session_state.grid_response['selected_rows']
 
     if selected_row is not None and len(selected_row) > 0:
         reqid = selected_row['REQID'].iloc[0]

@@ -415,7 +415,7 @@ def manage_request(conn):
 
 
     # Sidebar controls - Filters
-    st.sidebar.header(":orange[Filters]")
+    st.sidebar.header(":blue[Filters]")
     req_status_options = list(df_requests_grid['STATUS'].drop_duplicates().sort_values())
     status_filter = st.sidebar.selectbox(
         ":orange[Status]", 

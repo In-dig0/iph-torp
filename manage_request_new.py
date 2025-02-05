@@ -380,7 +380,6 @@ def manage_request(conn):
     grid_builder.configure_pagination(paginationAutoPageSize=False, paginationPageSize=12)
     grid_builder.configure_grid_options(domLayout='normal')
     grid_builder.configure_column("REQID", cellStyle=cellStyle)
-    grid_builder.configure_column("SEQUENCE", editable=True)  # Rend   
     grid_builder.configure_selection(
     selection_mode='single',     # Enable multiple row selection
     use_checkbox=True,             # Show checkboxes for selection

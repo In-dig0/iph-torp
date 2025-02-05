@@ -80,7 +80,8 @@ def create_workitem(conn)-> None:
         with st.expander(label=":orange[New Workitem]", expanded=False):
             st.write(tdsp_woassignedto_names)
             st.write(st.session_state["selected_tdsp_name"])
-            st.write(tdsp_woassignedto_names.index(st.session_state["selected_tdsp_name"]))
+            if st.session_state["selected_tdsp_name"]:
+                st.write(tdsp_woassignedto_names.index(st.session_state["selected_tdsp_name"]))
             # TD Specialist Dropdown (Form) - Use the VALUE directly
             if selected_tdsp_name:
                 selected_td_specialist_form = st.selectbox(

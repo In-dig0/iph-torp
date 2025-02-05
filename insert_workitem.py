@@ -44,7 +44,7 @@ def create_workitem(conn)-> None:
         label=":blue[Tech Dept Specialist]", 
         options=tdsp_woassignedto_names, 
         index=None,
-        key="tdspname_selectbox"
+        key="tdsp_sidebar"
     )
     if selected_tdsp_name: #se è stato selezionato un TD Specialist
         selected_tdsp_code = st.session_state.df_users[st.session_state.df_users["NAME"] == selected_tdsp_name]["CODE"].iloc[0] #Recupero il codice del TL
@@ -82,7 +82,7 @@ def create_workitem(conn)-> None:
             else:
                 tdsp_index = None
             st.write(tdsp_index)        
-            selected_td_specialist = st.selectbox(label=":blue[TD Specialist](:red[*])", options=tdsp_woassignedto_names, index=tdsp_index, key="tdspname_selectbox")
+            selected_td_specialist = st.selectbox(label=":blue[TD Specialist](:red[*])", options=tdsp_woassignedto_names, index=tdsp_index, key="tdsp_form")
             selected_td_specialist_code = servant.get_code_from_name(st.session_state.df_users, selected_td_specialist, "CODE")
 
             # # Work Order Number dropdown 

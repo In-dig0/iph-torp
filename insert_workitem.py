@@ -36,7 +36,7 @@ def create_workitem(conn)-> None:
             st.session_state[key] = loader(conn)
 
     tdsp_woassignedto_names = st.session_state.df_users[st.session_state.df_users["DEPTCODE"]=="DTD"]["NAME"]
-    st.write(tdsp_woassignedto_names)
+    #st.write(tdsp_woassignedto_names)
 
     selected_tdsp_name = st.sidebar.selectbox(
         label=":blue[Tech Dept Specialist]", 

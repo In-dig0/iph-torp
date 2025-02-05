@@ -86,7 +86,7 @@ def create_workitem(conn)-> None:
 
             # Work Order Number dropdown 
             if selected_td_specialist:
-                filtered_workorder_df = st.session_state.df_woassignedto[st.session_state.df_woassignedto["TDDSPID"]==selected_td_specialist_code]
+                filtered_workorder_df = st.session_state.df_woassignedto[st.session_state.df_woassignedto["TDSPID"]==selected_td_specialist_code]
                 filtered_workorder_list = list(filtered_workorder_df)
                 filtered_workorder = sorted(filtered_workorder_list)
             else:

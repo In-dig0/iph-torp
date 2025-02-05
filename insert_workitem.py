@@ -86,7 +86,7 @@ def create_workitem(conn)-> None:
                 selected_td_specialist_form = st.selectbox(
                     label=":blue[TD Specialist](:red[*])",
                     options=tdsp_woassignedto_names,
-                    index=tdsp_woassignedto_names.index(st.session_state["selected_tdsp_name"])
+                    index=tdsp_woassignedto_names.index(st.session_state["selected_tdsp_name"]),
                     key="tdsp_form"
                 )
             else:

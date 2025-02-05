@@ -58,13 +58,13 @@ def view_workitems(conn) -> None :
     )
     if selected_tdtl_name: #se è stato selezionato un TL
         selected_tdtl_code = st.session_state.df_users[st.session_state.df_users["NAME"] == selected_tdtl_name]["CODE"].iloc[0] #Recupero il codice del TL
+        filtered_tdsp_woassignedto = st.session_state.df_woassignedto[
+            (st.session_state.df_woassignedto['TDTLID'] == selected_tdtl_code)
+        ]  # Usa isin()
     else:
         selected_tdtl_code = None # o un valore di default che preferisci   
 
 
-    filtered_tdsp_woassignedto = st.session_state.df_woassignedto[
-        (st.session_state.df_woassignedto['TDTLID'] == selected_tdtl_code)
-    ]  # Usa isin()
             
     tdsp_woassignedto_names = []  # Lista per i nomi predefiniti
     for code in filtered_tdsp_woassignedto["TDSPID"]: # Itero sui codici
@@ -72,7 +72,7 @@ def view_workitems(conn) -> None :
         tdsp_woassignedto_names.append(name)
 
     # Select TD Specialist Name with dynamic filtering
-    selected_tdtl_name = st.sidebar.selectbox(
+    selected_tdsp_name = st.sidebar.selectbox(
         label=":blue[Tech Department Specialist]", 
         options=tdsp_woassignedto_names, 
         index=None,

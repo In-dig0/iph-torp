@@ -113,6 +113,7 @@ def create_workitem(conn)-> None:
 
             else:
                 filtered_workorder_list = []
+                selected_td_specialist_form_code = ""
 
             selected_workorder = st.selectbox(
                 label=":blue[Work Order]", 

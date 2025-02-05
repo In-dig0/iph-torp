@@ -77,28 +77,35 @@ def create_workitem(conn)-> None:
     with st.container(border=True):
         with st.expander(label=":orange[New Workitem]", expanded=False):
             # TD Specialist dropdown
-            if selected_tdsp_name: 
-                tdsp_index = tdsp_woassignedto_names.index(selected_tdsp_name)
-            else:
-                tdsp_index = None
-            st.write(tdsp_index)        
-            selected_td_specialist = st.selectbox(label=":blue[TD Specialist](:red[*])", options=tdsp_woassignedto_names, index=tdsp_index, key="tdsp_form")
-            selected_td_specialist_code = servant.get_code_from_name(st.session_state.df_users, selected_td_specialist, "CODE")
-
-            # # Work Order Number dropdown 
-            # if selected_td_specialist:
-            #     st.write(selected_td_specialist_code)
-            #     filtered_workorder_df = st.session_state.df_woassignedto[st.session_state.df_woassignedto["TDSPID"]==selected_td_specialist_code]
-            #     filtered_workorder_list = list(filtered_workorder_df)
-            #     filtered_workorder = sorted(filtered_workorder_list)
+            # if selected_tdsp_name: 
+            #     tdsp_index = tdsp_woassignedto_names.index(selected_tdsp_name)
             # else:
-            #     filtered_workorder = []
-            # selected_workorder = st.selectbox(label=":blue[Work Order]", options=filtered_workorder, index=None, key="tdsp_name")
+            #     tdsp_index = None
+            # st.write(tdsp_index)        
+            # selected_td_specialist = st.selectbox(label=":blue[TD Specialist](:red[*])", options=tdsp_woassignedto_names, index=tdsp_index, key="tdsp_form")
+            # selected_td_specialist_code = servant.get_code_from_name(st.session_state.df_users, selected_td_specialist, "CODE")
 
-            if selected_td_specialist:
+            # TD Specialist Dropdown (Form) - Use the VALUE directly
+            if selected_tdsp_name:
+                selected_td_specialist_form = st.selectbox(
+                    label=":blue[TD Specialist](:red[*])",
+                    options=tdsp_woassignedto_names,
+                    value=selected_tdsp_name,  # Set value directly
+                    key="tdsp_form"
+                )
+            else:
+                selected_td_specialist_form = st.selectbox(
+                    label=":blue[TD Specialist](:red[*])",
+                    options=tdsp_woassignedto_names,
+                    key="tdsp_form"
+                )
+
+
+            if selected_td_specialist_form:
+                selected_td_specialist_form_code = servant.get_code_from_name(st.session_state.df_users, selected_td_specialist_form, "CODE")
                 # Correctly filter and extract Work Order IDs
                 filtered_workorder_df = st.session_state.df_woassignedto[
-                    st.session_state.df_woassignedto["TDSPID"] == selected_td_specialist_code
+                    st.session_state.df_woassignedto["TDSPID"] == selected_td_specialist_form_code
                 ]
                 
                 if not filtered_workorder_df.empty:  # Check if the DataFrame is not empty

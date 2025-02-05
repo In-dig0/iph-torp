@@ -386,6 +386,7 @@ def load_woassignedto_data(conn):
         FROM TORP_WOASSIGNEDTO A
         INNER JOIN TORP_USERS B ON B.code = A.tdtlid    
         WHERE A.status = 'ACTIVE'
+        OR A.status = 'DISABLED'
         ORDER BY WOID
         """, conn)    
     except Exception as errMsg:
@@ -412,7 +413,6 @@ def load_workitems_data(conn):
             A.time_um AS TIME_UM
         FROM TORP_WORKITEMS A  
         WHERE A.status = 'ACTIVE'
-        OR A.status = 'DISABLED'
         ORDER BY WOID
         """, conn, parse_dates=["REFDATE"])
         df_workitem['REFDATE'] = df_workitem['REFDATE'].dt.date

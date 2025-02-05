@@ -39,23 +39,46 @@ def view_workitems(conn) -> None :
             st.session_state[key] = loader(conn)
 
     st.sidebar.divider()
+    
     st.sidebar.header(f":orange[Filters]")
     if st.session_state.df_woassignedto is None or st.session_state.df_woassignedto.empty:
         st.warning("No work order assignment data available. Please check your data source")
         st.stop()  # Stop execution of the script
     else:
-        unique_usernames = st.session_state.df_woassignedto['USERNAME'].unique()
-        sorted_usernames = sorted(unique_usernames)
-        wo_username_options = list(sorted_usernames)
+        unique_tdtl_names = st.session_state.df_woassignedto['USERNAME'].unique()
+        sorted_tdtl_names = sorted(unique_tdtl_names)
+        tdtl_name_options = list(sorted_tdtl_names)
 
-    # Select username with dynamic filtering
-    selected_username = st.sidebar.selectbox(
-        label=":blue[Tech Department Specialist]", 
-        options=wo_username_options, 
+    # Select Team Leader Name with dynamic filtering
+    selected_tdtl_name = st.sidebar.selectbox(
+        label=":blue[Tech Department Team Leader]", 
+        options=tdtl_name_options, 
         index=None,
-        key="username_selectbox"
+        key="tdtlname_selectbox"
     )
-    
+    if selected_tdtl_name: #se è stato selezionato un TL
+        selected_tdtl_code = st.session_state.df_users[st.session_state.df_users["NAME"] == selected_tdtl_name]["CODE"].iloc[0] #Recupero il codice del TL
+    else:
+        selected_tdtl_code = None # o un valore di default che preferisci   
+
+
+    filtered_tdsp_woassignedto = st.session_state.df_woassignedto[
+        (st.session_state.df_woassignedto['TDTLID'] == selected_tdtl_code)
+    ]  # Usa isin()
+            
+    tdsp_woassignedto_names = []  # Lista per i nomi predefiniti
+    for code in filtered_tdsp_woassignedto["TDSPID"]: # Itero sui codici
+        name = servant.get_description_from_code(st.session_state.df_tdusers, code, "NAME")
+        tdsp_woassignedto_names.append(name)
+
+    # Select TD Specialist Name with dynamic filtering
+    selected_tdtl_name = st.sidebar.selectbox(
+        label=":blue[Tech Department Specialist]", 
+        options=tdsp_woassignedto_names, 
+        index=None,
+        key="tdspname_selectbox"
+    )
+
     # Calculate date 7 days ago
     previus_7days = datetime.datetime.now() - datetime.timedelta(days=7)
     selected_from_date = st.sidebar.date_input(
@@ -71,35 +94,35 @@ def view_workitems(conn) -> None :
         format="DD/MM/YYYY"
     )
 
-    # Check if a username is selected
-    if selected_username:
-        selected_usercode = servant.get_code_from_name(st.session_state.df_users, selected_username, "CODE")
+    # # Check if a username is selected
+    # if selected_username:
+    #     selected_usercode = servant.get_code_from_name(st.session_state.df_users, selected_username, "CODE")
         
-        # Filter workitems dynamically
-        filtered_workitems = st.session_state.df_workitems[
-            (st.session_state.df_workitems["TDSPID"] == selected_usercode) &
-            (st.session_state.df_workitems["DATE"] >= selected_from_date) &
-            (st.session_state.df_workitems["DATE"] <= selected_to_date)
-        ]
+    #     # Filter workitems dynamically
+    #     filtered_workitems = st.session_state.df_workitems[
+    #         (st.session_state.df_workitems["TDSPID"] == selected_usercode) &
+    #         (st.session_state.df_workitems["DATE"] >= selected_from_date) &
+    #         (st.session_state.df_workitems["DATE"] <= selected_to_date)
+    #     ]
 
-        # Add radio button for view selection
-        view_option = st.sidebar.radio(
-            ":blue[View Options]", 
-            ["Detail View", "Grouped by Work Order"]
-        )
+    #     # Add radio button for view selection
+    #     view_option = st.sidebar.radio(
+    #         ":blue[View Options]", 
+    #         ["Detail View", "Grouped by Work Order"]
+    #     )
 
-        st.subheader(f":orange[List of Work items]")
-        with st.container(border=True, key="Workitem grid"):
-            if view_option == "Detail View":
-                st.dataframe(data=filtered_workitems, use_container_width=True, hide_index=True)
-            else:
-                # Group by WOID and sum TIME_QTY
-                grouped_workitems = filtered_workitems.groupby(["WOID", "TIME_UM"])["TIME_QTY"].sum().reset_index()
-                grouped_workitems = grouped_workitems[["WOID", "TIME_QTY", "TIME_UM"]]
-                st.dataframe(data=grouped_workitems, use_container_width=True, hide_index=True)
+    #     st.subheader(f":orange[List of Work items]")
+    #     with st.container(border=True, key="Workitem grid"):
+    #         if view_option == "Detail View":
+    #             st.dataframe(data=filtered_workitems, use_container_width=True, hide_index=True)
+    #         else:
+    #             # Group by WOID and sum TIME_QTY
+    #             grouped_workitems = filtered_workitems.groupby(["WOID", "TIME_UM"])["TIME_QTY"].sum().reset_index()
+    #             grouped_workitems = grouped_workitems[["WOID", "TIME_QTY", "TIME_UM"]]
+    #             st.dataframe(data=grouped_workitems, use_container_width=True, hide_index=True)
     
     
     
-    else:
-        # If no username is selected, show an empty or default state
-        st.info("Please select a Tech Department Specialist to view work items")
+    # else:
+    #     # If no username is selected, show an empty or default state
+    #     st.info("Please select a Tech Department Specialist to view work items")

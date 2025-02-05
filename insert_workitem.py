@@ -69,8 +69,10 @@ def create_workitem(conn)-> None:
         #]
 
 
-    df = pd.DataFrame(filtered_workitems)
-    st.session_state.df = df
+    df_out = pd.DataFrame(filtered_workitems)
+    #df_out.drop('colonna3', axis=1, inplace=True)
+
+    st.session_state.df_out = df_out
         #st.dataframe(df, use_container_width=True, hide_index=True)
     
     
@@ -174,7 +176,7 @@ def create_workitem(conn)-> None:
                     st.success("New workitem created!")
                     
                     #today = datetime.datetime.now().strftime("%Y-%m-%d")
-                    columns_name = ["REFDATE","WOID","TDSPID","STATUS","TSKGRL1","TSKGRL1","DESC","NOTE","TIME_QTY", "TIME_UM"]
+                    columns_name = ["REFDATE","WOID","TDSPID","STATUS","TSKGRL1","TSKGRL2","DESC","NOTE","TIME_QTY", "TIME_UM"]
                     df_new = pd.DataFrame(
                         [witem
                             # {
@@ -192,7 +194,7 @@ def create_workitem(conn)-> None:
                         ], columns=columns_name
                     )
 
-                    st.session_state.df = pd.concat([df_new, st.session_state.df], axis=0)
+                    st.session_state.df_out = pd.concat([df_new, st.session_state.df_out], axis=0)
 
     st.header("🎯Last Workitems")
     with st.container():

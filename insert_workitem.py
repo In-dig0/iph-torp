@@ -42,15 +42,15 @@ def create_workitem(conn)-> None:
     today = datetime.datetime.now()
 
     # Convert DATE column to datetime objects (if it's not already)
-    if st.session_state.df_workitems['DATE'].dtype != 'datetime64[ns]':  # Check the data type
-        st.session_state.df_workitems['DATE'] = pd.to_datetime(st.session_state.df_workitems['DATE'])        
+    if st.session_state.df_workitems['REFDATE'].dtype != 'datetime64[ns]':  # Check the data type
+        st.session_state.df_workitems['REFDATE'] = pd.to_datetime(st.session_state.df_workitems['DATE'])        
       
     # Filter workitems dynamically
     filtered_workitems = st.session_state.df_workitems
     [
 #            (st.session_state.df_workitems["TDSPID"] == selected_usercode) &
-        (st.session_state.df_workitems["DATE"] >= previus_7days) &
-        (st.session_state.df_workitems["DATE"] <= today)
+        (st.session_state.df_workitems["REFDATE"] >= previus_7days) &
+        (st.session_state.df_workitems["REFDATE"] <= today)
     ]
 
     df = pd.DataFrame(filtered_workitems)
@@ -106,7 +106,7 @@ def create_workitem(conn)-> None:
                 df_new = pd.DataFrame(
                     [
                         {
-                            "DATE": execution_date,
+                            "REFDATE": execution_date,
                             "WOID": selected_workorder,
                             "TDSPID": selected_td_specialist_code,
                             "STATUS": "ACTIVE",

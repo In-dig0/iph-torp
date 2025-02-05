@@ -415,10 +415,10 @@ def manage_request(conn):
 
 
     # Sidebar controls - Filters
-    st.sidebar.header("Filters")
+    st.sidebar.header(":blue[Filters]")
     req_status_options = list(df_requests_grid['STATUS'].drop_duplicates().sort_values())
     status_filter = st.sidebar.selectbox(
-        "Select a Status value:", 
+        ":orange[Status]", 
         req_status_options, 
         index=None,
         key='Status_value'
@@ -426,7 +426,7 @@ def manage_request(conn):
     
     req_pline_options = df_requests_grid['PRLINE_NAME'].drop_duplicates().sort_values()
     pline_filter = st.sidebar.selectbox(
-        "Select a Product Line:", 
+        ":orange[Product Line]", 
         req_pline_options, 
         index=None,
         key='Pline_value'
@@ -481,7 +481,7 @@ def manage_request(conn):
             st.session_state.df_requests = sqlite_db.load_requests_data(conn)  # Ricarica i dati dal database
     
     with col2:
-        if st.button("✏️ Modifica Request", type="secondary", disabled=modify_request_button_disable):
+        if st.button("✏️ Modify Request", type="secondary", disabled=modify_request_button_disable):
             if st.session_state.grid_response and st.session_state.grid_response['selected_rows'] is not None and not st.session_state.grid_response['selected_rows'].empty:
                 selected_rows_df = st.session_state.grid_response['selected_rows']
                 selected_row_dict = selected_rows_df.iloc[0].to_dict() #oppure selected_rows_df.to_dict('records')[0]
@@ -489,7 +489,7 @@ def manage_request(conn):
             # else:
             #     st.warning("Please select a request from the grid first.", icon="⚠️")
     with col3:
-        if st.button("📌 Create Worko Oder", type="secondary", disabled=workorder_button_disable):
+        if st.button("📌 Create Work Oder", type="secondary", disabled=workorder_button_disable):
             if st.session_state.grid_response and st.session_state.grid_response['selected_rows'] is not None and not st.session_state.grid_response['selected_rows'].empty:
                 selected_rows_df = st.session_state.grid_response['selected_rows']
                 selected_row_dict = selected_rows_df.iloc[0].to_dict()  # oppure selected_rows_df.to_dict('records')[0]

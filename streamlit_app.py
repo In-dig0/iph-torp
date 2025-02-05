@@ -54,7 +54,7 @@ def main():
 }    
   st.sidebar.divider()
   sidebar_title = st.sidebar.header(f":blue[Function menù]")
-  demo_name = st.sidebar.selectbox("Choose a function", page_names_to_funcs.keys())
+  demo_name = st.sidebar.selectbox(":orange[Choose a function]", page_names_to_funcs.keys())
   page_names_to_funcs[demo_name]()
 
            

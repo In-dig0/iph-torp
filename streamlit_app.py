@@ -32,7 +32,8 @@ def main():
 
   st.set_page_config(layout="wide")  
   conn = sqlite_db.open_sqlitecloud_db()
-  sqlite_db.initialize_session_state(conn) #passo la connessione
+  if conn:
+    sqlite_db.initialize_session_state(conn) #passo la connessione
 
   # Aggiungi l'immagine alla sidebar 
   st.sidebar.image("https://iph.it/wp-content/uploads/2020/02/logo-scritta.png", width=150)    

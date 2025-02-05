@@ -69,7 +69,7 @@ def show_request_dialog(selected_row_dict, req_status_options, update_request_fn
             default_tdtl_name = []
 
         req_tdtl_name = st.multiselect(
-            label=":blue[Tech Department Team Leader](:red[*])",
+            label=":orange[Tech Department Team Leader](:red[*])",
             options=tdtl_username_list,
             default=default_tdtl_name,
             key="sb_tdtl_reqmanage",
@@ -82,11 +82,11 @@ def show_request_dialog(selected_row_dict, req_status_options, update_request_fn
             req_tdtl_code = []
 
         idx_status = req_status_options.index(selected_row_dict['STATUS'])  # Usa selected_row_dict
-        req_status = st.selectbox(label=":blue[Status](:red[*])", options=req_status_options, index=idx_status, disabled=False, key="status_selectbox")
+        req_status = st.selectbox(label=":orange[Status](:red[*])", options=req_status_options, index=idx_status, disabled=False, key="status_selectbox")
         
         # Display Tech Dept Note
         default_note_td = str(st.session_state.df_requests[st.session_state.df_requests["REQID"] == reqid]["NOTE_TD"].values[0])
-        req_note_td = st.text_area(label=":blue[Tech Department Notes]", value=default_note_td, disabled=False)
+        req_note_td = st.text_area(label=":orange[Tech Department Notes]", value=default_note_td, disabled=False)
 
         if (req_note_td == default_note_td) and (selected_row_dict['STATUS'] == req_status) and (req_tdtl_name == default_tdtl_name): #Usa selected_row_dict
             disable_save_button = True

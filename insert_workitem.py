@@ -321,34 +321,34 @@ def create_workitem(conn)-> None:
             note = st.text_area(label=":blue[Notes]", key="ta_note")
 
 
-                save_button_disabled = not all([  # Use all() for cleaner logic
-                    execution_date,
-                    selected_td_specialist_form_code,
-                    selected_workorder,
-                    selected_tskgrl1_code,
-                    selected_tskgrl2_code,
-                    quantity
-                ])
+            save_button_disabled = not all([  # Use all() for cleaner logic
+                execution_date,
+                selected_td_specialist_form_code,
+                selected_workorder,
+                selected_tskgrl1_code,
+                selected_tskgrl2_code,
+                quantity
+            ])
 
-                if st.button("Save Work Item", disabled=save_button_disabled):
-                    witem = {
-                        "wi_refdate": execution_date,
-                        "wo_woid": selected_workorder,
-                        "wi_tdspid": selected_td_specialist_form_code,
-                        "wi_status": "ACTIVE",
-                        "wi_tskgrl1": selected_tskgrl1_code,
-                        "wi_tskgrl2": selected_tskgrl2_code,
-                        "wi_desc": desc,
-                        "wi_note": note,
-                        "wi_time_qty": quantity,
-                        "wi_time_um": "H"
-                    }
+            if st.button("Save Work Item", disabled=save_button_disabled):
+                witem = {
+                    "wi_refdate": execution_date,
+                    "wo_woid": selected_workorder,
+                    "wi_tdspid": selected_td_specialist_form_code,
+                    "wi_status": "ACTIVE",
+                    "wi_tskgrl1": selected_tskgrl1_code,
+                    "wi_tskgrl2": selected_tskgrl2_code,
+                    "wi_desc": desc,
+                    "wi_note": note,
+                    "wi_time_qty": quantity,
+                    "wi_time_um": "H"
+                }
 
-                    df_new = pd.DataFrame([witem])  # No need to specify columns if the dictionary keys match
-                    st.session_state.df_out = pd.concat([df_new, st.session_state.df_out], axis=0, ignore_index=True) # Add ignore_index=True
-                    success = sqlite_db.save_workitem(witem, conn)
-                    if success:
-                        st.success("New workitem created!")
+                df_new = pd.DataFrame([witem])  # No need to specify columns if the dictionary keys match
+                st.session_state.df_out = pd.concat([df_new, st.session_state.df_out], axis=0, ignore_index=True) # Add ignore_index=True
+                success = sqlite_db.save_workitem(witem, conn)
+                if success:
+                    st.success("New workitem created!")
 
     st.header("🎯Last Workitems")
     with st.container():

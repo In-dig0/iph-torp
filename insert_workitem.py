@@ -343,12 +343,25 @@ def create_workitem(conn)-> None:
                     "wi_time_qty": quantity,
                     "wi_time_um": "H"
                 }
-
-                df_new = pd.DataFrame([witem])  # No need to specify columns if the dictionary keys match
+                
+                columns_name = ["REFDATE","WOID","TDSPID","STATUS","TSKGRL1","TSKGRL2","DESC","NOTE","TIME_QTY", "TIME_UM"]
+                df_new = pd.DataFrame([witem], columns=columns_name)  # No need to specify columns if the dictionary keys match
                 st.session_state.df_out = pd.concat([df_new, st.session_state.df_out], axis=0, ignore_index=True) # Add ignore_index=True
                 success = sqlite_db.save_workitem(witem, conn)
                 if success:
                     st.success("New workitem created!")
+
+                    # Reset the form fields
+                    st.session_state.tdsp_form = None  # Or a default value
+                    st.session_state.sb_wo = None  # Or a default value
+                    st.session_state.sb_tskgrl1 = None  # Or a default value
+                    st.session_state.sb_tskgrl2 = None  # Or a default value
+                    st.session_state.in_time_qty = 0.0  # Or a default value
+                    st.session_state.ti_description = ""  # Or a default value
+                    st.session_state.ta_note = ""  # Or a default value
+
+                    # Force a rerun to update the grid
+                    st.rerun()
 
     st.header("🎯Last Workitems")
     with st.container():

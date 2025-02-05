@@ -424,61 +424,35 @@ def manage_request(conn):
 
     # Display grid
     st.subheader("Request list:")
-    # Display grid with height setting
-    # st.markdown(
-    #     f"""
-    #     <div id="grid-container" style="height: 500px; width: 100%; border: 1px solid #ccc; overflow: auto;">
-    #         <div id="grid-root" style="height: 100%;"></div> 
-    #     </div>
-    #     """,
-    #     unsafe_allow_html=True,
-    # )
-    # # Creazione/Aggiornamento della griglia (UNA SOLA VOLTA per ciclo di esecuzione)
-    # if st.session_state.grid_response is None:
-    #     st.session_state.grid_response = AgGrid(
-    #         st.session_state.grid_data,
-    #         gridOptions=grid_options,
-    #         allow_unsafe_jscode=True,
-    #         theme=available_themes[2],
-    #         fit_columns_on_grid_load=False,
-    #         update_mode=GridUpdateMode.MODEL_CHANGED,
-    #         data_return_mode=DataReturnMode.AS_INPUT,
-    #         key="main_grid"
-    #     )
-    # else:
-    #     st.session_state.grid_response = AgGrid( # Aggiorna la griglia esistente
-    #         st.session_state.grid_data,
-    #         gridOptions=grid_options,
-    #         allow_unsafe_jscode=True,
-    #         theme=available_themes[2],
-    #         fit_columns_on_grid_load=False,
-    #         update_mode=GridUpdateMode.MODEL_CHANGED,
-    #         data_return_mode=DataReturnMode.AS_INPUT,
-    #         key="main_grid"
-    #     )
+    
+    # Creazione/Aggiornamento della griglia (UNA SOLA VOLTA per ciclo di esecuzione)
+    if st.session_state.grid_response is None:
+        st.session_state.grid_response = AgGrid(
+            st.session_state.grid_data,
+            gridOptions=grid_options,
+            allow_unsafe_jscode=True,
+            theme=available_themes[2],
+            fit_columns_on_grid_load=False,
+            update_mode=GridUpdateMode.MODEL_CHANGED,
+            data_return_mode=DataReturnMode.AS_INPUT,
+            key="main_grid"
+        )
+    else:
+        st.session_state.grid_response = AgGrid( # Aggiorna la griglia esistente
+            st.session_state.grid_data,
+            gridOptions=grid_options,
+            allow_unsafe_jscode=True,
+            theme=available_themes[2],
+            fit_columns_on_grid_load=False,
+            update_mode=GridUpdateMode.MODEL_CHANGED,
+            data_return_mode=DataReturnMode.AS_INPUT,
+            key="main_grid"
+        )
 
-    # IMPORTANT:  Render the AgGrid within the designated container
-    # IMPORTANT: Render the AgGrid within the designated container
-    grid_response = AgGrid(
-        st.session_state.grid_data,
-        gridOptions=grid_options,
-        allow_unsafe_jscode=True,
-        theme=available_themes[2],
-        fit_columns_on_grid_load=False,
-        update_mode=GridUpdateMode.MODEL_CHANGED,
-        data_return_mode=DataReturnMode.AS_INPUT,
-        key="main_grid",
-        # Important: target the inner div for rendering
-        #dom_id='grid-root'
-    )
-    # selected_rows = st.session_state.grid_response['selected_rows']
-    # modify_request_button_disable = not (selected_rows is not None and isinstance(selected_rows, pd.DataFrame) and not selected_rows.empty)
-    # workorder_button_disable = not (selected_rows is not None and isinstance(selected_rows, pd.DataFrame) and not selected_rows.empty)
 
-    selected_rows = grid_response['selected_rows']  # Use the directly returned value
+    selected_rows = st.session_state.grid_response['selected_rows']
     modify_request_button_disable = not (selected_rows is not None and isinstance(selected_rows, pd.DataFrame) and not selected_rows.empty)
     workorder_button_disable = not (selected_rows is not None and isinstance(selected_rows, pd.DataFrame) and not selected_rows.empty)
-
 
     # ... (Pulsanti e chiamate di dialogo)
     col1, col2, col3 = st.columns(3)

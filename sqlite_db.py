@@ -300,7 +300,7 @@ def load_requests_data(conn):
         FROM TORP_REQUESTS A
         ORDER by REQID desc
         """, conn)
-        df_requests["INSDATE"] = pd.to_datetimedf_requests["INSDATE"]
+        df_requests["INSDATE"] = pd.to_datetime(df_requests["INSDATE"])
     except Exception as errMsg:
         st.error(f"**ERROR load data from TORP_REQUESTS: \n{errMsg}", icon="🚨")
         return None

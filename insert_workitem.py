@@ -165,10 +165,10 @@ def create_workitem(conn)-> None:
                         }
                     ]
                 )
-                st.dataframe(df_new, use_container_width=True, hide_index=True)
+                #st.dataframe(df_new, use_container_width=True, hide_index=True)
                 st.session_state.df = pd.concat([df_new, st.session_state.df], axis=0)
 
-    st.header("Last Workitems")
+    st.header("🎯Last Workitems")
     with st.container():
         st.write(f"Number of workitems: `{len(st.session_state.df)}`")
 

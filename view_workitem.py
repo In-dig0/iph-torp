@@ -51,7 +51,7 @@ def view_workitems(conn) -> None :
 
     # Select Team Leader Name with dynamic filtering
     selected_tdtl_name = st.sidebar.selectbox(
-        label=":blue[Tech Department Team Leader]", 
+        label=":blue[Tech Dept Team Leader]", 
         options=tdtl_name_options, 
         index=None,
         key="tdtlname_selectbox"
@@ -73,7 +73,7 @@ def view_workitems(conn) -> None :
 
     # Select TD Specialist Name with dynamic filtering
     selected_tdsp_name = st.sidebar.selectbox(
-        label=":blue[Tech Department Specialist]", 
+        label=":blue[Tech Dept Specialist]", 
         options=tdsp_woassignedto_names, 
         index=None,
         key="tdspname_selectbox"

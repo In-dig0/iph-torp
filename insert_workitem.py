@@ -35,7 +35,7 @@ def create_workitem(conn)-> None:
         if key not in st.session_state:
             st.session_state[key] = loader(conn)
     
-    st.sessione_state.df_out = t.sessione_state.df_workitems
+    st.sessione_state.df_out = st.session_state.df_workitems
     
     tdsp_woassignedto_names_df = st.session_state.df_users[st.session_state.df_users["DEPTCODE"]=="DTD"]["NAME"]
     tdsp_woassignedto_names_list = list(tdsp_woassignedto_names_df)

@@ -154,7 +154,7 @@ def create_workitem(conn)-> None:
                         {
                             "REFDATE": execution_date,
                             "WOID": selected_workorder,
-                            "TDSPID": selected_td_specialist_code,
+                            "TDSPID": selected_td_specialist_form_code,
                             "STATUS": "ACTIVE",
                             "TSKGRL1": selected_tskgrl1_code,
                             "TSKGRL2": selected_tskgrl2_code,

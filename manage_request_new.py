@@ -425,29 +425,16 @@ def manage_request(conn):
     # Display grid
     st.subheader("Request list:")
     
-    # Creazione/Aggiornamento della griglia (UNA SOLA VOLTA per ciclo di esecuzione)
-    if st.session_state.grid_response is None:
-        st.session_state.grid_response = AgGrid(
-            st.session_state.grid_data,
-            gridOptions=grid_options,
-            allow_unsafe_jscode=True,
-            theme=available_themes[2],
-            fit_columns_on_grid_load=False,
-            update_mode=GridUpdateMode.MODEL_CHANGED,
-            data_return_mode=DataReturnMode.AS_INPUT,
-            key="main_grid"
-        )
-    else:
-        st.session_state.grid_response = AgGrid( # Aggiorna la griglia esistente
-            st.session_state.grid_data,
-            gridOptions=grid_options,
-            allow_unsafe_jscode=True,
-            theme=available_themes[2],
-            fit_columns_on_grid_load=False,
-            update_mode=GridUpdateMode.MODEL_CHANGED,
-            data_return_mode=DataReturnMode.AS_INPUT,
-            key="main_grid"
-        )
+    st.session_state.grid_response = AgGrid( # Aggiorna la griglia esistente
+        st.session_state.grid_data,
+        gridOptions=grid_options,
+        allow_unsafe_jscode=True,
+        theme=available_themes[2],
+        fit_columns_on_grid_load=False,
+        update_mode=GridUpdateMode.MODEL_CHANGED,
+        data_return_mode=DataReturnMode.AS_INPUT,
+        key="main_grid"
+    )
 
 
     selected_rows = st.session_state.grid_response['selected_rows']

@@ -35,29 +35,15 @@ def create_workitem(conn)-> None:
         if key not in st.session_state:
             st.session_state[key] = loader(conn)
 
-    # st.subheader(":orange[Last Workitem]")
-    # with st.container():
+    tdsp_woassignedto_names = session_state.df_users[session_state.df_users["DEPT"]=="DTD"]["NAME"]
+    st.write(tdsp_woassignedto_names)
 
-    # # Calculate date 7 days ago
-    # previus_7days = datetime.datetime.now() - datetime.timedelta(days=7)
-    # today = datetime.datetime.now()
-
-    # # Convert DATE column to datetime objects (if it's not already)
-    # if st.session_state.df_workitems['REFDATE'].dtype != 'datetime64[ns]':  # Check the data type
-    #     st.session_state.df_workitems['REFDATE'] = pd.to_datetime(st.session_state.df_workitems['REFDATE'])        
-      
-    # # Filter workitems dynamically
-    # filtered_workitems = st.session_state.df_workitems[
-    #     (st.session_state.df_workitems["REFDATE"] >= previus_7days) &
-    #     (st.session_state.df_workitems["REFDATE"] <= today)
-    #     ]
     selected_tdsp_name = st.sidebar.selectbox(
         label=":blue[Tech Dept Specialist]", 
         options=tdsp_woassignedto_names, 
         index=None,
         key="tdspname_selectbox"
     )
-
     if selected_tdsp_name: #se è stato selezionato un TD Specialist
         selected_tdsp_code = st.session_state.df_users[st.session_state.df_users["NAME"] == selected_tdsp_name]["CODE"].iloc[0] #Recupero il codice del TL
     else:

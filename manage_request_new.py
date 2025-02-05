@@ -16,7 +16,6 @@ DISABLED_STATUS = "DISABLED"
 DEFAULT_DEPT_CODE = "DTD"
 REQ_STATUS_OPTIONS = ['NEW', 'PENDING', 'ASSIGNED', 'WIP', 'COMPLETED', 'DELETED']
 
-# ... (Caricamento dei dati nello stato della sessione come prima)
 
 def reset_application_state():
     """Reset all session state variables and cached data"""
@@ -335,6 +334,32 @@ def show_workorder_dialog(selected_row_dict,  # Passa un dizionario
 
 def manage_request(conn):
 
+    # Load data only once and store in session state
+    session_data = {
+        'df_depts': sqlite_db.load_dept_data,
+        'df_users': sqlite_db.load_users_data,
+        'df_pline': sqlite_db.load_pline_data,
+        'df_pfamily': sqlite_db.load_pfamily_data,
+        'df_category': sqlite_db.load_category_data,
+        'df_type': sqlite_db.load_type_data,
+        'df_lk_type_category': sqlite_db.load_lk_type_category_data,
+        'df_lk_category_detail': sqlite_db.load_lk_category_detail_data,
+        'df_lk_pline_tdtl': sqlite_db.load_lk_pline_tdtl_data,
+        'df_detail': sqlite_db.load_detail_data,
+        'df_requests': sqlite_db.load_requests_data,
+        'df_reqassignedto': sqlite_db.load_reqassignedto_data,
+        'df_attachments': sqlite_db.load_attachments_data,
+        'df_workorders': sqlite_db.load_workorders_data,
+        'df_woassignedto': sqlite_db.load_woassignedto_data,
+        'df_workitems': sqlite_db.load_workitems_data,
+        'df_tskgrl1': sqlite_db.load_tskgrl1_data,
+        'df_tskgrl2': sqlite_db.load_tskgrl2_data,
+    }
+
+    for key, loader in session_data.items():
+        if key not in st.session_state:
+            st.session_state[key] = loader(conn)
+
     # Initialize session state
     if "grid_data" not in st.session_state:
         st.session_state.grid_data = st.session_state.df_requests.copy()
@@ -424,8 +449,42 @@ def manage_request(conn):
 
     # Display grid
     st.subheader("Request list:")
-    
-    st.session_state.grid_response = AgGrid( # Aggiorna la griglia esistente
+    # Display grid with height setting
+    st.markdown(
+        f"""
+        <div id="grid-container" style="height: 500px; width: 100%; border: 1px solid #ccc; overflow: auto;">
+            <div id="grid-root" style="height: 100%;"></div> 
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )
+    # # Creazione/Aggiornamento della griglia (UNA SOLA VOLTA per ciclo di esecuzione)
+    # if st.session_state.grid_response is None:
+    #     st.session_state.grid_response = AgGrid(
+    #         st.session_state.grid_data,
+    #         gridOptions=grid_options,
+    #         allow_unsafe_jscode=True,
+    #         theme=available_themes[2],
+    #         fit_columns_on_grid_load=False,
+    #         update_mode=GridUpdateMode.MODEL_CHANGED,
+    #         data_return_mode=DataReturnMode.AS_INPUT,
+    #         key="main_grid"
+    #     )
+    # else:
+    #     st.session_state.grid_response = AgGrid( # Aggiorna la griglia esistente
+    #         st.session_state.grid_data,
+    #         gridOptions=grid_options,
+    #         allow_unsafe_jscode=True,
+    #         theme=available_themes[2],
+    #         fit_columns_on_grid_load=False,
+    #         update_mode=GridUpdateMode.MODEL_CHANGED,
+    #         data_return_mode=DataReturnMode.AS_INPUT,
+    #         key="main_grid"
+    #     )
+
+    # IMPORTANT:  Render the AgGrid within the designated container
+    # IMPORTANT: Render the AgGrid within the designated container
+    grid_response = AgGrid(
         st.session_state.grid_data,
         gridOptions=grid_options,
         allow_unsafe_jscode=True,
@@ -433,13 +492,18 @@ def manage_request(conn):
         fit_columns_on_grid_load=False,
         update_mode=GridUpdateMode.MODEL_CHANGED,
         data_return_mode=DataReturnMode.AS_INPUT,
-        key="main_grid"
+        key="main_grid",
+        # Important: target the inner div for rendering
+        dom_id='grid-root'
     )
+    # selected_rows = st.session_state.grid_response['selected_rows']
+    # modify_request_button_disable = not (selected_rows is not None and isinstance(selected_rows, pd.DataFrame) and not selected_rows.empty)
+    # workorder_button_disable = not (selected_rows is not None and isinstance(selected_rows, pd.DataFrame) and not selected_rows.empty)
 
-
-    selected_rows = st.session_state.grid_response['selected_rows']
+    selected_rows = grid_response['selected_rows']  # Use the directly returned value
     modify_request_button_disable = not (selected_rows is not None and isinstance(selected_rows, pd.DataFrame) and not selected_rows.empty)
     workorder_button_disable = not (selected_rows is not None and isinstance(selected_rows, pd.DataFrame) and not selected_rows.empty)
+
 
     # ... (Pulsanti e chiamate di dialogo)
     col1, col2, col3 = st.columns(3)

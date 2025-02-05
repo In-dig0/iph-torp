@@ -15,7 +15,7 @@ import view_request
 import view_workitem
 import insert_workitem
 import manage_request
-import manage_request_new
+import manage_workorder
 
 # 3th party packages
 import streamlit as st
@@ -26,7 +26,7 @@ from st_aggrid import AgGrid, GridOptionsBuilder, GridUpdateMode, DataReturnMode
 # Global constants
 APPNAME = "TORP" #IPH Technical Office Request POC (Proof Of Concept)
 APPCODE = "TORP"
-APPVERSION = "0.1"
+APPVERSION = "0.2"
 
 def main():
 
@@ -42,16 +42,13 @@ def main():
 
   page_names_to_funcs = {
     "ℹ️ App Info": lambda: app_info.display_app_info(APPNAME, APPVERSION),
-    #"Connect Database": lambda: sqlite_db.open_sqlitecloud_db()
     "📄 Create Request": lambda: insert_request.insert_request(conn),    
     "🔍 View Request ": lambda: view_request.view_requests(conn),       
     "🗂️ Manage Request": lambda: manage_request.manage_request(conn),
-    "🗂️ Manage Request NEW": lambda: manage_request_new.manage_request(conn),
-    # "📌 Manage Work Orders": manage_wo,
+    "📌 Manage Work Orders": lambda: manage_workorder.manage_workorder(conn),
     "🎯 Insert Workitem": lambda: insert_workitem.create_workitem(conn),
     "📅 View Workitem": lambda: view_workitem.view_workitems(conn)
     # "🔐 Close db": close_sqlitecloud_db,
-    # "--> TEST": my_test
 }    
   st.sidebar.divider()
   sidebar_title = st.sidebar.header(f":blue[Function menù]")

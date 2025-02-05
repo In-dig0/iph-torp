@@ -37,21 +37,47 @@ def create_workitem(conn)-> None:
 
     # st.subheader(":orange[Last Workitem]")
     # with st.container():
-    # Calculate date 7 days ago
-    previus_7days = datetime.datetime.now() - datetime.timedelta(days=7)
-    today = datetime.datetime.now()
 
-    # Convert DATE column to datetime objects (if it's not already)
-    if st.session_state.df_workitems['REFDATE'].dtype != 'datetime64[ns]':  # Check the data type
-        st.session_state.df_workitems['REFDATE'] = pd.to_datetime(st.session_state.df_workitems['REFDATE'])        
+    # # Calculate date 7 days ago
+    # previus_7days = datetime.datetime.now() - datetime.timedelta(days=7)
+    # today = datetime.datetime.now()
+
+    # # Convert DATE column to datetime objects (if it's not already)
+    # if st.session_state.df_workitems['REFDATE'].dtype != 'datetime64[ns]':  # Check the data type
+    #     st.session_state.df_workitems['REFDATE'] = pd.to_datetime(st.session_state.df_workitems['REFDATE'])        
       
-    # Filter workitems dynamically
-    filtered_workitems = st.session_state.df_workitems
-    [
-#            (st.session_state.df_workitems["TDSPID"] == selected_usercode) &
-        (st.session_state.df_workitems["REFDATE"] >= previus_7days) &
-        (st.session_state.df_workitems["REFDATE"] <= today)
-    ]
+    # # Filter workitems dynamically
+    # filtered_workitems = st.session_state.df_workitems[
+    #     (st.session_state.df_workitems["REFDATE"] >= previus_7days) &
+    #     (st.session_state.df_workitems["REFDATE"] <= today)
+    #     ]
+    selected_tdsp_name = st.sidebar.selectbox(
+        label=":blue[Tech Dept Specialist]", 
+        options=tdsp_woassignedto_names, 
+        index=None,
+        key="tdspname_selectbox"
+    )
+
+    if selected_tdsp_name: #se è stato selezionato un TD Specialist
+        selected_tdsp_code = st.session_state.df_users[st.session_state.df_users["NAME"] == selected_tdsp_name]["CODE"].iloc[0] #Recupero il codice del TL
+    else:
+        selected_tdsp_code = None # o un valore di default che preferisci 
+
+    # Check if a username is selected
+    if selected_tdsp_name:       
+        # Filter workitems dynamically
+        filtered_workitems = st.session_state.df_workitems[
+            (st.session_state.df_workitems["TDSPID"] == selected_tdsp_name) &
+            (st.session_state.df_workitems["REFDATE"] >= selected_from_date) &
+            (st.session_state.df_workitems["REFDATE"] <= selected_to_date)
+        ]
+    else:
+        # Filter workitems dynamically
+        filtered_workitems = st.session_state.df_workitems[
+            (st.session_state.df_workitems["REFDATE"] >= selected_from_date) &
+            (st.session_state.df_workitems["REFDATE"] <= selected_to_date)
+        ]
+
 
     df = pd.DataFrame(filtered_workitems)
     st.session_state.df = df

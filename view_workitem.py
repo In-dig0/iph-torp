@@ -84,10 +84,10 @@ def view_workitems(conn) -> None :
         key="tdspname_selectbox"
     )
 
-    if selected_tdsp_name: #se è stato selezionato un TL
+    if selected_tdsp_name: #se è stato selezionato un TD Specialist
         selected_tdsp_code = st.session_state.df_users[st.session_state.df_users["NAME"] == selected_tdsp_name]["CODE"].iloc[0] #Recupero il codice del TL
     else:
-        selected_tdtl_code = None # o un valore di default che preferisci   
+        selected_tdsp_code = None # o un valore di default che preferisci   
 
     # Calculate date 7 days ago
     previus_7days = datetime.datetime.now() - datetime.timedelta(days=7)

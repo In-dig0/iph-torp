@@ -35,9 +35,11 @@ def create_workitem(conn)-> None:
         if key not in st.session_state:
             st.session_state[key] = loader(conn)
 
-    tdsp_woassignedto_names = st.session_state.df_users[st.session_state.df_users["DEPTCODE"]=="DTD"]["NAME"]
+    tdsp_woassignedto_names_df = st.session_state.df_users[st.session_state.df_users["DEPTCODE"]=="DTD"]["NAME"]
+    tdsp_woassignedto_names_list = list(tdsp_woassignedto_names_df)
+    tdsp_woassignedto_names = sorted(tdsp_woassignedto_names_list)
     #st.write(tdsp_woassignedto_names)
-
+    
     selected_tdsp_name = st.sidebar.selectbox(
         label=":blue[Tech Dept Specialist]", 
         options=tdsp_woassignedto_names, 
@@ -75,10 +77,7 @@ def create_workitem(conn)-> None:
     with st.container(border=True):
         with st.expander(label=":orange[New Workitem]", expanded=False):
             # TD Specialist dropdown
-            td_specialists = st.session_state.df_woassignedto['USERNAME'].unique()
-            sorted_td_specialist = sorted(td_specialists)
-            td_specialist_options = list(sorted_td_specialist)
-            selected_td_specialist = st.selectbox(label=":blue[TD Specialist]", options=td_specialist_options, index=None, key="sb_tds")
+            selected_td_specialist = st.selectbox(label=":blue[TD Specialist]", options=tdsp_woassignedto_names, index=None, key="sb_tds")
             selected_td_specialist_code = servant.get_code_from_name(st.session_state.df_users, selected_td_specialist, "CODE")
 
             # Work Order Number dropdown 

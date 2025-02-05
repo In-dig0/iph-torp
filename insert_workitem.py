@@ -166,7 +166,7 @@ def create_workitem(conn)-> None:
                             "TIME_QTY": quantity,
                             "TIME_UM": "H"
                         }
-                success = save_workitem(witem, conn)        
+                success = sqlite_db.save_workitem(witem, conn)        
                 if success:
                     st.success("New workitem created!")
                     

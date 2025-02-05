@@ -84,11 +84,12 @@ def create_workitem(conn)-> None:
             else:
                 tdsp_index = None
             st.write(tdsp_index)        
-            selected_td_specialist = st.selectbox(label=":blue[TD Specialist](:red[*])", index=tdsp_index, options=tdsp_woassignedto_names, key="sb_tds")
+            selected_td_specialist = st.selectbox(label=":blue[TD Specialist](:red[*])", options=tdsp_woassignedto_names, index=tdsp_index, key="sb_tds")
             selected_td_specialist_code = servant.get_code_from_name(st.session_state.df_users, selected_td_specialist, "CODE")
 
             # Work Order Number dropdown 
             if selected_td_specialist:
+                st.write(selected_td_specialist_code)
                 filtered_workorder_df = st.session_state.df_woassignedto[st.session_state.df_woassignedto["TDSPID"]==selected_td_specialist_code]
                 filtered_workorder_list = list(filtered_workorder_df)
                 filtered_workorder = sorted(filtered_workorder_list)

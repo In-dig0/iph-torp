@@ -28,7 +28,7 @@ def dashboard(conn):
         alt.Chart(st.session_state.df_requests)
         .mark_bar()
         .encode(
-            x="month(Insdate):O",
+            x="day(Insdate):O",
             y="count():Q",
             xOffset="Status:N",
             color="Status:N",

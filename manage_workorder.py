@@ -17,7 +17,7 @@ STATUS_NEW = "NEW"
 STATUS_WIP = "WIP"
 REQ_STATUS_OPTIONS = ['NEW', 'PENDING', 'ASSIGNED', 'WIP', 'COMPLETED', 'DELETED']
 
-# ... (Caricamento dei dati nello stato della sessione come prima)
+
 
 def reset_application_state():
     """Reset all session state variables and cached data"""
@@ -516,29 +516,25 @@ def reset_application_state():
 def manage_workorder(conn):
     # Initialize session state
     sqlite_db.initialize_session_state(conn)
-    if "grid_data" not in st.session_state:
-        st.session_state.grid_data = st.session_state.df_workorders.copy()
-    if "grid_response" not in st.session_state:
-        st.session_state.grid_response = None
-    if "grid_refresh_key" not in st.session_state: 
-        st.session_state.grid_refresh_key = "initial"    
-
- # Inizializza lo stato della sessione e i dati, caricandoli solo una volta
+    
+    # Load data only once when needed
     if "df_workorders" not in st.session_state:
         st.session_state.df_workorders = sqlite_db.df_workorders(conn)
     if "grid_data" not in st.session_state:
-        st.session_state.grid_data = st.session_state.grid_data.copy()
+        st.session_state.grid_data = st.session_state.df_workorders.copy()
+    
+    # Create display DataFrame
+    df_workorder_grid = pd.DataFrame({
+        'WOID': st.session_state.grid_data['WOID'],
+        'TDTLID': st.session_state.grid_data['TDTLID'],
+        'STATUS': st.session_state.grid_data['STATUS'],
+        'SEQUENCE': st.session_state.grid_data.get('SEQUENCE', None),  # Preserve SEQUENCE values
+        'TYPE': st.session_state.grid_data['TYPE'],
+        'REQID': st.session_state.grid_data['REQID'],
+        'TITLE': st.session_state.grid_data['TITLE']
+    })
 
-    df_workorder_grid = pd.DataFrame()
-    df_workorder_grid['WOID'] = st.session_state.df_workorders['WOID']
-    df_workorder_grid['TDTLID'] = st.session_state.df_workorders['TDTLID']
-    df_workorder_grid['STATUS'] = st.session_state.df_workorders['STATUS']
-    df_workorder_grid['SEQUENCE'] = None
-    df_workorder_grid['TYPE'] = st.session_state.df_workorders['TYPE']
-    df_workorder_grid['REQID'] = st.session_state.df_workorders['REQID']
-    df_workorder_grid['TITLE'] = st.session_state.df_workorders['TITLE']
-
-    # Definisci lo stile della cella per la colonna WOID
+    # Cell styling
     cellStyle = JsCode("""
         function(params) {
             if (params.column.colId === 'WOID') {
@@ -552,7 +548,6 @@ def manage_workorder(conn):
         }
     """)
 
-    # Definisci lo stile della cella per la colonna SEQUENCE
     sequenceCellStyle = JsCode("""
         function(params) {
             if (params.value === 'HIGH' || params.value === 'LOW') {
@@ -564,12 +559,20 @@ def manage_workorder(conn):
         }
     """)
 
-    # Funzione per ordinare il dataframe in base alla colonna SEQUENCE
+    # Sort function considering SEQUENCE values
     def sort_dataframe(df):
-        if 'SEQUENCE' in df.columns:  # Check if the column exists
-            return df.sort_values(by='SEQUENCE', ascending=False, na_position='last')
+        if 'SEQUENCE' in df.columns:
+            # Create a priority map for sorting
+            priority_map = {'HIGH': 0, 'LOW': 1, None: 2}
+            # Create a temporary column for sorting
+            df['sort_priority'] = df['SEQUENCE'].map(priority_map)
+            # Sort by priority and then by WOID
+            df = df.sort_values(['sort_priority', 'WOID'])
+            # Remove temporary column
+            df = df.drop('sort_priority', axis=1)
         return df
 
+    # Grid configuration
     grid_builder = GridOptionsBuilder.from_dataframe(df_workorder_grid)
     grid_builder.configure_default_column(
         resizable=True,
@@ -581,24 +584,15 @@ def manage_workorder(conn):
     grid_builder.configure_pagination(paginationAutoPageSize=False, paginationPageSize=12)
     grid_builder.configure_grid_options(domLayout='normal')
     grid_builder.configure_column("WOID", cellStyle=cellStyle)
-    grid_builder.configure_column("SEQUENCE", editable=True, cellEditor='agSelectCellEditor', cellEditorParams={'values': ['HIGH', 'LOW']}, cellStyle=sequenceCellStyle)
-    grid_builder.configure_selection(
-        selection_mode='single',
-        use_checkbox=True,
-        header_checkbox=True
-    )
+    grid_builder.configure_column("SEQUENCE", 
+                                editable=True, 
+                                cellEditor='agSelectCellEditor', 
+                                cellEditorParams={'values': ['HIGH', 'LOW']}, 
+                                cellStyle=sequenceCellStyle)
+    grid_builder.configure_selection(selection_mode='single', use_checkbox=True)
     grid_options = grid_builder.build()
 
-    # Renderizza la griglia e ottieni i dati modificati
-    response = AgGrid(df_workorder_grid, gridOptions=grid_options, theme='streamlit', update_mode='MODEL_CHANGED', allow_unsafe_jscode=True)
-
-    # Ordina il dataframe in base alla colonna SEQUENCE
-    sorted_df = sort_dataframe(pd.DataFrame(response['data']))
-
-    # List of available themes
-    available_themes = ["streamlit", "alpine", "balham", "material"]
-
-    # Sidebar controls - Filters
+    # Sidebar filters
     st.sidebar.header(":blue[Filters]")
     wo_status_options = list(df_workorder_grid['STATUS'].drop_duplicates().sort_values())
     status_filter = st.sidebar.selectbox(
@@ -616,68 +610,55 @@ def manage_workorder(conn):
         key='tdtl_value'
     )
 
-    # Apply filters 
-    filtered_data = df_workorder_grid.copy() 
-    if status_filter: 
-        filtered_data = filtered_data[filtered_data["STATUS"] == status_filter] 
-    if tdtl_filter: 
-        filtered_data = filtered_data[filtered_data["TDTLID"] == tdtl_filter] 
-    st.session_state.grid_data = filtered_data
+    # Apply filters
+    filtered_data = df_workorder_grid.copy()
+    if status_filter:
+        filtered_data = filtered_data[filtered_data["STATUS"] == status_filter]
+    if tdtl_filter:
+        filtered_data = filtered_data[filtered_data["TDTLID"] == tdtl_filter]
 
-    # Sort after filtering
-    st.session_state.grid_data = sort_dataframe(st.session_state.grid_data)
-
-    # Display grid
+    # Sort and display grid
     st.subheader(":orange[Work Order list]")
+    filtered_data = sort_dataframe(filtered_data)
     
-    # Use a callback function to handle grid changes and get selected rows
-    def on_grid_change(data):
-        st.session_state.selected_rows = data['selected_rows'] if 'selected_rows' in data else []
-        # You can add any other logic you need to execute when the grid changes here
-
     grid_response = AgGrid(
-        st.session_state.grid_data,
+        filtered_data,
         gridOptions=grid_options,
         allow_unsafe_jscode=True,
         theme="streamlit",
         fit_columns_on_grid_load=False,
-        update_mode=GridUpdateMode.MODEL_CHANGED,  # This is important for updates
+        update_mode=GridUpdateMode.MODEL_CHANGED,
         data_return_mode=DataReturnMode.AS_INPUT,
-        key="main_grid",  # Unique key for the grid
-        enable_enterprise_modules=False,
-        # Add the callback function
-        on_grid_state_changed=on_grid_change  
+        key="workorder_grid"
     )
 
-    # Access selected rows using the grid_response directly
-    if 'selected_rows' in grid_response: # Check if selected_rows exists
-        selected_rows = grid_response['selected_rows']
-    else:
-        selected_rows = [] # Or handle the case where no rows are selected
+    # Update session state with modified data
+    if grid_response['data'] is not None:
+        st.session_state.grid_data = pd.DataFrame(grid_response['data'])
 
-    workorder_button_disable = not (selected_rows is not None and isinstance(selected_rows, pd.DataFrame) and not selected_rows.empty)
-    workitem_button_disable = not (selected_rows is not None and isinstance(selected_rows, pd.DataFrame) and not selected_rows.empty)
+    # Handle selected rows
+    selected_rows = grid_response.get('selected_rows', [])
+    workorder_button_disable = len(selected_rows) == 0
+    workitem_button_disable = len(selected_rows) == 0
 
-    # ... (Pulsanti e chiamate di dialogo)
+    # Buttons
     col1, col2, col3 = st.columns(3)
     with col1:
         if st.button("🔄 Refresh data", type="secondary"):
-            st.session_state.df_workorders = sqlite_db.load_workorders_data(conn)
+            st.session_state.df_workorders = sqlite_db.df_workorders(conn)
             st.session_state.grid_data = st.session_state.df_workorders.copy()
-            st.rerun()  # Force a rerun to update the grid
+            st.rerun()
+#            reset_application_state()
+#             st.session_state.df_workorders = sqlite_db.load_workorder_data(conn)  # Ricarica i dati dal database
     
     with col2:
         if st.button("✏️ Modify Work Order", type="secondary", disabled=workorder_button_disable):
-            if st.session_state.grid_response and st.session_state.grid_response['selected_rows'] is not None and not st.session_state.grid_response['selected_rows'].empty:
-                selected_rows_df = st.session_state.grid_response['selected_rows']
-                selected_row_dict = selected_rows_df.iloc[0].to_dict() #oppure selected_rows_df.to_dict('records')[0]
+            if selected_rows:
+                selected_row_dict = selected_rows[0]
+                # Uncomment when dialog is implemented
                 #show_workorder_dialog(selected_row_dict, WO_STATUS_OPTIONS, sqlite_db.update_workorder, conn)
 
     with col3:
         if st.button("🎯 Create Work Item", type="secondary", disabled=workitem_button_disable):
-            if st.session_state.grid_response and st.session_state.grid_response['selected_rows'] is not None and not st.session_state.grid_response['selected_rows'].empty:
-                selected_rows_df = st.session_state.grid_response['selected_rows']
-                selected_row_dict = selected_rows_df.iloc[0].to_dict()  # oppure selected_rows_df.to_dict('records')[0]
-                #show_workitem_dialog(selected_row_dict, st.session_state.df_workitem, st.session_state.df_woassignedto, st.session_state.df_users, STATUS_NEW, DEFAULT_DEPT_CODE, WO_STATUS_OPTIONS, sqlite_db.save_workorder, sqlite_db.save_workorder_assignments, conn)
-            # else:
-            #     st.warning("Please select a request from the grid first.", icon="⚠️")  # Avvisa l'utente
+            if selected_rows:
+                selected_row_dict = selected_rows[0]

@@ -44,8 +44,8 @@ def reset_application_state():
 def manage_workorder(conn):
     # Initialize session state
     sqlite_db.initialize_session_state(conn)
-    st.write("P00")
-    st.write(st.session_state.df_workorders)
+    #st.write("P00")
+    #st.write(st.session_state.df_workorders)
     
     # Load data only once when needed
     if "df_workorders" not in st.session_state:
@@ -53,8 +53,8 @@ def manage_workorder(conn):
     if "wo_grid_data" not in st.session_state:
         st.session_state.wo_grid_data = st.session_state.df_workorders.copy()
     
-    st.write("P01")
-    st.write(st.session_state.wo_grid_data)
+    #st.write("P01")
+    #st.write(st.session_state.wo_grid_data)
 
     # Create display DataFrame
     df_workorder_grid = pd.DataFrame({

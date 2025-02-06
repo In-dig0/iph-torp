@@ -23,7 +23,7 @@ def reset_application_state():
     """Reset all session state variables and cached data"""
     # Lista delle chiavi di sessione da eliminare
     keys_to_clear = [
-        'grid_data',
+        'wo_grid_data',
         'grid_response',
         'dialog_shown',
         'need_refresh',
@@ -50,11 +50,11 @@ def manage_workorder(conn):
     # Load data only once when needed
     if "df_workorders" not in st.session_state:
         st.session_state.df_workorders = sqlite_db.df_workorders(conn)
-    if "grid_data" not in st.session_state:
-        st.session_state.grid_data = st.session_state.df_workorders.copy()
+    if "wo_grid_data" not in st.session_state:
+        st.session_state.wo_grid_data = st.session_state.df_workorders.copy()
     
     st.write("P01")
-    st.write(st.session_state.grid_data)
+    st.write(st.session_state.wo_grid_data)
 
     # Create display DataFrame
     df_workorder_grid = pd.DataFrame({
@@ -176,7 +176,7 @@ def manage_workorder(conn):
     if grid_response['data'] is not None:
         new_data = pd.DataFrame(grid_response['data'])
         new_data = sort_dataframe(new_data)  # Sort before updating
-        st.session_state.grid_data = new_data
+        st.session_state.wo_grid_data = new_data
 
     # Handle selected rows - Safe handling of None case
     selected_rows = grid_response.get('selected_rows', [])
@@ -189,7 +189,7 @@ def manage_workorder(conn):
     with col1:
         if st.button("🔄 Refresh data", type="secondary"):
             st.session_state.df_workorders = sqlite_db.load_workorders_data(conn)
-            st.session_state.grid_data = st.session_state.df_workorders.copy()
+            st.session_state.wo_grid_data = st.session_state.df_workorders.copy()
             st.rerun()
 #            reset_application_state()
 #             st.session_state.df_workorders = sqlite_db.load_workorder_data(conn)  # Ricarica i dati dal database

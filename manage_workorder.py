@@ -41,6 +41,107 @@ def reset_application_state():
     st.session_state.grid_refresh_key = str(time.time())     
     st.rerun()
 
+##########################################
+def create_workitem(wo):
+    with st.container(border=True):
+        if selected_tdsp_name:
+            tdsp_index = tdsp_woassignedto_names.index(selected_tdsp_name)  # Get the index
+            selected_td_specialist_form = st.selectbox(
+                label=":blue[TD Specialist](:red[*])",
+                options=tdsp_woassignedto_names,
+                index=tdsp_index,  # Use index to set the default selection
+                key="tdsp_form"
+            )
+        else:
+            selected_td_specialist_form = st.selectbox(
+                label=":blue[TD Specialist](:red[*])",
+                options=tdsp_woassignedto_names,
+                index=None,
+                key="tdsp_form"
+            )
+
+        if selected_td_specialist_form:
+            selected_td_specialist_form_code = servant.get_code_from_name(st.session_state.df_users, selected_td_specialist_form, "CODE")
+
+            # Correctly filter and extract Work Order IDs
+            filtered_workorder_df = st.session_state.df_woassignedto[
+                st.session_state.df_woassignedto["TDSPID"] == selected_td_specialist_form_code
+            ]
+
+            if not filtered_workorder_df.empty:  # Check if the DataFrame is not empty
+                filtered_workorder_list = sorted(filtered_workorder_df["WOID"].tolist())  # Extract WOIDs and convert to a sorted list
+            else:
+                filtered_workorder_list = []  # Handle the case where no work orders are found
+
+        else:
+            filtered_workorder_list = []
+            selected_td_specialist_form_code = ""
+
+        selected_workorder = st.selectbox(
+            label=":blue[Work Order]",
+            options=filtered_workorder_list,
+            index=None,
+            key="sb_wo"
+            )
+
+        # Task Group Level 1 dropdown
+        tskgrl1_options = st.session_state.df_tskgrl1["NAME"].tolist()
+        selected_tskgrl1 = st.selectbox(label=":blue[TaskGroup L1]", options=tskgrl1_options, index=None, key="sb_tskgrl1")
+        selected_tskgrl1_code = servant.get_code_from_name(st.session_state.df_tskgrl1, selected_tskgrl1, "CODE")
+
+        # Task Group Level 2 dropdown (dependent on Level 1)
+        tskgrl2_options = st.session_state.df_tskgrl2[st.session_state.df_tskgrl2['PCODE'] == selected_tskgrl1_code]['NAME'].unique()
+        selected_tskgrl2 = st.selectbox(label=":blue[TaskGroup L2]", options=tskgrl2_options, index=None, key="sb_tskgrl2")
+        selected_tskgrl2_code = servant.get_code_from_name(st.session_state.df_tskgrl2, selected_tskgrl2, "CODE")
+
+        # Execution Date
+        execution_date = st.date_input(label=":blue[Execution Date]", value=datetime.datetime.now(), format="DD/MM/YYYY")
+
+        # Quantity
+        quantity = st.number_input(label=":blue[Time]", min_value=0.0, step=0.5, value=0.0, key="in_time_qty")
+
+        # Description
+        desc = st.text_input(label=":blue[Description]", key="ti_description")
+
+        # Note
+        note = st.text_area(label=":blue[Notes]", key="ta_note")
+
+        save_button_disabled = not all([  # Use all() for cleaner logic
+            execution_date,
+            selected_td_specialist_form_code,
+            selected_workorder,
+            selected_tskgrl1_code,
+            selected_tskgrl2_code,
+            quantity
+        ])
+
+        if st.button("Save Work Item", disabled=save_button_disabled):
+            witem = {
+                "wi_refdate": execution_date,
+                "wo_woid": selected_workorder,
+                "wi_tdspid": selected_td_specialist_form_code,
+                "wi_status": "ACTIVE",
+                "wi_tskgrl1": selected_tskgrl1_code,
+                "wi_tskgrl2": selected_tskgrl2_code,
+                "wi_desc": desc,
+                "wi_note": note,
+                "wi_time_qty": quantity,
+                "wi_time_um": "H"
+            }
+
+            success = sqlite_db.save_workitem(witem, conn)
+            if success:
+                st.success("New workitem created!")
+                # Set a flag in session state to indicate that a reload is needed
+                st.session_state.reload_needed = True
+                # Set default values for the form fields
+                st.session_state.form_reset = True
+                time.sleep(1)
+                st.rerun()
+
+
+##########################################
+
 def manage_workorder(conn):
     # Initialize session state
     sqlite_db.initialize_session_state(conn)
@@ -205,5 +306,6 @@ def manage_workorder(conn):
     with col3:
         if st.button("🎯 Create Work Item", type="secondary", disabled=workitem_button_disable):
             if has_selection:
-                pass
+                st.write(selected_rows)
+                #create_work_item(selected_row_dict)
                 #selected_row_dict = selected_rows[0]

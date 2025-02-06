@@ -70,7 +70,7 @@ def dashboard(conn):
     st.write("##### Requests status per day")
     
     # Convertiamo la colonna Insdate in datetime se non lo è già
-    st.session_state.df_requests['Insdate'] = pd.to_datetime(st.session_state.df_requests['Insdate'])
+    st.session_state.df_requests['INSDATE'] = pd.to_datetime(st.session_state.df_requests['INSDATE'])
     
     # Creiamo una colonna per la data formattata
     st.session_state.df_requests['Date'] = st.session_state.df_requests['Insdate'].dt.strftime('%Y-%m-%d')

@@ -165,6 +165,7 @@ def show_workorder_dialog(selected_row_dict,  # Passa un dizionario
 
         reqid = selected_row_dict["REQID"]  # Usa direttamente il dizionario
         woid = "W" + selected_row_dict["REQID"][1:]
+        
 
         # ... (Resto del contenuto del dialogo, usando selected_row_dict)
         # Display request details

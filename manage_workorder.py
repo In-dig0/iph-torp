@@ -647,7 +647,12 @@ def manage_workorder(conn):
         enable_enterprise_modules=False # Set to False unless you are using Enterprise Modules
     )
 
-    selected_rows = st.session_state.grid_response['selected_rows']
+    # Access selected rows using the grid_response directly
+    if 'selected_rows' in grid_response: # Check if selected_rows exists
+        selected_rows = grid_response['selected_rows']
+    else:
+        selected_rows = [] # Or handle the case where no rows are selected
+        
     workorder_button_disable = not (selected_rows is not None and isinstance(selected_rows, pd.DataFrame) and not selected_rows.empty)
     workitem_button_disable = not (selected_rows is not None and isinstance(selected_rows, pd.DataFrame) and not selected_rows.empty)
 

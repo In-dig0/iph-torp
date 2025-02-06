@@ -294,7 +294,7 @@ def manage_workorder(conn):
             if has_selection:
                 st.write(selected_rows)
                 #selected_row_dict = selected_rows.to_dict()
-                workorder_id = str(workorder_id.iloc[0]) 
+                workorder_id = str(selected_rows.iloc[0]) 
                 st.write(f"{type(workorder_id)} - {workorder_id}")
                 #success = create_work_item(workorder_id)
 

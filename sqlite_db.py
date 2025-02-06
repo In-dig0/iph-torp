@@ -355,9 +355,11 @@ def load_workorders_data(conn):
         df_workorders = pd.read_sql_query("""
         SELECT 
             A.woid AS WOID,
+            A.insdate AS INSDATE,
             A.tdtlid AS TDTLID, 
             A.type AS TYPE, 
-            A.status AS STATUS,        
+            A.status AS STATUS, 
+            A.sequence AS SEQUENCE,       
             A.title AS TITLE,
             A.description AS DESCRIPTION,
             A.time_qty AS TIME_QTY,
@@ -368,6 +370,7 @@ def load_workorders_data(conn):
         FROM TORP_WORKORDERS A
         ORDER BY REQID
         """, conn)
+        df_workorders["INSDATE"] = pd.to_datetime(df_workorders["INSDATE"])
     except Exception as errMsg:
         st.error(f"**ERROR load data from TORP_WORKORDERS: \n{errMsg}", icon="🚨")
         return None
@@ -715,7 +718,7 @@ def save_workorder(wo: dict, conn): # Pass connection and cursor
         with conn:
             cursor = conn.cursor()
             # Check if a workorder with the given woid already exists
-            cursor.execute("SELECT 1 FROM TORP_WORKORDERS WHERE woid = ? AND tdtlid = ?", (wo["woid"],wo["tdtlid"]))
+            cursor.execute("SELECT 1 FROM TORP_WORKORDERS WHERE woid = ? AND tdtlid = ?", (wo["woid"], wo["tdtlid"]))
             existing_workorder = cursor.fetchone()
 
             if existing_workorder:
@@ -724,14 +727,14 @@ def save_workorder(wo: dict, conn): # Pass connection and cursor
                     UPDATE TORP_WORKORDERS SET
                         type = ?, title = ?, description = ?,
                         time_qty = ?, time_um = ?, status = ?, startdate = ?,
-                        enddate = ?, reqid = ?
+                        enddate = ?, reqid = ?, sequence = ?
                     WHERE woid = ?
                     AND tdtlid = ?
                 """
                 values = (
                     wo["type"], wo["title"], wo["description"],
                     wo["time_qty"], wo["time_um"], wo["status"], wo["startdate"],
-                    wo["enddate"], wo["reqid"], wo["woid"], wo["tdtlid"]  # Include woid in WHERE clause
+                    wo["enddate"], wo["reqid"], wo["woid"], wo["tdtlid"], wo["sequence"]  # Include woid in WHERE clause
                 )
                 cursor.execute(sql, values)
                 conn.commit()
@@ -742,13 +745,13 @@ def save_workorder(wo: dict, conn): # Pass connection and cursor
                 sql = """
                     INSERT INTO TORP_WORKORDERS (
                         woid, tdtlid, type, title, description, time_qty, time_um,
-                        status, startdate, enddate, reqid
-                    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                        status, startdate, enddate, reqid, insdate, sequence
+                    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                 """
                 values = (
                     wo["woid"], wo["tdtlid"], wo["type"], wo["title"], wo["description"],
                     wo["time_qty"], wo["time_um"], wo["status"], wo["startdate"],
-                    wo["enddate"], wo["reqid"]
+                    wo["enddate"], wo["reqid"], wo["insdate"], wo["sequence"]
                 )
                 cursor.execute(sql, values)
                 conn.commit()

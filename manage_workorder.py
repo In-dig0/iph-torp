@@ -526,6 +526,7 @@ def manage_workorder(conn):
     # Create display DataFrame
     df_workorder_grid = pd.DataFrame({
         'WOID': st.session_state.grid_data['WOID'],
+        'INSDATE': st.session_state.grid_data['INSDATE'],
         'TDTLID': st.session_state.grid_data['TDTLID'],
         'STATUS': st.session_state.grid_data['STATUS'],
         'SEQUENCE': st.session_state.grid_data.get('SEQUENCE', None),  # Preserve SEQUENCE values

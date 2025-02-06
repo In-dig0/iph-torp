@@ -16,6 +16,7 @@ DEFAULT_DEPT_CODE = "DTD"
 STATUS_NEW = "NEW"
 STATUS_WIP = "WIP"
 REQ_STATUS_OPTIONS = ['NEW', 'PENDING', 'ASSIGNED', 'WIP', 'COMPLETED', 'DELETED']
+SEQUENCE_NORMAL = ""
 
 # ... (Caricamento dei dati nello stato della sessione come prima)
 
@@ -300,8 +301,7 @@ def show_workorder_dialog(selected_row_dict,  # Passa un dizionario
 
 
         if st.button("Salva", type="primary", disabled=disable_save_button, key="wo_save_button"):
-            # ... (Resto della tua logica di salvataggio)
-
+            insdate = datetime.datetime.now().strftime("%Y-%m-%d")
             wo = {
                 "woid": woid,
                 "tdtlid": req_tdtl_code,
@@ -313,7 +313,9 @@ def show_workorder_dialog(selected_row_dict,  # Passa un dizionario
                 "status": STATUS_NEW,
                 "startdate": wo_startdate,
                 "enddate": wo_enddate,
-                "reqid": reqid
+                "reqid": reqid,
+                "insdate": insdate,
+                "sequence": SEQUENCE_NORMAL
             }
             wo_idrow, success = sqlite_db.save_workorder(wo, conn)
             if success:

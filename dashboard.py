@@ -74,7 +74,7 @@ def dashboard(conn):
     #st.write(st.session_state.df_requests.head())
 
     #st.write("Colonne disponibili:")
-    st.write(st.session_state.df_requests.columns.tolist())
+    #st.write(st.session_state.df_requests.columns.tolist())
 
     # Convertiamo la colonna Insdate in datetime se non lo è già
     st.session_state.df_requests['INSDATE'] = pd.to_datetime(st.session_state.df_requests['INSDATE'])
@@ -88,7 +88,7 @@ def dashboard(conn):
     )
 
     # Grafico semplificato
-    status_plot = alt.Chart(st.session_state.df_requests).mark_bar().encode(
+    dept_plot = alt.Chart(st.session_state.df_requests).mark_bar().encode(
         x='DATE:O',
         y='count():Q',
         color='DEPT:N'

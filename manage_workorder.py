@@ -49,7 +49,6 @@ def show_workitem_dialog(workorder_id, tdtl_id, conn):
     def create_workitem_popup():
         with st.container(border=True ):
             
-            selected_tdsp = ""
             tdsp_woassignedto_names_df = st.session_state.df_users[st.session_state.df_users["DEPTCODE"]=="DTD"]["NAME"]
             tdsp_woassignedto_names_list = list(tdsp_woassignedto_names_df)
             tdsp_woassignedto_names = sorted(tdsp_woassignedto_names_list)
@@ -63,9 +62,11 @@ def show_workitem_dialog(workorder_id, tdtl_id, conn):
             
 
             if selected_tdsp:
-                st.write(selected_tdsp)
+                #st.write(selected_tdsp)
                 selected_tdsp_code = servant.get_code_from_name(st.session_state.df_users, selected_tdsp, "CODE")
-                st.write(selected_tdsp)
+                #st.write(selected_tdsp)
+            else:
+                selected_tdsp_code = ""
 
             filtered_workorder_list = [workorder_id]  
             selected_workorder = st.selectbox(

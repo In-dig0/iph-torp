@@ -295,7 +295,7 @@ def manage_workorder(conn):
     with col3:
         if st.button("🎯 Create Work Item", type="secondary", disabled=workitem_button_disable):
             if has_selection:
-                st.write(selected_rows)
+                #st.write(selected_rows)
                 #selected_row_dict = selected_rows.to_dict()
                 workorder_id = selected_rows["WOID"].iloc[0]
                 tdtl_id = selected_rows["TDTLID"].iloc[0]

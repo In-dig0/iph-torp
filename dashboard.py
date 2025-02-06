@@ -73,7 +73,7 @@ def dashboard(conn):
     st.session_state.df_requests['INSDATE'] = pd.to_datetime(st.session_state.df_requests['INSDATE'])
     
     # Creiamo una colonna per la data formattata
-    st.session_state.df_requests['Date'] = st.session_state.df_requests['Insdate'].dt.strftime('%Y-%m-%d')
+    st.session_state.df_requests['DATE'] = st.session_state.df_requests['INSDATE'].dt.strftime('%Y-%m-%d')
     
     status_plot = (
         alt.Chart(st.session_state.df_requests)
@@ -86,7 +86,7 @@ def dashboard(conn):
                 title='Number of Requests'),
             xOffset="Status:N",  # Questo raggruppa le barre per stato
             color=alt.Color("Status:N", title="Status"),
-            tooltip=['Date', 'Status', 'count()']  # Aggiungiamo un tooltip per maggiori informazioni
+            tooltip=['INSDATE', 'Status', 'count()']  # Aggiungiamo un tooltip per maggiori informazioni
         )
         .configure_legend(
             orient="bottom",

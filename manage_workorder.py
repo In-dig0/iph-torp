@@ -591,6 +591,9 @@ def manage_workorder(conn):
     st.write("Updated DataFrame:")
     AgGrid(sorted_df, gridOptions=grid_options, theme='streamlit', allow_unsafe_jscode=True)
 
+    # List of available themes
+    available_themes = ["streamlit", "alpine", "balham", "material"]
+
     # Sidebar controls - Filters
     st.sidebar.header(":blue[Filters]")
     wo_status_options = list(df_workorder_grid['STATUS'].drop_duplicates().sort_values())

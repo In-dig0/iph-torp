@@ -67,13 +67,13 @@ def dashboard(conn):
     col1.metric(label="Number of NEW requests", value=num_open_requests, delta=10)
     col2.metric(label="Number of ASSIGNED requests", value=num_assigned_requests, delta=-1.5)
     col3.metric(label="Number of COMPLETED requests", value=num_completed_requests, delta=2)
-    col3.metric(label="Number of PENDING requests", value=num_pending_requests, delta=1)
+    col4.metric(label="Number of PENDING requests", value=num_pending_requests, delta=1)
 
     # Verifichiamo i dati
-    st.write("Preview dei dati:")
-    st.write(st.session_state.df_requests.head())
+    #st.write("Preview dei dati:")
+    #st.write(st.session_state.df_requests.head())
 
-    st.write("Colonne disponibili:")
+    #st.write("Colonne disponibili:")
     st.write(st.session_state.df_requests.columns.tolist())
 
     # Convertiamo la colonna Insdate in datetime se non lo è già
@@ -87,6 +87,12 @@ def dashboard(conn):
         color='PR_LINE:N'
     )
 
+    # Grafico semplificato
+    status_plot = alt.Chart(st.session_state.df_requests).mark_bar().encode(
+        x='DATE:O',
+        y='count():Q',
+        color='DEPT:N'
+    )
     # Proviamo a visualizzare il grafico
     try:
         st.altair_chart(status_plot, use_container_width=True)

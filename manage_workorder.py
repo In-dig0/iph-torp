@@ -58,14 +58,14 @@ def manage_workorder(conn):
 
     # Create display DataFrame
     df_workorder_grid = pd.DataFrame({
-        'WOID': st.session_state.grid_data['WOID'],
-        'INSDATE': pd.to_datetime(st.session_state.grid_data['INSDATE']).dt.strftime('%d/%m/%Y'),
-        'TDTLID': st.session_state.grid_data['TDTLID'],
-        'STATUS': st.session_state.grid_data['STATUS'],
-        'SEQUENCE': st.session_state.grid_data.get('SEQUENCE', None),  # Preserve SEQUENCE values
-        'TYPE': st.session_state.grid_data['TYPE'],
-        'REQID': st.session_state.grid_data['REQID'],
-        'TITLE': st.session_state.grid_data['TITLE']
+        'WOID': st.session_state.df_workorders['WOID'],
+        'INSDATE': pd.to_datetime(st.session_state.df_workorders['INSDATE']).dt.strftime('%d/%m/%Y'),
+        'TDTLID': st.session_state.df_workorders['TDTLID'],
+        'STATUS': st.session_state.df_workorders['STATUS'],
+        'SEQUENCE': st.session_state.df_workorders.get('SEQUENCE', None),  # Preserve SEQUENCE values
+        'TYPE': st.session_state.df_workorders['TYPE'],
+        'REQID': st.session_state.df_workorders['REQID'],
+        'TITLE': st.session_state.df_workorders['TITLE']
     })
 
     # Cell styling

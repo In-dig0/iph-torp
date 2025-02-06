@@ -630,17 +630,23 @@ def manage_workorder(conn):
     # Display grid
     st.subheader(":orange[Work Order list]")
     
-    # Show the grid and handle interactions
+    # Use a callback function to handle grid changes and get selected rows
+    def on_grid_change(data):
+        st.session_state.selected_rows = data['selected_rows'] if 'selected_rows' in data else []
+        # You can add any other logic you need to execute when the grid changes here
+
     grid_response = AgGrid(
         st.session_state.grid_data,
         gridOptions=grid_options,
         allow_unsafe_jscode=True,
-        theme="streamlit",  # Use a default or custom theme
+        theme="streamlit",
         fit_columns_on_grid_load=False,
-        update_mode=GridUpdateMode.MODEL_CHANGED,
+        update_mode=GridUpdateMode.MODEL_CHANGED,  # This is important for updates
         data_return_mode=DataReturnMode.AS_INPUT,
         key="main_grid",  # Unique key for the grid
-        enable_enterprise_modules=False # Set to False unless you are using Enterprise Modules
+        enable_enterprise_modules=False,
+        # Add the callback function
+        on_grid_state_changed=on_grid_change  
     )
 
     # Access selected rows using the grid_response directly
@@ -656,8 +662,7 @@ def manage_workorder(conn):
     col1, col2, col3 = st.columns(3)
     with col1:
         if st.button("🔄 Refresh data", type="secondary"):
-            reset_application_state()
-            st.session_state.df_workorders = sqlite_db.load_workorder_data(conn)  # Ricarica i dati dal database
+            st.session_state.df_workorders = sqlite_db.load_workorder_data(conn)
             st.session_state.grid_data = st.session_state.df_workorders.copy()
             st.rerun()  # Force a rerun to update the grid
     

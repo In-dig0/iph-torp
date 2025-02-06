@@ -42,7 +42,7 @@ def reset_application_state():
     st.rerun()
 
 ##########################################
-def create_workitem(wo):
+def create_workitem(p_woid, p_tdtlid):
     with st.container(border=True):
         
         tdsp_woassignedto_names_df = st.session_state.df_users[st.session_state.df_users["DEPTCODE"]=="DTD"]["NAME"]
@@ -58,7 +58,7 @@ def create_workitem(wo):
         if selected_tdsp:
             selected_tdsp_code = servant.get_code_from_name(st.session_state.df_users, selected_tdsp, "CODE")
 
-        filtered_workorder_list = sorted(list(wo["WOID"]["1"]))  
+        filtered_workorder_list = [p_woid]  
         selected_workorder = st.selectbox(
             label=":blue[Work Order]",
             options=filtered_workorder_list,
@@ -296,6 +296,6 @@ def manage_workorder(conn):
                 #selected_row_dict = selected_rows.to_dict()
                 workorder_id = selected_rows["WOID"].iloc[0]
                 tdtl_id = selected_rows["TDTLID"].iloc[0]
-                st.write(f"{workorder_id} - {tdtl_id }")
-                #success = create_work_item(workorder_id)
+                #st.write(f"{workorder_id} - {tdtl_id }")
+                success = create_work_item(workorder_id, tdtl_id)
 

@@ -595,10 +595,6 @@ def manage_workorder(conn):
     # Ordina il dataframe in base alla colonna SEQUENCE
     sorted_df = sort_dataframe(pd.DataFrame(response['data']))
 
-    # Mostra il dataframe ordinato
-    st.write("Updated DataFrame:")
-    AgGrid(sorted_df, gridOptions=grid_options, theme='streamlit', allow_unsafe_jscode=True)
-
     # List of available themes
     available_themes = ["streamlit", "alpine", "balham", "material"]
 
@@ -652,7 +648,7 @@ def manage_workorder(conn):
         selected_rows = grid_response['selected_rows']
     else:
         selected_rows = [] # Or handle the case where no rows are selected
-        
+
     workorder_button_disable = not (selected_rows is not None and isinstance(selected_rows, pd.DataFrame) and not selected_rows.empty)
     workitem_button_disable = not (selected_rows is not None and isinstance(selected_rows, pd.DataFrame) and not selected_rows.empty)
 

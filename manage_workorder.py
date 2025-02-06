@@ -559,17 +559,23 @@ def manage_workorder(conn):
         }
     """)
 
-    # Sort function considering SEQUENCE values
+        # Sort function considering SEQUENCE values
     def sort_dataframe(df):
         if 'SEQUENCE' in df.columns:
-            # Create a priority map for sorting
-            priority_map = {'HIGH': 0, 'LOW': 1, None: 2}
+            # Create a priority map for sorting (HIGH should be first)
+            priority_map = {'HIGH': 1, 'LOW': 2}
+            
             # Create a temporary column for sorting
-            df['sort_priority'] = df['SEQUENCE'].map(priority_map)
-            # Sort by priority and then by WOID
-            df = df.sort_values(['sort_priority', 'WOID'])
+            df = df.copy()
+            df['sort_priority'] = df['SEQUENCE'].map(lambda x: priority_map.get(x, 3))
+            
+            # Sort by priority
+            df = df.sort_values('sort_priority', ascending=True)
+            
             # Remove temporary column
             df = df.drop('sort_priority', axis=1)
+            
+            return df
         return df
 
     # Grid configuration
@@ -632,9 +638,10 @@ def manage_workorder(conn):
         key="workorder_grid"
     )
 
-    # Update session state with modified data
     if grid_response['data'] is not None:
-        st.session_state.grid_data = pd.DataFrame(grid_response['data'])
+        new_data = pd.DataFrame(grid_response['data'])
+        new_data = sort_dataframe(new_data)  # Sort before updating
+        st.session_state.grid_data = new_data
 
     # Handle selected rows - Safe handling of None case
     selected_rows = grid_response.get('selected_rows', [])

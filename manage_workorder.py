@@ -295,7 +295,7 @@ def manage_workorder(conn):
                 st.write(selected_rows)
                 #selected_row_dict = selected_rows.to_dict()
                 workorder_id = selected_rows["WOID"].iloc[0]
-                tdtl_id = selected_rows["TDTL"].iloc[0]
+                tdtl_id = selected_rows["TDTLID"].iloc[0]
                 st.write(f"{workorder_id} - {tdtl_id }")
                 #success = create_work_item(workorder_id)
 

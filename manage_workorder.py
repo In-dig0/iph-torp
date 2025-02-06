@@ -636,10 +636,11 @@ def manage_workorder(conn):
     if grid_response['data'] is not None:
         st.session_state.grid_data = pd.DataFrame(grid_response['data'])
 
-    # Handle selected rows
+    # Handle selected rows - Safe handling of None case
     selected_rows = grid_response.get('selected_rows', [])
-    workorder_button_disable = len(selected_rows) == 0
-    workitem_button_disable = len(selected_rows) == 0
+    has_selection = selected_rows is not None and len(selected_rows) > 0
+    workorder_button_disable = not has_selection
+    workitem_button_disable = not has_selection
 
     # Buttons
     col1, col2, col3 = st.columns(3)
@@ -653,7 +654,7 @@ def manage_workorder(conn):
     
     with col2:
         if st.button("✏️ Modify Work Order", type="secondary", disabled=workorder_button_disable):
-            if selected_rows:
+            if has_selection:
                 selected_row_dict = selected_rows[0]
                 # Uncomment when dialog is implemented
                 #show_workorder_dialog(selected_row_dict, WO_STATUS_OPTIONS, sqlite_db.update_workorder, conn)

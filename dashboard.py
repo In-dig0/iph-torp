@@ -65,33 +65,28 @@ def dashboard(conn):
     col2.metric(label="Number of ASSIGNED requests", value=num_assigned_requests, delta=-1.5)
     col3.metric(label="Number of COMPLETED requests", value=num_completed_requests, delta=2)
 
-    # Show two Altair charts using `st.altair_chart`.
-    st.write("")
-    st.write("##### Requests status per day")
-    
+    st.header("Statistics")
+
+    # Verifichiamo i dati
+    st.write("Preview dei dati:")
+    st.write(st.session_state.df_requests.head())
+
+    st.write("Colonne disponibili:")
+    st.write(st.session_state.df_requests.columns.tolist())
+
     # Convertiamo la colonna Insdate in datetime se non lo è già
     st.session_state.df_requests['INSDATE'] = pd.to_datetime(st.session_state.df_requests['INSDATE'])
-    
-    # Creiamo una colonna per la data formattata
     st.session_state.df_requests['DATE'] = st.session_state.df_requests['INSDATE'].dt.strftime('%Y-%m-%d')
-    
-    status_plot = (
-        alt.Chart(st.session_state.df_requests)
-        .mark_bar()
-        .encode(
-            x=alt.X('DATE:O', 
-                title='Date',
-                axis=alt.Axis(labelAngle=-45)),
-            y=alt.Y('count():Q',
-                title='Number of Requests'),
-            xOffset="STATUS:N",  # Modificato da "Status:N" a "STATUS:N"
-            color=alt.Color("STATUS:N", title="Status"),  # Modificato da "Status:N" a "STATUS:N"
-            tooltip=['INSDATE', 'STATUS', 'count()']  # Modificato da 'Status' a 'STATUS'
-        )
-        .configure_legend(
-            orient="bottom",
-            titleFontSize=14,
-            labelFontSize=14,
-            titlePadding=5
-        )
+
+    # Grafico semplificato
+    status_plot = alt.Chart(st.session_state.df_requests).mark_bar().encode(
+        x='DATE:O',
+        y='count():Q',
+        color='STATUS:N'
     )
+
+    # Proviamo a visualizzare il grafico
+    try:
+        st.altair_chart(status_plot, use_container_width=True)
+    except Exception as e:
+        st.error(f"Errore nella visualizzazione del grafico: {str(e)}")

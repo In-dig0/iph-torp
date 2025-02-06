@@ -197,11 +197,13 @@ def manage_workorder(conn):
     with col2:
         if st.button("✏️ Modify Work Order", type="secondary", disabled=workorder_button_disable):
             if has_selection:
-                selected_row_dict = selected_rows[0]
+                pass
+                #selected_row_dict = selected_rows[0]
                 # Uncomment when dialog is implemented
                 #show_workorder_dialog(selected_row_dict, WO_STATUS_OPTIONS, sqlite_db.update_workorder, conn)
 
     with col3:
         if st.button("🎯 Create Work Item", type="secondary", disabled=workitem_button_disable):
             if selected_rows:
-                selected_row_dict = selected_rows[0]
+                pass
+                #selected_row_dict = selected_rows[0]

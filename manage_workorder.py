@@ -580,6 +580,8 @@ def manage_workorder(conn):
         header_checkbox=True
     )
     grid_options = grid_builder.build()
+    # List of available themes
+    available_themes = ["streamlit", "alpine", "balham", "material"]
 
     # Renderizza la griglia e ottieni i dati modificati
     response = AgGrid(df_workorder_grid, gridOptions=grid_options, theme='streamlit', update_mode='MODEL_CHANGED', allow_unsafe_jscode=True)

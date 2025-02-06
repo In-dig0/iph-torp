@@ -54,7 +54,7 @@ def dashboard(conn):
     # return True
 
     # Show some metrics and charts about the ticket.
-    st.header("Statistics")
+    st.header("Requests Statistics")
 
     # Show metrics side by side using `st.columns` and `st.metric`.
     col1, col2, col3, col4 = st.columns(4)
@@ -68,7 +68,6 @@ def dashboard(conn):
     col2.metric(label="Number of ASSIGNED requests", value=num_assigned_requests, delta=-1.5)
     col3.metric(label="Number of COMPLETED requests", value=num_completed_requests, delta=2)
     col3.metric(label="Number of PENDING requests", value=num_pending_requests, delta=1)
-    st.header("Statistics")
 
     # Verifichiamo i dati
     st.write("Preview dei dati:")

@@ -565,8 +565,8 @@ def manage_workorder(conn):
     """)
 
     # Funzione per ordinare il dataframe in base alla colonna SEQUENCE
-    def ordina_dataframe(df):
-        if 'SEQUENCE' in df.columns:  # Verifica se la colonna esiste
+    def sort_dataframe(df):
+        if 'SEQUENCE' in df.columns:  # Check if the column exists
             return df.sort_values(by='SEQUENCE', ascending=False, na_position='last')
         return df
 

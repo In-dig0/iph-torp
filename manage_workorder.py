@@ -306,6 +306,6 @@ def manage_workorder(conn):
     with col3:
         if st.button("🎯 Create Work Item", type="secondary", disabled=workitem_button_disable):
             if has_selection:
-                st.write(selected_row.to_dict())
+                st.write(selected_rows[0])
                 #create_work_item(selected_row.to_dict())
                 #selected_row_dict = selected_rows[0]

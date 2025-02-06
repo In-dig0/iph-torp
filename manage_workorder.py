@@ -549,7 +549,7 @@ def manage_workorder(conn):
     # Definisci lo stile della cella per la colonna SEQUENCE
     sequenceCellStyle = JsCode("""
         function(params) {
-            if (params.value === 'HIGH') {
+            if (params.value === 'HIGH' || params.value === 'LOW') {
                 return {
                     'color': 'red'
                 };
@@ -573,15 +573,13 @@ def manage_workorder(conn):
     grid_builder.configure_pagination(paginationAutoPageSize=False, paginationPageSize=12)
     grid_builder.configure_grid_options(domLayout='normal')
     grid_builder.configure_column("WOID", cellStyle=cellStyle)
-    grid_builder.configure_column("SEQUENCE", editable=True, cellEditor='agSelectCellEditor', cellEditorParams={'values': ['HIGH', ' ']}, cellStyle=sequenceCellStyle)
+    grid_builder.configure_column("SEQUENCE", editable=True, cellEditor='agSelectCellEditor', cellEditorParams={'values': ['HIGH', 'LOW']}, cellStyle=sequenceCellStyle)
     grid_builder.configure_selection(
         selection_mode='single',
         use_checkbox=True,
         header_checkbox=True
     )
     grid_options = grid_builder.build()
-    # List of available themes
-    available_themes = ["streamlit", "alpine", "balham", "material"]
 
     # Renderizza la griglia e ottieni i dati modificati
     response = AgGrid(df_workorder_grid, gridOptions=grid_options, theme='streamlit', update_mode='MODEL_CHANGED', allow_unsafe_jscode=True)
@@ -592,12 +590,6 @@ def manage_workorder(conn):
     # Mostra il dataframe ordinato
     st.write("Updated DataFrame:")
     AgGrid(sorted_df, gridOptions=grid_options, theme='streamlit', allow_unsafe_jscode=True)
-
-    # Inizializzazione della sessione
-    if "grid_data" not in st.session_state:
-        st.session_state.grid_data = df_workorder_grid.copy()  # Copia per evitare modifiche al DataFrame originale
-    if "grid_response" not in st.session_state:
-        st.session_state.grid_response = None
 
     # Sidebar controls - Filters
     st.sidebar.header(":blue[Filters]")

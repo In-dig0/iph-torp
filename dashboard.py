@@ -57,7 +57,7 @@ def dashboard(conn):
     st.header("Statistics")
 
     # Show metrics side by side using `st.columns` and `st.metric`.
-    col1, col2, col3, col4 = st.columns(3)
+    col1, col2, col3, col4 = st.columns(4)
     num_open_requests = len(st.session_state.df_requests[st.session_state.df_requests["STATUS"] == "NEW"])
     num_assigned_requests = len(st.session_state.df_requests[st.session_state.df_requests["STATUS"] == "ASSIGNED"])
     num_completed_requests = len(st.session_state.df_requests[st.session_state.df_requests["STATUS"] == "COMPLETED"])
@@ -67,7 +67,7 @@ def dashboard(conn):
     col1.metric(label="Number of NEW requests", value=num_open_requests, delta=10)
     col2.metric(label="Number of ASSIGNED requests", value=num_assigned_requests, delta=-1.5)
     col3.metric(label="Number of COMPLETED requests", value=num_completed_requests, delta=2)
-    col3.metric(label="Number of PENDING requests", value=num_pending_requests, delta=2)
+    col3.metric(label="Number of PENDING requests", value=num_pending_requests, delta=1)
     st.header("Statistics")
 
     # Verifichiamo i dati

@@ -51,7 +51,7 @@ def create_workitem(wo):
         selected_tdsp = st.selectbox(
             label=":blue[TD Specialist](:red[*])",
             options=tdsp_woassignedto_names,
-            index=None  # Use index to set the default selection
+            index=None, 
             key="sb_tdsp"
         )
 
@@ -62,7 +62,7 @@ def create_workitem(wo):
         selected_workorder = st.selectbox(
             label=":blue[Work Order]",
             options=filtered_workorder_list,
-            index=None,
+            index=0,
             key="sb_wo"
             )
 

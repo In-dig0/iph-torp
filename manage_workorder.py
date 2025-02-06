@@ -549,7 +549,7 @@ def manage_workorder(conn):
     # Definisci lo stile della cella per la colonna SEQUENCE
     sequenceCellStyle = JsCode("""
         function(params) {
-            if (params.value === 'HIGH' || params.value === 'LOW') {
+            if (params.value === 'HIGH') {
                 return {
                     'color': 'red'
                 };
@@ -573,7 +573,7 @@ def manage_workorder(conn):
     grid_builder.configure_pagination(paginationAutoPageSize=False, paginationPageSize=12)
     grid_builder.configure_grid_options(domLayout='normal')
     grid_builder.configure_column("WOID", cellStyle=cellStyle)
-    grid_builder.configure_column("SEQUENCE", editable=True, cellEditor='agSelectCellEditor', cellEditorParams={'values': ['HIGH', 'LOW']}, cellStyle=sequenceCellStyle)
+    grid_builder.configure_column("SEQUENCE", editable=True, cellEditor='agSelectCellEditor', cellEditorParams={'values': ['HIGH']}, cellStyle=sequenceCellStyle)
     grid_builder.configure_selection(
         selection_mode='single',
         use_checkbox=True,

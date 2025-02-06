@@ -662,7 +662,7 @@ def manage_workorder(conn):
     col1, col2, col3 = st.columns(3)
     with col1:
         if st.button("🔄 Refresh data", type="secondary"):
-            st.session_state.df_workorders = sqlite_db.load_workorder_data(conn)
+            st.session_state.df_workorders = sqlite_db.load_workorders_data(conn)
             st.session_state.grid_data = st.session_state.df_workorders.copy()
             st.rerun()  # Force a rerun to update the grid
     

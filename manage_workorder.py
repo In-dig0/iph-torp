@@ -523,6 +523,12 @@ def manage_workorder(conn):
     if "grid_refresh_key" not in st.session_state: 
         st.session_state.grid_refresh_key = "initial"    
 
+ # Inizializza lo stato della sessione e i dati, caricandoli solo una volta
+    if "df_workorders" not in st.session_state:
+        st.session_state.df_workorders = sqlite_db.df_workorders(conn)
+    if "grid_data" not in st.session_state:
+        st.session_state.grid_data = st.session_state.grid_data.copy()
+
     df_workorder_grid = pd.DataFrame()
     df_workorder_grid['WOID'] = st.session_state.df_workorders['WOID']
     df_workorder_grid['TDTLID'] = st.session_state.df_workorders['TDTLID']
@@ -559,8 +565,10 @@ def manage_workorder(conn):
     """)
 
     # Funzione per ordinare il dataframe in base alla colonna SEQUENCE
-    def sort_dataframe(df):
-        return df.sort_values(by='SEQUENCE', ascending=False, na_position='last')
+    def ordina_dataframe(df):
+        if 'SEQUENCE' in df.columns:  # Verifica se la colonna esiste
+            return df.sort_values(by='SEQUENCE', ascending=False, na_position='last')
+        return df
 
     grid_builder = GridOptionsBuilder.from_dataframe(df_workorder_grid)
     grid_builder.configure_default_column(
@@ -620,32 +628,24 @@ def manage_workorder(conn):
         filtered_data = filtered_data[filtered_data["TDTLID"] == tdtl_filter] 
     st.session_state.grid_data = filtered_data
 
+    # Sort after filtering
+    st.session_state.grid_data = sort_dataframe(st.session_state.grid_data)
+
     # Display grid
     st.subheader(":orange[Work Order list]")
     
-    # Creazione/Aggiornamento della griglia (UNA SOLA VOLTA per ciclo di esecuzione)
-    if st.session_state.grid_response is None:
-        st.session_state.grid_response = AgGrid(
-            st.session_state.grid_data,
-            gridOptions=grid_options,
-            allow_unsafe_jscode=True,
-            theme=available_themes[2],
-            fit_columns_on_grid_load=False,
-            update_mode=GridUpdateMode.MODEL_CHANGED,
-            data_return_mode=DataReturnMode.AS_INPUT,
-            key="main_grid"
-        )
-    else:
-        st.session_state.grid_response = AgGrid( # Aggiorna la griglia esistente
-            st.session_state.grid_data,
-            gridOptions=grid_options,
-            allow_unsafe_jscode=True,
-            theme=available_themes[2],
-            fit_columns_on_grid_load=False,
-            update_mode=GridUpdateMode.MODEL_CHANGED,
-            data_return_mode=DataReturnMode.AS_INPUT,
-            key="main_grid"
-        )
+    # Show the grid and handle interactions
+    grid_response = AgGrid(
+        st.session_state.grid_data,
+        gridOptions=grid_options,
+        allow_unsafe_jscode=True,
+        theme="streamlit",  # Use a default or custom theme
+        fit_columns_on_grid_load=False,
+        update_mode=GridUpdateMode.MODEL_CHANGED,
+        data_return_mode=DataReturnMode.AS_INPUT,
+        key="main_grid",  # Unique key for the grid
+        enable_enterprise_modules=False # Set to False unless you are using Enterprise Modules
+    )
 
     selected_rows = st.session_state.grid_response['selected_rows']
     workorder_button_disable = not (selected_rows is not None and isinstance(selected_rows, pd.DataFrame) and not selected_rows.empty)
@@ -657,6 +657,8 @@ def manage_workorder(conn):
         if st.button("🔄 Refresh data", type="secondary"):
             reset_application_state()
             st.session_state.df_workorders = sqlite_db.load_workorder_data(conn)  # Ricarica i dati dal database
+            st.session_state.grid_data = st.session_state.df_workorders.copy()
+            st.rerun()  # Force a rerun to update the grid
     
     with col2:
         if st.button("✏️ Modify Work Order", type="secondary", disabled=workorder_button_disable):

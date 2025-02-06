@@ -308,6 +308,6 @@ def manage_workorder(conn):
             if has_selection:
                 st.write(selected_rows)
                 selected_row_dict = selected_rows.to_dict()
-                st.write(selected_row_dict)
+                st.write(selected_row_dict["WOID"]["1"])
                 #create_work_item(selected_row.to_dict())
                 #selected_row_dict = selected_rows[0]

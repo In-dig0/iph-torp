@@ -353,6 +353,7 @@ def manage_workorder(conn):
     df_workorder_grid['TYPE'] = st.session_state.df_workorders['TYPE']
     df_workorder_grid['REQID'] = st.session_state.df_workorders['REQID']
     df_workorder_grid['TITLE'] = st.session_state.df_workorders['TITLE']
+    df_workorder_grid = df_workorder_grid.sort_values(['SEQUENCE', 'WOID'], ascending=[True, False])
 
     # Definisci lo stile della cella per la colonna WOID
     cellStyle = JsCode("""

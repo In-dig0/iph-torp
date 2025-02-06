@@ -54,7 +54,7 @@ def main():
     "📌 Manage Work Orders": lambda: manage_workorder.manage_workorder(conn),
     "🎯 Insert Workitem": lambda: insert_workitem.create_workitem(conn),
     "📅 View Workitem": lambda: view_workitem.view_workitems(conn),
-    "📉 Dashboard": lambda: dashboard.dashboard(conn),
+    "📉 Dashboard": lambda: dashboard.dashboard(conn)
     # "🔐 Close db": close_sqlitecloud_db,
 }    
   st.sidebar.divider()

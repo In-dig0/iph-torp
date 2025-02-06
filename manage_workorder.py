@@ -353,7 +353,8 @@ def manage_workorder(conn):
     df_workorder_grid['TYPE'] = st.session_state.df_workorders['TYPE']
     df_workorder_grid['REQID'] = st.session_state.df_workorders['REQID']
     df_workorder_grid['TITLE'] = st.session_state.df_workorders['TITLE']
-
+    
+    # Definisci lo stile della cella per la colonna WOID
     cellStyle = JsCode("""
         function(params) {
             if (params.column.colId === 'WOID') {
@@ -366,6 +367,15 @@ def manage_workorder(conn):
             return null;
         }
         """)
+    # Definisci lo stile della cella per la colonna SEQUENCE
+    sequenceCellStyle = JsCode("""
+        function(params) {
+            return {
+                'color': 'red'
+            };
+        }
+    """)   
+
     grid_builder = GridOptionsBuilder.from_dataframe(df_workorder_grid)
     # makes columns resizable, sortable and filterable by default
     grid_builder.configure_default_column(

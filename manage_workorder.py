@@ -446,7 +446,7 @@ def manage_workorder(conn):
     
     # Creazione/Aggiornamento della griglia (UNA SOLA VOLTA per ciclo di esecuzione)
 
-    st.session_state.grid_response = st.session_state.grid_response.sort_values(['SEQUENCE', 'WOID'], ascending=[True, False])
+    #st.session_state.grid_response = st.session_state.grid_response.sort_values(['SEQUENCE', 'WOID'], ascending=[True, False])
     if st.session_state.grid_response is None:
         st.session_state.grid_response = AgGrid(
             st.session_state.grid_data,

@@ -42,88 +42,91 @@ def reset_application_state():
     st.rerun()
 
 ##########################################
-def create_workitem(p_woid, p_tdtlid):
-    with st.container(border=True):
-        
-        tdsp_woassignedto_names_df = st.session_state.df_users[st.session_state.df_users["DEPTCODE"]=="DTD"]["NAME"]
-        tdsp_woassignedto_names_list = list(tdsp_woassignedto_names_df)
-        tdsp_woassignedto_names = sorted(tdsp_woassignedto_names_list)
-        selected_tdsp = st.selectbox(
-            label=":blue[TD Specialist](:red[*])",
-            options=tdsp_woassignedto_names,
-            index=None, 
-            key="sb_tdsp"
-        )
+def show_workitem_dialog(workorder_id, tdtl_id, conn):
+    popup_title = f'Work Order {workorder_id}'  # Accedi a REQID direttamente
 
-        if selected_tdsp:
-            selected_tdsp_code = servant.get_code_from_name(st.session_state.df_users, selected_tdsp, "CODE")
-
-        filtered_workorder_list = [p_woid]  
-        selected_workorder = st.selectbox(
-            label=":blue[Work Order]",
-            options=filtered_workorder_list,
-            index=0,
-            key="sb_wo"
+    @st.dialog(popup_title, width="large")
+    def create_workitem(p_woid, p_tdtlid):
+        with st.container(border=True, ):
+            tdsp_woassignedto_names_df = st.session_state.df_users[st.session_state.df_users["DEPTCODE"]=="DTD"]["NAME"]
+            tdsp_woassignedto_names_list = list(tdsp_woassignedto_names_df)
+            tdsp_woassignedto_names = sorted(tdsp_woassignedto_names_list)
+            selected_tdsp = st.selectbox(
+                label=":blue[TD Specialist](:red[*])",
+                options=tdsp_woassignedto_names,
+                index=None, 
+                key="sb_tdsp"
             )
 
-        # Task Group Level 1 dropdown
-        tskgrl1_options = st.session_state.df_tskgrl1["NAME"].tolist()
-        selected_tskgrl1 = st.selectbox(label=":blue[TaskGroup L1]", options=tskgrl1_options, index=None, key="sb_tskgrl1")
-        selected_tskgrl1_code = servant.get_code_from_name(st.session_state.df_tskgrl1, selected_tskgrl1, "CODE")
+            if selected_tdsp:
+                selected_tdsp_code = servant.get_code_from_name(st.session_state.df_users, selected_tdsp, "CODE")
 
-        # Task Group Level 2 dropdown (dependent on Level 1)
-        tskgrl2_options = st.session_state.df_tskgrl2[st.session_state.df_tskgrl2['PCODE'] == selected_tskgrl1_code]['NAME'].unique()
-        selected_tskgrl2 = st.selectbox(label=":blue[TaskGroup L2]", options=tskgrl2_options, index=None, key="sb_tskgrl2")
-        selected_tskgrl2_code = servant.get_code_from_name(st.session_state.df_tskgrl2, selected_tskgrl2, "CODE")
+            filtered_workorder_list = [p_woid]  
+            selected_workorder = st.selectbox(
+                label=":blue[Work Order]",
+                options=filtered_workorder_list,
+                index=0,
+                key="sb_wo"
+                )
 
-        # Execution Date
-        execution_date = st.date_input(label=":blue[Execution Date]", value=datetime.datetime.now(), format="DD/MM/YYYY")
+            # Task Group Level 1 dropdown
+            tskgrl1_options = st.session_state.df_tskgrl1["NAME"].tolist()
+            selected_tskgrl1 = st.selectbox(label=":blue[TaskGroup L1]", options=tskgrl1_options, index=None, key="sb_tskgrl1")
+            selected_tskgrl1_code = servant.get_code_from_name(st.session_state.df_tskgrl1, selected_tskgrl1, "CODE")
 
-        # Quantity
-        quantity = st.number_input(label=":blue[Time]", min_value=0.0, step=0.5, value=0.0, key="in_time_qty")
+            # Task Group Level 2 dropdown (dependent on Level 1)
+            tskgrl2_options = st.session_state.df_tskgrl2[st.session_state.df_tskgrl2['PCODE'] == selected_tskgrl1_code]['NAME'].unique()
+            selected_tskgrl2 = st.selectbox(label=":blue[TaskGroup L2]", options=tskgrl2_options, index=None, key="sb_tskgrl2")
+            selected_tskgrl2_code = servant.get_code_from_name(st.session_state.df_tskgrl2, selected_tskgrl2, "CODE")
 
-        # Description
-        desc = st.text_input(label=":blue[Description]", key="ti_description")
+            # Execution Date
+            execution_date = st.date_input(label=":blue[Execution Date]", value=datetime.datetime.now(), format="DD/MM/YYYY")
 
-        # Note
-        note = st.text_area(label=":blue[Notes]", key="ta_note")
+            # Quantity
+            quantity = st.number_input(label=":blue[Time]", min_value=0.0, step=0.5, value=0.0, key="in_time_qty")
 
-        save_button_disabled = not all([  # Use all() for cleaner logic
-            execution_date,
-            selected_td_specialist_form_code,
-            selected_workorder,
-            selected_tskgrl1_code,
-            selected_tskgrl2_code,
-            quantity
-        ])
+            # Description
+            desc = st.text_input(label=":blue[Description]", key="ti_description")
 
-        if st.button("Save Work Item", disabled=save_button_disabled):
-            witem = {
-                "wi_refdate": execution_date,
-                "wo_woid": selected_workorder,
-                "wi_tdspid": selected_td_specialist_form_code,
-                "wi_status": "ACTIVE",
-                "wi_tskgrl1": selected_tskgrl1_code,
-                "wi_tskgrl2": selected_tskgrl2_code,
-                "wi_desc": desc,
-                "wi_note": note,
-                "wi_time_qty": quantity,
-                "wi_time_um": "H"
-            }
+            # Note
+            note = st.text_area(label=":blue[Notes]", key="ta_note")
 
-            success = sqlite_db.save_workitem(witem, conn)
-            if success:
-                st.success("New workitem created!")
-                # Set a flag in session state to indicate that a reload is needed
-                st.session_state.reload_needed = True
-                # Set default values for the form fields
-                st.session_state.form_reset = True
-                time.sleep(1)
-                st.rerun()
-                return True
-            else:
-                st.error("**ERROR saving WorkItem!")
-                return False        
+            save_button_disabled = not all([  # Use all() for cleaner logic
+                execution_date,
+                selected_tdsp_code,
+                selected_workorder,
+                selected_tskgrl1_code,
+                selected_tskgrl2_code,
+                quantity
+            ])
+
+            if st.button("Save Work Item", disabled=save_button_disabled):
+                witem = {
+                    "wi_refdate": execution_date,
+                    "wo_woid": selected_workorder,
+                    "wi_tdspid": selected_tdsp_code,
+                    "wi_status": "ACTIVE",
+                    "wi_tskgrl1": selected_tskgrl1_code,
+                    "wi_tskgrl2": selected_tskgrl2_code,
+                    "wi_desc": desc,
+                    "wi_note": note,
+                    "wi_time_qty": quantity,
+                    "wi_time_um": "H"
+                }
+
+                success = sqlite_db.save_workitem(witem, conn)
+                if success:
+                    st.success("New workitem created!")
+                    # Set a flag in session state to indicate that a reload is needed
+                    st.session_state.reload_needed = True
+                    # Set default values for the form fields
+                    st.session_state.form_reset = True
+                    time.sleep(1)
+                    st.rerun()
+                    return True
+                else:
+                    st.error("**ERROR saving WorkItem!")
+                    return False        
 
 
 ##########################################
@@ -297,5 +300,5 @@ def manage_workorder(conn):
                 workorder_id = selected_rows["WOID"].iloc[0]
                 tdtl_id = selected_rows["TDTLID"].iloc[0]
                 #st.write(f"{workorder_id} - {tdtl_id }")
-                success = create_workitem(workorder_id, tdtl_id)
+                success = show_workitem_dialog(workorder_id, tdtl_id, conn)
 

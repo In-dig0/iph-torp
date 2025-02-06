@@ -526,7 +526,6 @@ def manage_workorder(conn):
     # Create display DataFrame
     df_workorder_grid = pd.DataFrame({
         'WOID': st.session_state.grid_data['WOID'],
-        #'INSDATE': st.session_state.grid_data['INSDATE'],
         'INSDATE': pd.to_datetime(st.session_state.grid_data['INSDATE']).dt.strftime('%d/%m/%Y'),
         'TDTLID': st.session_state.grid_data['TDTLID'],
         'STATUS': st.session_state.grid_data['STATUS'],
@@ -599,7 +598,8 @@ def manage_workorder(conn):
                                 cellStyle=sequenceCellStyle)
     grid_builder.configure_selection(selection_mode='single', use_checkbox=True)
     grid_options = grid_builder.build()
-
+    # List of available themes
+    available_themes = ["streamlit", "alpine", "balham", "material"]
     # Sidebar filters
     st.sidebar.header(":blue[Filters]")
     wo_status_options = list(df_workorder_grid['STATUS'].drop_duplicates().sort_values())
@@ -633,7 +633,7 @@ def manage_workorder(conn):
         filtered_data,
         gridOptions=grid_options,
         allow_unsafe_jscode=True,
-        theme="streamlit",
+        theme=available_themes[2],
         fit_columns_on_grid_load=False,
         update_mode=GridUpdateMode.MODEL_CHANGED,
         data_return_mode=DataReturnMode.AS_INPUT,

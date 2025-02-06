@@ -417,7 +417,6 @@ def load_workitems_data(conn):
         ORDER BY WOID
         """, conn)
         df_workitem['REFDATE'] = pd.to_datetime(df_workitem['REFDATE']) 
-
     except Exception as errMsg:
         st.error(f"**ERROR load data from TORP_WORKITEMS: \n{errMsg}", icon="🚨")
         return None

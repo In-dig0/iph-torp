@@ -47,10 +47,13 @@ def show_workitem_dialog(workorder_id, tdtl_id, conn):
 
     @st.dialog(popup_title, width="large")
     def create_workitem_popup():
-        with st.container(border=True, ):
+        with st.container(border=True ):
+            
+            selected_tdsp = ""
             tdsp_woassignedto_names_df = st.session_state.df_users[st.session_state.df_users["DEPTCODE"]=="DTD"]["NAME"]
             tdsp_woassignedto_names_list = list(tdsp_woassignedto_names_df)
             tdsp_woassignedto_names = sorted(tdsp_woassignedto_names_list)
+            
             selected_tdsp = st.selectbox(
                 label=":blue[TD Specialist](:red[*])",
                 options=tdsp_woassignedto_names,

@@ -349,6 +349,7 @@ def manage_workorder(conn):
     df_workorder_grid['WOID'] = st.session_state.df_workorders['WOID']
     df_workorder_grid['TDTLID'] = st.session_state.df_workorders['TDTLID'] 
     df_workorder_grid['STATUS'] = st.session_state.df_workorders['STATUS']
+    df_workorder_grid['SEQUENCE'] = None
     df_workorder_grid['TYPE'] = st.session_state.df_workorders['TYPE']
     df_workorder_grid['REQID'] = st.session_state.df_workorders['REQID']
     df_workorder_grid['TITLE'] = st.session_state.df_workorders['TITLE']
@@ -378,6 +379,13 @@ def manage_workorder(conn):
     grid_builder.configure_pagination(paginationAutoPageSize=False, paginationPageSize=12)
     grid_builder.configure_grid_options(domLayout='normal')
     grid_builder.configure_column("WOID", cellStyle=cellStyle)
+
+    grid_builder.configure_column("SEQUENCE", editable=True, cellEditor='agSelectCellEditor', cellEditorParams={'values': ['HIGH']})
+    grid_builder.configure_selection(
+        selection_mode='single',
+        use_checkbox=True,
+        header_checkbox=True
+    )   
     grid_builder.configure_selection(
     selection_mode='single',     # Enable multiple row selection
     use_checkbox=True,             # Show checkboxes for selection

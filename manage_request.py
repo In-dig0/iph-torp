@@ -423,7 +423,7 @@ def manage_request(conn):
     st.session_state.grid_data = filtered_data
 
     # Display grid
-    st.subheader("Request list:")
+    st.subheader(":orange[Request list]")
     
     # Creazione/Aggiornamento della griglia (UNA SOLA VOLTA per ciclo di esecuzione)
     if st.session_state.grid_response is None:

@@ -57,9 +57,12 @@ def show_workitem_dialog(workorder_id, tdtl_id, conn):
                 index=None, 
                 key="sb_tdsp"
             )
+            
 
             if selected_tdsp:
+                st.write(selected_tdsp)
                 selected_tdsp_code = servant.get_code_from_name(st.session_state.df_users, selected_tdsp, "CODE")
+                st.write(selected_tdsp)
 
             filtered_workorder_list = [workorder_id]  
             selected_workorder = st.selectbox(

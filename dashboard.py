@@ -13,9 +13,9 @@ def dashboard(conn):
 
     # Show metrics side by side using `st.columns` and `st.metric`.
     col1, col2, col3 = st.columns(3)
-    num_open_requests = len(st.session_state.df_requests[st.session_state.df_requests == "NEW"])
-    num_assigned_requests = len(st.session_state.df_requests[st.session_state.df_requests == "ASSIGNED"])
-    num_completed_requests = len(st.session_state.df_requests[st.session_state.df_requests == "COMPLETED"])
+    num_open_requests = len(st.session_state.df_requests[st.session_state.df_requests["STATUS"] == "NEW"])
+    num_assigned_requests = len(st.session_state.df_requests[st.session_state.df_requests["STATUS"] == "ASSIGNED"])
+    num_completed_requests = len(st.session_state.df_requests[st.session_state.df_requests["STATUS"] == "COMPLETED"])
     col1.metric(label="Number of open requests", value=num_open_requests, delta=10)
     col2.metric(label="Number of assigned requests", value=num_assigned_requests, delta=-1.5)
     col3.metric(label="Number of completed requests", value=num_completed_requests, delta=2)

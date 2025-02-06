@@ -46,7 +46,7 @@ def show_workitem_dialog(workorder_id, tdtl_id, conn):
     popup_title = f'Work Order {workorder_id}'  # Accedi a REQID direttamente
 
     @st.dialog(popup_title, width="large")
-    def create_workitem(p_woid, p_tdtlid):
+    def create_workitem_popup():
         with st.container(border=True, ):
             tdsp_woassignedto_names_df = st.session_state.df_users[st.session_state.df_users["DEPTCODE"]=="DTD"]["NAME"]
             tdsp_woassignedto_names_list = list(tdsp_woassignedto_names_df)
@@ -61,7 +61,7 @@ def show_workitem_dialog(workorder_id, tdtl_id, conn):
             if selected_tdsp:
                 selected_tdsp_code = servant.get_code_from_name(st.session_state.df_users, selected_tdsp, "CODE")
 
-            filtered_workorder_list = [p_woid]  
+            filtered_workorder_list = [workorder_id]  
             selected_workorder = st.selectbox(
                 label=":blue[Work Order]",
                 options=filtered_workorder_list,
@@ -128,7 +128,7 @@ def show_workitem_dialog(workorder_id, tdtl_id, conn):
                     st.error("**ERROR saving WorkItem!")
                     return False        
 
-
+    return create_workitem_popup()
 ##########################################
 
 def manage_workorder(conn):

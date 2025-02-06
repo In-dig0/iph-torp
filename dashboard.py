@@ -87,14 +87,21 @@ def dashboard(conn):
         color='PR_LINE:N'
     )
 
+    # Proviamo a visualizzare il grafico
+    try:
+        st.altair_chart(status_plot, use_container_width=True)
+    except Exception as e:
+        st.error(f"Errore nella visualizzazione del grafico: {str(e)}")
+
     # Grafico semplificato
     dept_plot = alt.Chart(st.session_state.df_requests).mark_bar().encode(
         x='DATE:O',
         y='count():Q',
         color='DEPT:N'
-    )
+    )    
+
     # Proviamo a visualizzare il grafico
     try:
-        st.altair_chart(status_plot, use_container_width=True)
+        st.altair_chart(dept_plot, use_container_width=True)
     except Exception as e:
         st.error(f"Errore nella visualizzazione del grafico: {str(e)}")

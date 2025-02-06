@@ -333,8 +333,187 @@ def reset_application_state():
 #     return dialog_content()
 
 
-def manage_workorder(conn):
+# def manage_workorder(conn):
 
+#     # Initialize session state
+#     sqlite_db.initialize_session_state(conn)
+#     if "grid_data" not in st.session_state:
+#         st.session_state.grid_data = st.session_state.df_workorders.copy()
+#     if "grid_response" not in st.session_state:
+#         st.session_state.grid_response = None
+#     if "grid_refresh_key" not in st.session_state: 
+#         st.session_state.grid_refresh_key = "initial"    
+
+
+#     df_workorder_grid = pd.DataFrame()
+#     df_workorder_grid['WOID'] = st.session_state.df_workorders['WOID']
+#     df_workorder_grid['TDTLID'] = st.session_state.df_workorders['TDTLID'] 
+#     df_workorder_grid['STATUS'] = st.session_state.df_workorders['STATUS']
+#     df_workorder_grid['SEQUENCE'] = None
+#     df_workorder_grid['TYPE'] = st.session_state.df_workorders['TYPE']
+#     df_workorder_grid['REQID'] = st.session_state.df_workorders['REQID']
+#     df_workorder_grid['TITLE'] = st.session_state.df_workorders['TITLE']
+#     df_workorder_grid = df_workorder_grid.sort_values(['SEQUENCE', 'WOID'], ascending=[True, False])
+
+#     # Definisci lo stile della cella per la colonna WOID
+#     cellStyle = JsCode("""
+#         function(params) {
+#             if (params.column.colId === 'WOID') {
+#                        return {
+#                         'backgroundColor': '#8ebfde',
+#                         'color': '#111810',
+#                         'fontWeight': 'bold'
+#                     };
+#             }
+#             return null;
+#         }
+
+#         """)
+#     # Definisci lo stile della cella per la colonna SEQUENCE
+#     sequenceCellStyle = JsCode("""
+#         function(params) {
+#             if (params.value === 'HIGH') {
+#                 return {
+#                     'color': 'red'
+#                 };
+#             }
+#             return null;
+#         }
+#     """)
+#     # Funzione per ordinare il dataframe in base alla colonna SEQUENCE
+#     def sort_dataframe(df):
+#         return df.sort_values(by='SEQUENCE', ascending=False, na_position='last')
+
+#     grid_builder = GridOptionsBuilder.from_dataframe(df_workorder_grid)
+#     # makes columns resizable, sortable and filterable by default
+#     grid_builder.configure_default_column(
+#         resizable=True,
+#         filterable=True,
+#         sortable=True,
+#         editable=False,
+#         enableRowGroup=False
+#     )
+#     # Enalble pagination
+#     grid_builder.configure_pagination(paginationAutoPageSize=False, paginationPageSize=12)
+#     grid_builder.configure_grid_options(domLayout='normal')
+#     grid_builder.configure_column("WOID", cellStyle=cellStyle)
+#     grid_builder.configure_column("SEQUENCE", editable=True, cellEditor='agSelectCellEditor', cellEditorParams={'values': ['HIGH', 'LOW']}, cellStyle=sequenceCellStyle)
+#     grid_builder.configure_selection(
+#         selection_mode='single',
+#         use_checkbox=True,
+#         header_checkbox=True
+#     ) 
+#     grid_builder.configure_selection(
+#     selection_mode='single',     # Enable multiple row selection
+#     use_checkbox=True,             # Show checkboxes for selection
+#     header_checkbox=True
+#     )
+#     grid_options = grid_builder.build()
+
+#     # Renderizza la griglia e ottieni i dati modificati
+#     response = AgGrid(df_workorder_grid, gridOptions=grid_options, theme='streamlit', update_mode='MODEL_CHANGED')
+    
+#     # Ordina il dataframe in base alla colonna SEQUENCE
+#     sorted_df = sort_dataframe(response['data'])
+
+#     # List of available themes
+#     available_themes = ["streamlit", "alpine", "balham", "material"]
+    
+#     # Mostra il dataframe ordinato
+#     st.write("Updated DataFrame:")
+#     AgGrid(sorted_df, gridOptions=grid_options, theme='streamlit')
+
+#     # Inizializzazione della sessione
+#     if "grid_data" not in st.session_state:
+#         st.session_state.grid_data = df_workorder_grid.copy()  # Copia per evitare modifiche al DataFrame originale
+#     if "grid_response" not in st.session_state:
+#         st.session_state.grid_response = None
+
+
+#     # Sidebar controls - Filters
+#     st.sidebar.header(":blue[Filters]")
+#     wo_status_options = list(df_workorder_grid['STATUS'].drop_duplicates().sort_values())
+#     status_filter = st.sidebar.selectbox(
+#         ":orange[Status]", 
+#         wo_status_options, 
+#         index=None,
+#         key='Status_value'
+#     )
+    
+#     wo_tdtl_options = df_workorder_grid['TDTLID'].drop_duplicates().sort_values()
+#     tdtl_filter = st.sidebar.selectbox(
+#         ":orange[TDTL Id]", 
+#         wo_tdtl_options, 
+#         index=None,
+#         key='tdtl_value'
+#     )
+
+#     # Apply filters 
+#     filtered_data = df_workorder_grid.copy() 
+#     if status_filter: 
+#         filtered_data = filtered_data[filtered_data["STATUS"] == status_filter] 
+#     if tdtl_filter: 
+#         filtered_data = filtered_data[filtered_data["TDTLID"] == tdtl_filter] 
+#     st.session_state.grid_data = filtered_data
+
+#     # Display grid
+#     st.subheader(":orange[Work Order list]")
+    
+#     # Creazione/Aggiornamento della griglia (UNA SOLA VOLTA per ciclo di esecuzione)
+
+#     #st.session_state.grid_response = st.session_state.grid_response.sort_values(['SEQUENCE', 'WOID'], ascending=[True, False])
+#     if st.session_state.grid_response is None:
+#         st.session_state.grid_response = AgGrid(
+#             st.session_state.grid_data,
+#             gridOptions=grid_options,
+#             allow_unsafe_jscode=True,
+#             theme=available_themes[2],
+#             fit_columns_on_grid_load=False,
+#             update_mode=GridUpdateMode.MODEL_CHANGED,
+#             data_return_mode=DataReturnMode.AS_INPUT,
+#             key="main_grid"
+#         )
+#     else:
+#         st.session_state.grid_response = AgGrid( # Aggiorna la griglia esistente
+#             st.session_state.grid_data,
+#             gridOptions=grid_options,
+#             allow_unsafe_jscode=True,
+#             theme=available_themes[2],
+#             fit_columns_on_grid_load=False,
+#             update_mode=GridUpdateMode.MODEL_CHANGED,
+#             data_return_mode=DataReturnMode.AS_INPUT,
+#             key="main_grid"
+#         )
+
+
+#     selected_rows = st.session_state.grid_response['selected_rows']
+#     workorder_button_disable = not (selected_rows is not None and isinstance(selected_rows, pd.DataFrame) and not selected_rows.empty)
+#     workitem_button_disable = not (selected_rows is not None and isinstance(selected_rows, pd.DataFrame) and not selected_rows.empty)
+
+#     # ... (Pulsanti e chiamate di dialogo)
+#     col1, col2, col3 = st.columns(3)
+#     with col1:
+#         if st.button("🔄 Refresh data", type="secondary"):
+#             reset_application_state()
+#             st.session_state.df_workorders = sqlite_db.load_workorder_data(conn)  # Ricarica i dati dal database
+    
+#     with col2:
+#         if st.button("✏️ Modify Work Order", type="secondary", disabled=workorder_button_disable):
+#             if st.session_state.grid_response and st.session_state.grid_response['selected_rows'] is not None and not st.session_state.grid_response['selected_rows'].empty:
+#                 selected_rows_df = st.session_state.grid_response['selected_rows']
+#                 selected_row_dict = selected_rows_df.iloc[0].to_dict() #oppure selected_rows_df.to_dict('records')[0]
+#                 #show_workorder_dialog(selected_row_dict, WO_STATUS_OPTIONS, sqlite_db.update_workorder, conn)
+
+#     with col3:
+#         if st.button("🎯 Create Work Item", type="secondary", disabled=workitem_button_disable):
+#             if st.session_state.grid_response and st.session_state.grid_response['selected_rows'] is not None and not st.session_state.grid_response['selected_rows'].empty:
+#                 selected_rows_df = st.session_state.grid_response['selected_rows']
+#                 selected_row_dict = selected_rows_df.iloc[0].to_dict()  # oppure selected_rows_df.to_dict('records')[0]
+#                 #show_workitem_dialog(selected_row_dict, st.session_state.df_workitem, st.session_state.df_woassignedto, st.session_state.df_users, STATUS_NEW, DEFAULT_DEPT_CODE, WO_STATUS_OPTIONS, sqlite_db.save_workorder, sqlite_db.save_workorder_assignments, conn)
+#             # else:
+#             #     st.warning("Please select a request from the grid first.", icon="⚠️")  # Avvisa l'utent# ... (Resto del tuo codice)
+
+def manage_workorder(conn):
     # Initialize session state
     sqlite_db.initialize_session_state(conn)
     if "grid_data" not in st.session_state:
@@ -344,35 +523,33 @@ def manage_workorder(conn):
     if "grid_refresh_key" not in st.session_state: 
         st.session_state.grid_refresh_key = "initial"    
 
-
     df_workorder_grid = pd.DataFrame()
     df_workorder_grid['WOID'] = st.session_state.df_workorders['WOID']
-    df_workorder_grid['TDTLID'] = st.session_state.df_workorders['TDTLID'] 
+    df_workorder_grid['TDTLID'] = st.session_state.df_workorders['TDTLID']
     df_workorder_grid['STATUS'] = st.session_state.df_workorders['STATUS']
     df_workorder_grid['SEQUENCE'] = None
     df_workorder_grid['TYPE'] = st.session_state.df_workorders['TYPE']
     df_workorder_grid['REQID'] = st.session_state.df_workorders['REQID']
     df_workorder_grid['TITLE'] = st.session_state.df_workorders['TITLE']
-    df_workorder_grid = df_workorder_grid.sort_values(['SEQUENCE', 'WOID'], ascending=[True, False])
 
     # Definisci lo stile della cella per la colonna WOID
     cellStyle = JsCode("""
         function(params) {
             if (params.column.colId === 'WOID') {
-                       return {
-                        'backgroundColor': '#8ebfde',
-                        'color': '#111810',
-                        'fontWeight': 'bold'
-                    };
+                return {
+                    'backgroundColor': '#8ebfde',
+                    'color': '#111810',
+                    'fontWeight': 'bold'
+                };
             }
             return null;
         }
+    """)
 
-        """)
     # Definisci lo stile della cella per la colonna SEQUENCE
     sequenceCellStyle = JsCode("""
         function(params) {
-            if (params.value === 'HIGH') {
+            if (params.value === 'HIGH' || params.value === 'LOW') {
                 return {
                     'color': 'red'
                 };
@@ -381,8 +558,11 @@ def manage_workorder(conn):
         }
     """)
 
+    # Funzione per ordinare il dataframe in base alla colonna SEQUENCE
+    def sort_dataframe(df):
+        return df.sort_values(by='SEQUENCE', ascending=False, na_position='last')
+
     grid_builder = GridOptionsBuilder.from_dataframe(df_workorder_grid)
-    # makes columns resizable, sortable and filterable by default
     grid_builder.configure_default_column(
         resizable=True,
         filterable=True,
@@ -390,7 +570,6 @@ def manage_workorder(conn):
         editable=False,
         enableRowGroup=False
     )
-    # Enalble pagination
     grid_builder.configure_pagination(paginationAutoPageSize=False, paginationPageSize=12)
     grid_builder.configure_grid_options(domLayout='normal')
     grid_builder.configure_column("WOID", cellStyle=cellStyle)
@@ -399,22 +578,24 @@ def manage_workorder(conn):
         selection_mode='single',
         use_checkbox=True,
         header_checkbox=True
-    ) 
-    grid_builder.configure_selection(
-    selection_mode='single',     # Enable multiple row selection
-    use_checkbox=True,             # Show checkboxes for selection
-    header_checkbox=True
     )
     grid_options = grid_builder.build()
-    # List of available themes
-    available_themes = ["streamlit", "alpine", "balham", "material"]
-    
+
+    # Renderizza la griglia e ottieni i dati modificati
+    response = AgGrid(df_workorder_grid, gridOptions=grid_options, theme='streamlit', update_mode='MODEL_CHANGED')
+
+    # Ordina il dataframe in base alla colonna SEQUENCE
+    sorted_df = sort_dataframe(pd.DataFrame(response['data']))
+
+    # Mostra il dataframe ordinato
+    st.write("Updated DataFrame:")
+    AgGrid(sorted_df, gridOptions=grid_options, theme='streamlit')
+
     # Inizializzazione della sessione
     if "grid_data" not in st.session_state:
         st.session_state.grid_data = df_workorder_grid.copy()  # Copia per evitare modifiche al DataFrame originale
     if "grid_response" not in st.session_state:
         st.session_state.grid_response = None
-
 
     # Sidebar controls - Filters
     st.sidebar.header(":blue[Filters]")
@@ -446,8 +627,6 @@ def manage_workorder(conn):
     st.subheader(":orange[Work Order list]")
     
     # Creazione/Aggiornamento della griglia (UNA SOLA VOLTA per ciclo di esecuzione)
-
-    #st.session_state.grid_response = st.session_state.grid_response.sort_values(['SEQUENCE', 'WOID'], ascending=[True, False])
     if st.session_state.grid_response is None:
         st.session_state.grid_response = AgGrid(
             st.session_state.grid_data,
@@ -470,7 +649,6 @@ def manage_workorder(conn):
             data_return_mode=DataReturnMode.AS_INPUT,
             key="main_grid"
         )
-
 
     selected_rows = st.session_state.grid_response['selected_rows']
     workorder_button_disable = not (selected_rows is not None and isinstance(selected_rows, pd.DataFrame) and not selected_rows.empty)
@@ -497,4 +675,4 @@ def manage_workorder(conn):
                 selected_row_dict = selected_rows_df.iloc[0].to_dict()  # oppure selected_rows_df.to_dict('records')[0]
                 #show_workitem_dialog(selected_row_dict, st.session_state.df_workitem, st.session_state.df_woassignedto, st.session_state.df_users, STATUS_NEW, DEFAULT_DEPT_CODE, WO_STATUS_OPTIONS, sqlite_db.save_workorder, sqlite_db.save_workorder_assignments, conn)
             # else:
-            #     st.warning("Please select a request from the grid first.", icon="⚠️")  # Avvisa l'utent# ... (Resto del tuo codice)
+            #     st.warning("Please select a request from the grid first.", icon="⚠️")  # Avvisa l'utente

@@ -25,7 +25,7 @@ def dashboard(conn):
     st.write("")
     st.write("##### Requests status per day")
     status_plot = (
-        alt.Chart(df_requests)
+        alt.Chart(st.session_state.df_requests)
         .mark_bar()
         .encode(
             x="month(Insdate):O",

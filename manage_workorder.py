@@ -44,39 +44,21 @@ def reset_application_state():
 ##########################################
 def create_workitem(wo):
     with st.container(border=True):
-        if selected_tdsp_name:
-            tdsp_index = tdsp_woassignedto_names.index(selected_tdsp_name)  # Get the index
-            selected_td_specialist_form = st.selectbox(
-                label=":blue[TD Specialist](:red[*])",
-                options=tdsp_woassignedto_names,
-                index=tdsp_index,  # Use index to set the default selection
-                key="tdsp_form"
-            )
-        else:
-            selected_td_specialist_form = st.selectbox(
-                label=":blue[TD Specialist](:red[*])",
-                options=tdsp_woassignedto_names,
-                index=None,
-                key="tdsp_form"
-            )
+        
+        tdsp_woassignedto_names_df = st.session_state.df_users[st.session_state.df_users["DEPTCODE"]=="DTD"]["NAME"]
+        tdsp_woassignedto_names_list = list(tdsp_woassignedto_names_df)
+        tdsp_woassignedto_names = sorted(tdsp_woassignedto_names_list)
+        selected_tdsp = st.selectbox(
+            label=":blue[TD Specialist](:red[*])",
+            options=tdsp_woassignedto_names,
+            index=None  # Use index to set the default selection
+            key="sb_tdsp"
+        )
 
-        if selected_td_specialist_form:
-            selected_td_specialist_form_code = servant.get_code_from_name(st.session_state.df_users, selected_td_specialist_form, "CODE")
+        if selected_tdsp:
+            selected_tdsp_code = servant.get_code_from_name(st.session_state.df_users, selected_tdsp, "CODE")
 
-            # Correctly filter and extract Work Order IDs
-            filtered_workorder_df = st.session_state.df_woassignedto[
-                st.session_state.df_woassignedto["TDSPID"] == selected_td_specialist_form_code
-            ]
-
-            if not filtered_workorder_df.empty:  # Check if the DataFrame is not empty
-                filtered_workorder_list = sorted(filtered_workorder_df["WOID"].tolist())  # Extract WOIDs and convert to a sorted list
-            else:
-                filtered_workorder_list = []  # Handle the case where no work orders are found
-
-        else:
-            filtered_workorder_list = []
-            selected_td_specialist_form_code = ""
-
+        filtered_workorder_list = sorted(list(wo["WOID"]["1"]))  
         selected_workorder = st.selectbox(
             label=":blue[Work Order]",
             options=filtered_workorder_list,
@@ -138,6 +120,10 @@ def create_workitem(wo):
                 st.session_state.form_reset = True
                 time.sleep(1)
                 st.rerun()
+                return True
+            else:
+                st.error("**ERROR saving WorkItem!")
+                return False        
 
 
 ##########################################
@@ -308,6 +294,6 @@ def manage_workorder(conn):
             if has_selection:
                 st.write(selected_rows)
                 selected_row_dict = selected_rows.to_dict()
-                st.write(selected_row_dict["WOID"]["1"])
-                #create_work_item(selected_row.to_dict())
-                #selected_row_dict = selected_rows[0]
+                workorder_id = selected_row_dict["WOID"]["1"])
+                success = create_work_item(workorder_id)
+

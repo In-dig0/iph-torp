@@ -41,7 +41,7 @@ def dashboard(conn):
 
     st.write("##### Current requests procut line")
     priority_plot = (
-        alt.Chart(df_requests)
+        alt.Chart(st.session_state.df_requests)
         .mark_arc()
         .encode(theta="count():Q", color="PR_LINE:N")
         .properties(height=300)

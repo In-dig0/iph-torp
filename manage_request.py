@@ -361,7 +361,7 @@ def manage_request(conn):
         function(params) {
             if (params.column.colId === 'REQID') {
                        return {
-                        'backgroundColor': '#8ebfde',
+                        'backgroundColor': '#a2add0',
                         'color': '#111810',
                         'fontWeight': 'bold'
                     };

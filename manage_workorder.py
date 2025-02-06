@@ -68,7 +68,7 @@ def manage_workorder(conn):
         function(params) {
             if (params.column.colId === 'WOID') {
                 return {
-                    'backgroundColor': '#8ebfde',
+                    'backgroundColor': '#a2add0',
                     'color': '#111810',
                     'fontWeight': 'bold'
                 };

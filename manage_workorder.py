@@ -204,6 +204,6 @@ def manage_workorder(conn):
 
     with col3:
         if st.button("🎯 Create Work Item", type="secondary", disabled=workitem_button_disable):
-            if selected_rows:
+            if has_selection:
                 pass
                 #selected_row_dict = selected_rows[0]

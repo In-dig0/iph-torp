@@ -51,6 +51,8 @@ def main():
     st.stop() 
   
   st.write(st.session_state["username"])
+
+  st.session_state.
   # Add IPH logo to sidebar 
   st.sidebar.image("https://iph.it/wp-content/uploads/2020/02/logo-scritta.png", width=150)    
   

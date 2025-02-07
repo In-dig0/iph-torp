@@ -102,7 +102,8 @@ def load_users_data(conn):
             SELECT 
                 A.code AS CODE, 
                 A.name AS NAME, 
-                A.deptcode AS DEPTCODE, 
+                A.deptcode AS DEPTCODE,
+                A.email AS EMAIL, 
                 B.name AS DEPTNAME
             FROM TORP_USERS A
             INNER JOIN TORP_DEPARTMENTS B ON B.code = A.deptcode

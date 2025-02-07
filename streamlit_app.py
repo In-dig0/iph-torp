@@ -51,7 +51,8 @@ def main():
 
  
   if st.session_state.username:
-    st.write(st.session_state.username)
+    current_username = st.session_state.df_users[st.session_state.df_users["EMAIL"] == st.session_state.username]["NAME"]
+    st.title(f"Welcome {current_username}")
 
   # Add IPH logo to sidebar 
   st.sidebar.image("https://iph.it/wp-content/uploads/2020/02/logo-scritta.png", width=150)    

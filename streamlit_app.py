@@ -35,22 +35,23 @@ APPVERSION = "0.2"
 def main():   
 
   st.set_page_config(layout="wide")
-  # Open connection to SQLITE db
-  conn = sqlite_db.open_sqlitecloud_db()
-  if conn:
   # Login procedure
-    if not app_signin.check_password(conn):
-      sqlite_db.close_sqlitecloud_db(conn)
-      st.stop()
-    else:  
-      # Load initial data from SQLITE db
+  if not app_signin.check_password(conn):
+    st.stop()
+  else:
+    # Open connection to SQLITE db
+    conn = sqlite_db.open_sqlitecloud_db()
+    if conn:
+      # Load initial data
       with st.spinner(text="Loading data..."):
         sqlite_db.initialize_session_state(conn)
-  else:
-    st.error("Database connection failed!") 
-    st.stop() 
-  
-  st.write(st.session_state["username"])
+    else:
+      st.error("Database connection failed!") 
+      st.stop() 
+
+ 
+  if st.session_state.username:
+    st.write(st.session_state.username)
 
   # Add IPH logo to sidebar 
   st.sidebar.image("https://iph.it/wp-content/uploads/2020/02/logo-scritta.png", width=150)    

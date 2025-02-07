@@ -77,6 +77,7 @@ def main():
   if st.sidebar.button("Logout", type="primary", use_container_width=False):
     sqlite_db.close_sqlitecloud_db
     st.success(f"Logout successfully!")
+    st.stop()
     return True
 
            

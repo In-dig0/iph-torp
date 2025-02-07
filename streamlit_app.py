@@ -36,7 +36,7 @@ def main():
 
   st.set_page_config(layout="wide")
   # Login procedure
-  if not app_signin.check_password(conn):
+  if not app_signin.check_password():
     st.stop()
   else:
     # Open connection to SQLITE db

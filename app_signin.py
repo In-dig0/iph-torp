@@ -4,7 +4,7 @@ import sqlitecloud
 import hmac
 
 
-def check_password(conn):
+def check_password():
     """Returns `True` if the user had a correct password."""
 
     def login_form():

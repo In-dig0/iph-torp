@@ -70,9 +70,14 @@ def main():
     "📉 Dashboard": lambda: dashboard.dashboard(conn)
     # "🔐 Close db": close_sqlitecloud_db,
 }    
-  st.sidebar.divider()
   demo_name = st.sidebar.selectbox(":orange[Choose a function]", page_names_to_funcs.keys())
   page_names_to_funcs[demo_name]()
+  st.sidebar.divider()
+  
+  if st.sidebar.button("Logout", type="primary", use_container_width=False):
+    sqlite_db.close_sqlitecloud_db
+    st.success(f"Logout successfully!")
+    return True
 
            
 if __name__ == "__main__":

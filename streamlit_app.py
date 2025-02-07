@@ -35,15 +35,17 @@ APPVERSION = "0.2"
 def main():   
 
   st.set_page_config(layout="wide")
-  # Login procedure
-  if not app_signin.check_password():
-    st.stop()
   # Open connection to SQLITE db
   conn = sqlite_db.open_sqlitecloud_db()
   if conn:
-    # Load initial data from SQLITE db
-    with st.spinner(text="Loading data..."):
-      sqlite_db.initialize_session_state(conn)
+  # Login procedure
+    if not app_signin.check_password():
+      sqlite_db.close_sqlitecloud_db(conn)
+      st.stop()
+    else:  
+      # Load initial data from SQLITE db
+      with st.spinner(text="Loading data..."):
+        sqlite_db.initialize_session_state(conn)
   else:
     st.error("Database connection failed!") 
     st.stop() 

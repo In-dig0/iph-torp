@@ -39,7 +39,7 @@ def main():
   conn = sqlite_db.open_sqlitecloud_db()
   if conn:
   # Login procedure
-    if not app_signin.check_password():
+    if not app_signin.check_password(conn):
       sqlite_db.close_sqlitecloud_db(conn)
       st.stop()
     else:  

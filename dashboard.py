@@ -81,11 +81,18 @@ def dashboard(conn):
     st.session_state.df_requests['DATE'] = st.session_state.df_requests['INSDATE'].dt.strftime('%Y-%m-%d')
 
     # Grafico semplificato
+    # status_plot = alt.Chart(st.session_state.df_requests).mark_bar().encode(
+    #     x='month(DATE):O',
+    #     y='count():Q',
+    #     color='PR_LINE:N'
+    # )
+
     status_plot = alt.Chart(st.session_state.df_requests).mark_bar().encode(
-        x='DATE:O',
-        y='count():Q',
-        color='PR_LINE:N'
+        x=alt.X('month(DATE):O', title='Month'),
+        y=alt.Y('count():Q', title='Count'),
+        color=alt.Color('PR_LINE:N', title='Product Line')
     )
+
 
     # Proviamo a visualizzare il grafico
     try:
@@ -95,10 +102,10 @@ def dashboard(conn):
 
     # Grafico semplificato
     dept_plot = alt.Chart(st.session_state.df_requests).mark_bar().encode(
-        x='DATE:O',
-        y='count():Q',
-        color='DEPT:N'
-    )    
+        x=alt.X('month(DATE):O', title='Month'),
+        y=alt.Y('count():Q', title='Count'),
+        color=alt.Color('DEPT:N', title='Department')
+    )   
 
     # Proviamo a visualizzare il grafico
     try:

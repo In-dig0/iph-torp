@@ -50,7 +50,7 @@ def main():
       st.stop() 
 
  
-  if st.session_state.username:
+  if "username" in st.session_state:
     current_username = st.session_state.df_users[st.session_state.df_users["EMAIL"] == st.session_state.username]["NAME"]
     st.title(f"Welcome :orange[{current_username.iloc[0]}]!")
 

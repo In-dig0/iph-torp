@@ -32,7 +32,6 @@ APPCODE = "TORP"
 APPVERSION = "0.2"
 
 
-
 def main():   
 
   st.set_page_config(layout="wide")

@@ -79,16 +79,17 @@ def dashboard(conn):
     # Convertiamo la colonna Insdate in datetime se non lo è già
     st.session_state.df_requests['INSDATE'] = pd.to_datetime(st.session_state.df_requests['INSDATE'])
     st.session_state.df_requests['DATE'] = st.session_state.df_requests['INSDATE'].dt.strftime('%Y-%m-%d')
-
+    st.session_state.df_requests['WEEK_YEAR'] = st.session_state.df_requests['INSDATE'].dt.strftime('%U-%Y')
     # Grafico semplificato
     # status_plot = alt.Chart(st.session_state.df_requests).mark_bar().encode(
     #     x='month(DATE):O',
     #     y='count():Q',
     #     color='PR_LINE:N'
     # )
-
+    
+    # Grafico con Altair
     status_plot = alt.Chart(st.session_state.df_requests).mark_bar().encode(
-        x=alt.X('month(DATE):O', title='Month'),
+        x=alt.X('WEEK_YEAR:O', title='Week-Year'),
         y=alt.Y('count():Q', title='Count'),
         color=alt.Color('PR_LINE:N', title='Product Line')
     )

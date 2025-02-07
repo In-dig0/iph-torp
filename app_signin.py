@@ -1,5 +1,5 @@
 
-def check_password():
+def check_password(conn):
     """Returns `True` if the user had a correct password."""
 
     def login_form():
@@ -21,7 +21,7 @@ def check_password():
         ):
             st.session_state["password_correct"] = True
             del st.session_state["password"]  # Don't store the username or password.
-            del st.session_state["username"]
+            #del st.session_state["username"]
         else:
             st.session_state["password_correct"] = False
 

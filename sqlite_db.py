@@ -62,6 +62,19 @@ def open_sqlitecloud_db():
     else:
         return st.session_state["conn"]
 
+
+def close_sqlitecloud_db(conn):
+    with st.container(border=True):
+        try:  
+            if conn:
+                conn.close() 
+        except Exception as errMsg:
+            st.error(f"**ERROR closing database connection: \n{errMsg}", icon="🚨")
+            return False
+        return True    
+
+
+
 def load_dept_data(conn):
     """ Load TORP_DEPARTMENTS records into df """ 
 

@@ -10,10 +10,10 @@ def show_calendar(conn):
             "center": "title",
             "right": "resourceTimelineDay,resourceTimelineWeek,resourceTimelineMonth",
         },
-        "slotMinTime": "08:00:00",
-        "slotMaxTime": "18:00:00",
+        # "slotMinTime": "08:00:00",
+        # "slotMaxTime": "18:00:00",
         "initialView": "resourceTimelineDay",
-        "resourceGroupField": "building",
+        #"resourceGroupField": "building",
         # "resources": [
         #     {"id": "a", "building": "Building A", "title": "Building A"},
         #     {"id": "b", "building": "Building A", "title": "Building B"},

@@ -58,9 +58,15 @@ def show_calendar(conn):
         }
     """
 
-    calendar = calendar(
-        events=calendar_events, 
-        options=calendar_options, 
-        custom_css=custom_css)
-    
-    st.write(calendar)
+    try:
+        calendar_output = calendar(
+            events=calendar_events, 
+            options=calendar_options, 
+            custom_css=custom_css
+        )
+        st.write(calendar_output)  # Only write if successful
+    except Exception as e:
+        st.error(f"Error displaying calendar: {e}")  # Display error in Streamlit
+        st.write("Check your event data and calendar options.") # Provide user-friendly feedback
+        import traceback
+        st.write(traceback.format_exc()) # Print the full traceback for debugging

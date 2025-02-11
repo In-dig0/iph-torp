@@ -93,9 +93,24 @@ def show_calendar(conn):
         "left": "today prev,next",
         "center": "title",
         "right": "",
-    },
+        },
     "initialDate": "2025-02-01",
-}
+    }
+
+    custom_css="""
+        .fc-event-past {
+            opacity: 0.8;
+        }
+        .fc-event-time {
+            font-style: italic;
+        }
+        .fc-event-title {
+            font-weight: 700;
+        }
+        .fc-toolbar-title {
+            font-size: 2rem;
+        }
+    """
 
     try:
         calendar_output = calendar(

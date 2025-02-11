@@ -2,7 +2,6 @@ import streamlit as st
 from streamlit_calendar import calendar
 
 def show_calendar(conn):
-
     calendar_options = {
         "editable": True,
         "selectable": True,
@@ -24,16 +23,26 @@ def show_calendar(conn):
             {"id": "f", "building": "Building C", "title": "Building F"},
         ],
     }
-
     calendar_events = [
         {
             "title": "Event 1",
             "start": "2025-02-11T08:30:00",
             "end": "2025-02-11T10:30:00",
             "resourceId": "a",
+        },
+        {
+            "title": "Event 2",
+            "start": "2025-02-10T07:30:00",
+            "end": "2025-02-10T10:30:00",
+            "resourceId": "b",
+        },
+        {
+            "title": "Event 3",
+            "start": "2025-02-09T10:40:00",
+            "end": "2025-02-09T12:30:00",
+            "resourceId": "a",
         }
     ]
-
     custom_css="""
         .fc-event-past {
             opacity: 0.8;
@@ -49,11 +58,9 @@ def show_calendar(conn):
         }
     """
 
-
     calendar = calendar(
-        events=calendar_events,
-        options=calendar_options,
-        custom_css=custom_css,
-        key='calendar', # Assign a widget key to prevent state loss
-        )
+        events=calendar_events, 
+        options=calendar_options, 
+        custom_css=custom_css)
+    
     st.write(calendar)

@@ -100,8 +100,11 @@ def show_calendar(conn):
         },
         # Aggiungi la configurazione delle viste
         'views': {
-            'dayGridMonth': {'buttonText': 'month'},
-            'timeGridWeek': {'buttonText': 'week'}
+            'dayGridMonth': {
+                'buttonText': 'Mese',
+                'dayHeaders': False  # Puoi specificarlo anche nella vista specifica
+                },
+            'timeGridWeek': {'buttonText': 'Settimana'}
         },
         #"dayHeaderFormat": "dd MMM"
         # Formato dell'intestazione del giorno

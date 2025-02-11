@@ -93,6 +93,7 @@ def show_calendar(conn):
             "doy": 4
             }
         },
+        "timeZone": "local",  # Usa il fuso orario locale del browser
         "buttonText": {
             "today": "Oggi",
             "month": "Mese",

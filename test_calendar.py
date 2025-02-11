@@ -100,6 +100,14 @@ def show_calendar(conn):
         'views': {
             'dayGridMonth': {'buttonText': 'month'},
             'timeGridWeek': {'buttonText': 'week'}
+        },
+        # Formato della data
+        "eventTimeFormat": { 
+            "hour": '2-digit',
+            "minute": '2-digit',
+            "meridiem": False,
+            "day": '2-digit',
+            "month": 'short'
         }
     }
     

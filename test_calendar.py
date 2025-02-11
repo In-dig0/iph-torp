@@ -75,28 +75,34 @@ def show_calendar(conn):
     # Titolo
     st.title("Esempio di Calendario Streamlit")
 
-    # # Imposta il range di date
-    # start_date = "2025-01-01"
-    # end_date = "2025-01-31"
-
-    # # Crea il calendario con il range di date pre-impostato e vista mensile
-    # selected_dates = calendar(start_date=start_date, end_date=end_date, view='month')
-
-    # # Mostra le date selezionate
-    # st.write(f"Date selezionate: {selected_dates}")
-
+    # calendar_options = {
+    # "editable": True,
+    # "navLinks": True,
+    # "selectable": True,
+    # "headerToolbar": {
+    #     "left": "today prev,next",
+    #     "center": "title",
+    #     "right": "",
+    #     },
+    # "initialDate": "2025-02-01",
+    # }
     calendar_options = {
-    "editable": True,
-    "navLinks": True,
-    "selectable": True,
-    "headerToolbar": {
-        "left": "today prev,next",
-        "center": "title",
-        "right": "",
+        "editable": True,
+        "navLinks": True,
+        "selectable": True,
+        "headerToolbar": {
+            "left": "today prev,next",
+            "center": "title",
+            "right": "dayGridMonth,timeGridWeek"
         },
-    "initialDate": "2025-02-01",
+        "initialDate": "2025-02-01",
+        # Aggiungi la configurazione delle viste
+        'views': {
+            'dayGridMonth': {'buttonText': 'month'},
+            'timeGridWeek': {'buttonText': 'week'}
+        }
     }
-
+    
     custom_css="""
         .fc-event-past {
             opacity: 0.8;

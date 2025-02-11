@@ -75,17 +75,6 @@ def show_calendar(conn):
     # Titolo
     st.title("Esempio di Calendario Streamlit")
 
-    # calendar_options = {
-    # "editable": True,
-    # "navLinks": True,
-    # "selectable": True,
-    # "headerToolbar": {
-    #     "left": "today prev,next",
-    #     "center": "title",
-    #     "right": "",
-    #     },
-    # "initialDate": "2025-02-01",
-    # }
     calendar_options = {
         "editable": True,
         "navLinks": True,
@@ -101,11 +90,17 @@ def show_calendar(conn):
             'dayGridMonth': {'buttonText': 'month'},
             'timeGridWeek': {'buttonText': 'week'}
         },
-        # Formato dell'intestazione del giorno
+        # # Formato dell'intestazione del giorno
+        # "dayHeaderFormat": {
+        #     "weekday": 'short',
+        #     "day": '2-digit',
+        #     "month": 'short'
+        # }
+        # Modifica qui il formato dell'intestazione del giorno
         "dayHeaderFormat": {
-            "weekday": 'short',
-            "day": '2-digit',
-            "month": 'short'
+            "day": '2-digit',  # Prima il giorno
+            "month": 'short',  # Poi il mese
+            "weekday": 'short' # Il nome del giorno della settimana
         }
     }
     

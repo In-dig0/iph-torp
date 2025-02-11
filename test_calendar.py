@@ -98,29 +98,48 @@ def show_calendar(conn):
             "month": "Mese",
             "week": "Settimana"
         },
-        # Aggiungi la configurazione delle viste
         'views': {
-            'dayGridMonth': {
-                'buttonText': 'Mese',
-                'dayHeaders': False  # Puoi specificarlo anche nella vista specifica
-                },
-            'timeGridWeek': {'buttonText': 'Settimana'}
+        'dayGridMonth': {
+            'buttonText': 'Mese',
+            'dayHeaderFormat': {
+                'weekday': 'short'  # Solo abbreviazione giorno per vista mensile
+            }
         },
-        #"dayHeaderFormat": "dd MMM"
-        # Formato dell'intestazione del giorno
-        "dayHeaderFormat": {
-            "weekday": 'short',
-            "day": '2-digit',
-            "month": 'short'
-        },
-        "firstDay": 1  # 1 = lunedì
-        # Modifica qui il formato dell'intestazione del giorno
-        # "dayHeaderFormat": {
-        #     "day": '2-digit',  # Prima il giorno
-        #     "month": 'short',  # Poi il mese
-        #     "weekday": 'short' # Il nome del giorno della settimana
-        # },
+        'timeGridWeek': {
+            'buttonText': 'Settimana',
+            'dayHeaderFormat': {
+                'weekday': 'short',
+                'day': '2-digit',
+                'month': '2-digit',
+            }
+        }
     }
+
+    #     # Aggiungi la configurazione delle viste
+    #     'views': {
+    #         'dayGridMonth': {
+    #             'buttonText': 'Mese',
+    #             'dayHeaderFormat': {
+    #             'weekday': 'short'  # Solo abbreviazione giorno per vista mensile
+    #             }
+    #             },
+    #         'timeGridWeek': {'buttonText': 'Settimana'}
+    #     },
+    #     #"dayHeaderFormat": "dd MMM"
+    #     # Formato dell'intestazione del giorno
+    #     "dayHeaderFormat": {
+    #         "weekday": 'short',
+    #         "day": '2-digit',
+    #         "month": 'short'
+    #     },
+    #     "firstDay": 1  # 1 = lunedì
+    #     # Modifica qui il formato dell'intestazione del giorno
+    #     # "dayHeaderFormat": {
+    #     #     "day": '2-digit',  # Prima il giorno
+    #     #     "month": 'short',  # Poi il mese
+    #     #     "weekday": 'short' # Il nome del giorno della settimana
+    #     # },
+    # }
     
     custom_css="""
         .fc-event-past {

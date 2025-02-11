@@ -85,24 +85,25 @@ def show_calendar(conn):
             "right": "dayGridMonth,timeGridWeek"
         },
         "initialDate": "2025-02-01",
+        "locale": "it",  # Imposta la lingua italiana
         # Aggiungi la configurazione delle viste
         'views': {
             'dayGridMonth': {'buttonText': 'month'},
             'timeGridWeek': {'buttonText': 'week'}
         },
-        "dayHeaderFormat": "dd MMM"
-        # # Formato dell'intestazione del giorno
-        # "dayHeaderFormat": {
-        #     "weekday": 'short',
-        #     "day": '2-digit',
-        #     "month": 'short'
-        # }
+        #"dayHeaderFormat": "dd MMM"
+        # Formato dell'intestazione del giorno
+        "dayHeaderFormat": {
+            "weekday": 'short',
+            "day": '2-digit',
+            "month": 'short'
+        },
         # Modifica qui il formato dell'intestazione del giorno
         # "dayHeaderFormat": {
         #     "day": '2-digit',  # Prima il giorno
         #     "month": 'short',  # Poi il mese
         #     "weekday": 'short' # Il nome del giorno della settimana
-        # }
+        # },
     }
     
     custom_css="""

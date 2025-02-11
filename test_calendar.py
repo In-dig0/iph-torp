@@ -101,11 +101,9 @@ def show_calendar(conn):
             'dayGridMonth': {'buttonText': 'month'},
             'timeGridWeek': {'buttonText': 'week'}
         },
-        # Formato della data
-        "eventTimeFormat": { 
-            "hour": '2-digit',
-            "minute": '2-digit',
-            "meridiem": False,
+        # Formato dell'intestazione del giorno
+        "dayHeaderFormat": {
+            "weekday": 'short',
             "day": '2-digit',
             "month": 'short'
         }

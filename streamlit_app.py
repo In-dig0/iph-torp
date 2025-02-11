@@ -19,6 +19,7 @@ import insert_workitem
 import manage_request
 import manage_workorder
 import dashboard
+import test_calendar
 
 # 3th party packages
 import streamlit as st
@@ -67,7 +68,8 @@ def main():
     "📌 Manage Work Orders": lambda: manage_workorder.manage_workorder(conn),
     "🎯 Insert Workitem": lambda: insert_workitem.create_workitem(conn),
     "📅 View Workitem": lambda: view_workitem.view_workitems(conn),
-    "📉 Dashboard": lambda: dashboard.dashboard(conn)
+    "📉 Dashboard": lambda: dashboard.dashboard(conn),
+    "TEST Calendar": lambda: test_calendar.show_calendar(conn)
     # "🔐 Close db": close_sqlitecloud_db,
 }    
   demo_name = st.sidebar.selectbox(":orange[Choose a function]", page_names_to_funcs.keys())

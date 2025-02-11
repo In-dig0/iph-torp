@@ -90,6 +90,7 @@ def show_calendar(conn):
             'dayGridMonth': {'buttonText': 'month'},
             'timeGridWeek': {'buttonText': 'week'}
         },
+        "dayHeaderFormat": "dd MMM"
         # # Formato dell'intestazione del giorno
         # "dayHeaderFormat": {
         #     "weekday": 'short',
@@ -97,11 +98,11 @@ def show_calendar(conn):
         #     "month": 'short'
         # }
         # Modifica qui il formato dell'intestazione del giorno
-        "dayHeaderFormat": {
-            "day": '2-digit',  # Prima il giorno
-            "month": 'short',  # Poi il mese
-            "weekday": 'short' # Il nome del giorno della settimana
-        }
+        # "dayHeaderFormat": {
+        #     "day": '2-digit',  # Prima il giorno
+        #     "month": 'short',  # Poi il mese
+        #     "weekday": 'short' # Il nome del giorno della settimana
+        # }
     }
     
     custom_css="""

@@ -71,6 +71,12 @@ from streamlit_calendar import calendar
 #         import traceback
 #         st.write(traceback.format_exc()) # Print the full traceback for debugging
 
+# Funzione per applicare lo stile ai weekend
+def custom_style(date):
+    if date.weekday() == 5 or date.weekday() == 6:  # Sabato (5) e Domenica (6)
+        return 'background-color: gray;'
+    return ''
+
 def show_calendar(conn):
     # Titolo
     st.title("Esempio di Calendario Streamlit")
@@ -157,11 +163,15 @@ def show_calendar(conn):
         }
     """
 
+
+
+# Configurazione del calendario con stile personalizzato
     try:
         calendar_output = calendar(
 #            events=calendar_events, 
             options=calendar_options, 
-            custom_css=custom_css
+            custom_css=custom_css,
+            style=custom_style
         )
         st.write(calendar_output)  # Only write if successful
     except Exception as e:

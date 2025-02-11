@@ -85,7 +85,18 @@ def show_calendar(conn):
             "right": "dayGridMonth,timeGridWeek"
         },
         #"initialDate": "2025-02-01",
-        "locale": "it",  # Imposta la lingua italiana
+        #"locale": "it",  # Imposta la lingua italiana
+        "locale": {
+            "code": "it",
+            "week": {
+            "dow": 1,  # Inizia la settimana da lunedì
+            "doy": 4
+        },
+        "buttonText": {
+            "today": "Oggi",
+            "month": "Mese",
+            "week": "Settimana"
+        },
         # Aggiungi la configurazione delle viste
         'views': {
             'dayGridMonth': {'buttonText': 'month'},
@@ -98,6 +109,7 @@ def show_calendar(conn):
             "day": '2-digit',
             "month": 'short'
         },
+        "firstDay": 1  # 1 = lunedì
         # Modifica qui il formato dell'intestazione del giorno
         # "dayHeaderFormat": {
         #     "day": '2-digit',  # Prima il giorno

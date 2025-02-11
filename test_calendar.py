@@ -91,6 +91,7 @@ def show_calendar(conn):
             "week": {
             "dow": 1,  # Inizia la settimana da lunedì
             "doy": 4
+            }
         },
         "buttonText": {
             "today": "Oggi",
@@ -108,8 +109,8 @@ def show_calendar(conn):
             "weekday": 'short',
             "day": '2-digit',
             "month": 'short'
-        },
-        "firstDay": 1  # 1 = lunedì
+        }
+        #"firstDay": 1  # 1 = lunedì
         # Modifica qui il formato dell'intestazione del giorno
         # "dayHeaderFormat": {
         #     "day": '2-digit',  # Prima il giorno

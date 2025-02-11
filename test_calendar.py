@@ -114,7 +114,7 @@ def show_calendar(conn):
             }
         }
     }
-
+}
     #     # Aggiungi la configurazione delle viste
     #     'views': {
     #         'dayGridMonth': {

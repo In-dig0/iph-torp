@@ -83,6 +83,10 @@ def create_workitem(conn)-> None:
             }
             .fc-event-title {
                 font-weight: 700;
+                color: #000000; /* Imposta il colore del titolo degli eventi in nero */
+            }            
+            .fc-event-title {
+                font-weight: 700;
             }
             .fc-toolbar-title {
                 font-size: 2rem;

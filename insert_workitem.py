@@ -162,19 +162,19 @@ def create_workitem(conn)-> None:
         if key not in st.session_state:
             st.session_state[key] = loader(conn)
 
-    previus_10days = datetime.datetime.now() - datetime.timedelta(days=10)
-    previus_10days = previus_10days.date()
+    previus_xdays = datetime.now() - timedelta(days=10)
+    previus_xdays = previus_xdays.date()
 
     if "df_out" not in st.session_state:
         # Esegui il filtro
         st.session_state.df_out = st.session_state.df_workitems[
-            st.session_state.df_workitems["REFDATE"].dt.date > previus_10days
+            st.session_state.df_workitems["REFDATE"].dt.date > previus_xdays
         ].copy()  # .copy() is important
 
     # Reload workitems if needed
     if 'reload_needed' in st.session_state and st.session_state.reload_needed:
         st.session_state.df_workitems = sqlite_db.load_workitems_data(conn)
-        st.session_state.df_out = st.session_state.df_workitems[st.session_state.df_workitems["REFDATE"] > previus_10days].copy()
+        st.session_state.df_out = st.session_state.df_workitems[st.session_state.df_workitems["REFDATE"] > previus_xdays].copy()
         del st.session_state.reload_needed
 
     tdsp_woassignedto_names_df = st.session_state.df_users[st.session_state.df_users["DEPTCODE"]=="DTD"]["NAME"]

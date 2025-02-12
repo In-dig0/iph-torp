@@ -135,6 +135,8 @@ def create_workitem(conn)-> None:
             st.write("Check your event data and calendar options.") # Provide user-friendly feedback
             import traceback
             st.write(traceback.format_exc()) # Print the full traceback for debugging
+        
+        return calendar_output
 
     # Load data only once and store in session state
     session_data = {
@@ -258,6 +260,8 @@ def create_workitem(conn)-> None:
                 grouped_workitems = grouped_workitems[["WOID", "TDSP_DESC","TIME_QTY", "TIME_UM"]]
                 st.dataframe(data=grouped_workitems, use_container_width=True, hide_index=True)
     show_calendar()
+    st.write(selected_tdsp_name)
+    st.write()
     with st.expander(label=":orange[New Workitem]", expanded=False):
         if selected_tdsp_name:
             tdsp_index = tdsp_woassignedto_names.index(selected_tdsp_name)  # Get the index

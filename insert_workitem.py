@@ -265,8 +265,9 @@ def create_workitem(conn)-> None:
     st.write(calendar_output)
     
     with st.expander(label=":orange[New Workitem]", expanded=False):
-        if selected_tdsp_name:
+        if selected_tdsp_name is not None:
             tdsp_index = tdsp_woassignedto_names.index(selected_tdsp_name)  # Get the index
+            st.write(tdsp_index)
             selected_td_specialist_form = st.selectbox(
                 label=":blue[TD Specialist](:red[*])",
                 options=tdsp_woassignedto_names,

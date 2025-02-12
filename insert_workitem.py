@@ -272,11 +272,11 @@ def create_workitem(conn)-> None:
         data_datetime = datetime.fromisoformat(date_iso.replace("Z", "+00:00"))
 
         # 2. Formatta l'oggetto datetime nel formato desiderato
-        formatted_date = data_datetime.strftime("%d/%m/%Y")
+        formatted_date = data_datetime.strftime("%Y-%m-%d")
         #st.write(formatted_date)
     else:
         st.write(f"Pick a day from calendar first!")
-        formatted_date = datetime.now().strftime("%d/%m/%Y")    
+        formatted_date = datetime.now().strftime("%Y-%m-%d")    
     
     if selected_tdsp_name:
         with st.expander(label=":orange[New Workitem]", expanded=False):

@@ -89,7 +89,7 @@ def show_calendar(conn):
         }
     """
 
-    events: [
+    calendar_events: [
         {
         id: 'W25-0012',
         title: 'User Meeting',
@@ -99,7 +99,7 @@ def show_calendar(conn):
 # Configurazione del calendario con stile personalizzato
     try:
         calendar_output = calendar(
-#            events=calendar_events, 
+            events=calendar_events, 
             options=calendar_options, 
             custom_css=custom_css
             #style=custom_style

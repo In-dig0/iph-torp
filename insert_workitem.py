@@ -264,8 +264,9 @@ def create_workitem(conn)-> None:
     calendar_output = show_calendar()
     
     st.write(selected_tdsp_name)
-    st.write(calendar_output)#.get["dateClick"])
-    st.write(calendar_output.items())#.get["dateClick"])
+    st.write(type(calendar_output))
+    #st.write(calendar_output)#.get["dateClick"])
+    #st.write(calendar_output.items())#.get["dateClick"])
     
     if selected_tdsp_name:
         with st.expander(label=":orange[New Workitem]", expanded=False):

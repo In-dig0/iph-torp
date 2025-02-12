@@ -273,7 +273,7 @@ def create_workitem(conn)-> None:
 
         # 2. Formatta l'oggetto datetime nel formato desiderato
         formatted_date = data_datetime.strftime("%d/%m/%Y")
-        st.write(formatted_date)
+        #st.write(formatted_date)
     else:
         st.write(f"Pick a day from calendar first!")    
     
@@ -326,7 +326,8 @@ def create_workitem(conn)-> None:
             if formatted_date:
                 default_date = formatted_date
             else:
-                default_date = datetime.now().strftime("%d/%m/%Y")    
+                default_date = datetime.now().strftime("%d/%m/%Y")
+            st.write(default_date)        
             execution_date = st.date_input(label=":blue[Execution Date]", value=default_date, format="DD/MM/YYYY")
 
             # Quantity

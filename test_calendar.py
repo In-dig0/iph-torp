@@ -66,6 +66,22 @@ def show_calendar(conn):
         .fc-toolbar-title {
             font-size: 2rem;
         }
+        .fc-daygrid-day.fc-day-other,
+        .fc-daygrid-day[data-date^="2025-02-16"],
+        .fc-daygrid-day[data-date^="2025-02-17"],
+        .fc-daygrid-day[data-date^="2025-02-18"],
+        .fc-daygrid-day[data-date^="2025-02-19"],
+        .fc-daygrid-day[data-date^="2025-02-20"],
+        .fc-daygrid-day[data-date^="2025-02-21"],
+        .fc-daygrid-day[data-date^="2025-02-22"],
+        .fc-daygrid-day[data-date^="2025-02-23"],
+        .fc-daygrid-day[data-date^="2025-02-24"],
+        .fc-daygrid-day[data-date^="2025-02-25"],
+        .fc-daygrid-day[data-date^="2025-02-26"],
+        .fc-daygrid-day[data-date^="2025-02-27"],
+        .fc-daygrid-day[data-date^="2025-02-28"] {
+                    display: none;
+                }        
     """
 
 

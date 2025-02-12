@@ -88,18 +88,19 @@ def show_calendar(conn):
             visibility: hidden;
         }
     """
-
+    time_wo1 = "2H"
+    time_wo2 = "4H"
     calendar_events = [
         {
         "id":'W25-0012',
-        "title": '[W25-0012] Update Scania project \n-> 2H',
+        "title": f'[W25-0012] Update Scania project\n-> {time_wo1}',
         "start": '2025-02-12',
         "backgroundColor": '#FF4B4B',
         "borderColor": '#FF6C6C'
         },
         {
         "id": 'W25-0017',
-        "title": '[W25-0017] Update Volvo project \n-> 4H',
+        "title": f'[W25-0017] Update Volvo project\n-> {time_wo2}',
         "start": '2025-02-12',
         "backgroundColor": '#FF4B4B',
         "borderColor": '#FF6C6C'       

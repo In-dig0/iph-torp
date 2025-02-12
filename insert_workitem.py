@@ -12,6 +12,7 @@ from datetime import datetime, timedelta, date
 import servant
 
 def create_workitem(conn)-> None:
+    
     def show_calendar():
         # Titolo
         #st.title("Esempio di Calendario Streamlit")
@@ -142,51 +143,51 @@ def create_workitem(conn)-> None:
         
         return calendar_output
 
-        def show_workitem_dataframe():
-            with st.container(border=True):
-                st.header("🎯Workitems List")
-                with st.expander(label=":orange[Last Workitem]", expanded=False):
-                    with st.container():
-                        # Format the REFDATE column for display
-                        st.session_state.df_out['REFDATE'] = st.session_state.df_out['REFDATE'].dt.date  # Convert to date objects            
-                        
-                        # Apply the function to get descriptions
-                        st.session_state.df_out['TSKGRL1_DESC'] = st.session_state.df_out['TSKGRL1'].apply(
-                            lambda code: servant.get_description_from_code(st.session_state.df_tskgrl1, code, "NAME")
-                        )
+    def show_workitem_dataframe():
+        with st.container(border=True):
+            st.header("🎯Workitems List")
+            with st.expander(label=":orange[Last Workitem]", expanded=False):
+                with st.container():
+                    # Format the REFDATE column for display
+                    st.session_state.df_out['REFDATE'] = st.session_state.df_out['REFDATE'].dt.date  # Convert to date objects            
+                    
+                    # Apply the function to get descriptions
+                    st.session_state.df_out['TSKGRL1_DESC'] = st.session_state.df_out['TSKGRL1'].apply(
+                        lambda code: servant.get_description_from_code(st.session_state.df_tskgrl1, code, "NAME")
+                    )
 
-                        st.session_state.df_out['TSKGRL2_DESC'] = st.session_state.df_out['TSKGRL2'].apply(
-                            lambda code: servant.get_description_from_code(st.session_state.df_tskgrl2, code, "NAME")
-                        )
+                    st.session_state.df_out['TSKGRL2_DESC'] = st.session_state.df_out['TSKGRL2'].apply(
+                        lambda code: servant.get_description_from_code(st.session_state.df_tskgrl2, code, "NAME")
+                    )
 
-                        st.session_state.df_out['TDSP_DESC'] = st.session_state.df_out['TDSPID'].apply(
-                            lambda code: servant.get_description_from_code(st.session_state.df_users, code, "NAME")
-                        )            
+                    st.session_state.df_out['TDSP_DESC'] = st.session_state.df_out['TDSPID'].apply(
+                        lambda code: servant.get_description_from_code(st.session_state.df_users, code, "NAME")
+                    )            
 
-                        # Format the REFDATE column for display
-            #            st.session_state.df_out['REFDATE'] = st.session_state.df_out['REFDATE'].dt.date
-                        df_to_display = st.session_state.df_out.drop(columns=["TSKGRL1", "TSKGRL2", "STATUS", "DESC", "NOTE"])
-                        
-                                # Add radio button for view selection
-                        view_option = st.sidebar.radio(
-                            ":blue[View Options]", 
-                            ["Detail View", "Grouped by Work Order"]
-                        )
-                        if view_option == "Detail View":
-                            st.write(f"Number of workitems: `{len(df_to_display)}`")
-                        
-                            st.dataframe(df_to_display, 
-                                        use_container_width=True, 
-                                        hide_index=True,
-                                        column_order=["REFDATE", "WOID", "TDSP_DESC", "TSKGRL1_DESC","TIME_QTY", "TIME_UM"]
-                                        )
-                        else:
-                            # Group by WOID and sum TIME_QTY
-                            grouped_workitems = df_to_display.groupby(["WOID", "TDSP_DESC", "TIME_UM"])["TIME_QTY"].sum().reset_index()
-                            grouped_workitems = grouped_workitems[["WOID", "TDSP_DESC","TIME_QTY", "TIME_UM"]]
-                            st.dataframe(data=grouped_workitems, use_container_width=True, hide_index=True)
+                    # Format the REFDATE column for display
+        #            st.session_state.df_out['REFDATE'] = st.session_state.df_out['REFDATE'].dt.date
+                    df_to_display = st.session_state.df_out.drop(columns=["TSKGRL1", "TSKGRL2", "STATUS", "DESC", "NOTE"])
+                    
+                            # Add radio button for view selection
+                    view_option = st.sidebar.radio(
+                        ":blue[View Options]", 
+                        ["Detail View", "Grouped by Work Order"]
+                    )
+                    if view_option == "Detail View":
+                        st.write(f"Number of workitems: `{len(df_to_display)}`")
+                    
+                        st.dataframe(df_to_display, 
+                                    use_container_width=True, 
+                                    hide_index=True,
+                                    column_order=["REFDATE", "WOID", "TDSP_DESC", "TSKGRL1_DESC","TIME_QTY", "TIME_UM"]
+                                    )
+                    else:
+                        # Group by WOID and sum TIME_QTY
+                        grouped_workitems = df_to_display.groupby(["WOID", "TDSP_DESC", "TIME_UM"])["TIME_QTY"].sum().reset_index()
+                        grouped_workitems = grouped_workitems[["WOID", "TDSP_DESC","TIME_QTY", "TIME_UM"]]
+                        st.dataframe(data=grouped_workitems, use_container_width=True, hide_index=True)
 
-    
+
     
     # Load data only once and store in session state
     session_data = {

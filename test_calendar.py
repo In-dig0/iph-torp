@@ -87,20 +87,23 @@ def show_calendar(conn):
         .fc-daygrid-day[data-date="2025-02-28"] {
             visibility: hidden;
         }
+        .fc-event-title {
+            white-space: pre-wrap; /* Forza il testo a capo */
+        }
     """
     time_wo1 = "2H"
     time_wo2 = "4H"
     calendar_events = [
         {
         "id":'W25-0012',
-        "title": f'[W25-0012] Update Scania project\n-> {time_wo1}',
+        "title": f'[W25-0012] Update Scania project-> {time_wo1}',
         "start": '2025-02-12',
         "backgroundColor": '#FF4B4B',
         "borderColor": '#FF6C6C'
         },
         {
         "id": 'W25-0017',
-        "title": f'[W25-0017] Update Volvo project\n-> {time_wo2}',
+        "title": f'[W25-0017] Update Volvo project-> {time_wo2}',
         "start": '2025-02-12',
         "backgroundColor": '#FF4B4B',
         "borderColor": '#FF6C6C'       

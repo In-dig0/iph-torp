@@ -6,7 +6,7 @@ from datetime import datetime, timedelta
 
 def show_calendar(conn):
     # Titolo
-    st.title("Esempio di Calendario Streamlit")
+    #st.title("Esempio di Calendario Streamlit")
 
     # Ottieni la data corrente
     now = datetime.now()
@@ -31,14 +31,11 @@ def show_calendar(conn):
             "center": "title",
             "right": "dayGridMonth,timeGridWeek"
         },
-        #"initialDate": "2025-02-01",
-        #"initialDate": f"2025-02-01",
         "validRange": {
             "start": f"{first_day_previous_month}",
             "end": f"{last_day_current_month}"
         },
         "hiddenDays": [0, 6],  # Nasconde le domeniche (0) e i sabati (6)
-        #"locale": "it",  # Imposta la lingua italiana
         "locale": {
             "code": "it",
             "week": {

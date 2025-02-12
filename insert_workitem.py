@@ -326,7 +326,7 @@ def create_workitem(conn)-> None:
 
             save_button_disabled = not all([  # Use all() for cleaner logic
                 execution_date,
-                selected_td_specialist_form_code,
+                selected_tdsp_code,
                 selected_workorder,
                 selected_tskgrl1_code,
                 selected_tskgrl2_code,

@@ -264,7 +264,7 @@ def create_workitem(conn)-> None:
     calendar_output = show_calendar()
     
     st.write(selected_tdsp_name)
-    st.write(calendar_output)#.get["dateClick"])
+    #st.write(calendar_output)#.get["dateClick"])
     data = calendar_output["dateClick"].get("date")
 
     if data is None:

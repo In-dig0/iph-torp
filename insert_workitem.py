@@ -326,7 +326,8 @@ def create_workitem(conn)-> None:
             if formatted_date:
                 default_date = formatted_date
             else:
-                default_date = datetime.now().strftime("%d/%m/%Y")
+                default_date_str = datetime.now().strftime("%d/%m/%Y")
+                default_date = date.fromisoformat(default_date_str) #Convert to date object
             st.write(default_date)        
             execution_date = st.date_input(label=":blue[Execution Date]", value=default_date, format="DD/MM/YYYY")
 

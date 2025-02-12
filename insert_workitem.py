@@ -270,7 +270,7 @@ def create_workitem(conn)-> None:
             st.write(tdsp_index)
             selected_td_specialist_form = st.selectbox(
                 label=":blue[TD Specialist](:red[*])",
-                options=list(selected_tdsp_name),
+                options=selected_tdsp_name,
                 index=0,  # Use index to set the default selection
                 key="tdsp_form"
             )

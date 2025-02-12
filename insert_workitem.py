@@ -323,7 +323,11 @@ def create_workitem(conn)-> None:
             selected_tskgrl2_code = servant.get_code_from_name(st.session_state.df_tskgrl2, selected_tskgrl2, "CODE")
 
             # Execution Date
-            execution_date = st.date_input(label=":blue[Execution Date]", value=datetime.now(), format="DD/MM/YYYY")
+            if formatted_date:
+                default_date = formatted_date
+            else:
+                default_date = datetime.now()    
+            execution_date = st.date_input(label=":blue[Execution Date]", value=default_date, format="DD/MM/YYYY")
 
             # Quantity
             quantity = st.number_input(label=":blue[Time]", min_value=0.0, step=0.5, value=0.0, key="in_time_qty")

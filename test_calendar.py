@@ -53,7 +53,7 @@ def show_calendar(conn):
         }
     }
 }
-    custom_css="""
+    custom_css = """
         .fc-event-past {
             opacity: 0.8;
         }
@@ -66,24 +66,28 @@ def show_calendar(conn):
         .fc-toolbar-title {
             font-size: 2rem;
         }
-        .fc-daygrid-day.fc-day-other,
-        .fc-daygrid-day[data-date^="2025-02-16"],
-        .fc-daygrid-day[data-date^="2025-02-17"],
-        .fc-daygrid-day[data-date^="2025-02-18"],
-        .fc-daygrid-day[data-date^="2025-02-19"],
-        .fc-daygrid-day[data-date^="2025-02-20"],
-        .fc-daygrid-day[data-date^="2025-02-21"],
-        .fc-daygrid-day[data-date^="2025-02-22"],
-        .fc-daygrid-day[data-date^="2025-02-23"],
-        .fc-daygrid-day[data-date^="2025-02-24"],
-        .fc-daygrid-day[data-date^="2025-02-25"],
-        .fc-daygrid-day[data-date^="2025-02-26"],
-        .fc-daygrid-day[data-date^="2025-02-27"],
-        .fc-daygrid-day[data-date^="2025-02-28"] {
-                    display: none;
-                }        
+        .fc-daygrid-day.fc-day-other {
+            display: none;
+        }
+        .fc-daygrid-day.fc-day-other {
+            display: none;
+        }
+        .fc-daygrid-day[data-date="2025-02-16"],
+        .fc-daygrid-day[data-date="2025-02-17"],
+        .fc-daygrid-day[data-date="2025-02-18"],
+        .fc-daygrid-day[data-date="2025-02-19"],
+        .fc-daygrid-day[data-date="2025-02-20"],
+        .fc-daygrid-day[data-date="2025-02-21"],
+        .fc-daygrid-day[data-date="2025-02-22"],
+        .fc-daygrid-day[data-date="2025-02-23"],
+        .fc-daygrid-day[data-date="2025-02-24"],
+        .fc-daygrid-day[data-date="2025-02-25"],
+        .fc-daygrid-day[data-date="2025-02-26"],
+        .fc-daygrid-day[data-date="2025-02-27"],
+        .fc-daygrid-day[data-date="2025-02-28"] {
+            visibility: hidden;
+        }
     """
-
 
 
 # Configurazione del calendario con stile personalizzato
@@ -91,7 +95,7 @@ def show_calendar(conn):
         calendar_output = calendar(
 #            events=calendar_events, 
             options=calendar_options, 
-            custom_css=custom_css#,
+            custom_css=custom_css
             #style=custom_style
         )
         st.write(calendar_output)  # Only write if successful

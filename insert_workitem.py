@@ -276,7 +276,7 @@ def create_workitem(conn)-> None:
         #st.write(formatted_date)
     else:
         st.write(f"Pick a day from calendar first!")
-        formatted_date = ""    
+        formatted_date = datetime.now().strftime("%d/%m/%Y")    
     
     if selected_tdsp_name:
         with st.expander(label=":orange[New Workitem]", expanded=False):
@@ -325,11 +325,11 @@ def create_workitem(conn)-> None:
 
             # Execution Date
             if formatted_date:
-                default_date = formatted_date
-            else:
-                default_date_str = datetime.now().strftime("%d/%m/%Y")
+                st.write(formatted_date)
+                default_date_str = formatted_date
                 default_date = date.fromisoformat(default_date_str) #Convert to date object
-            st.write(default_date)        
+                st.write(default_date)
+        
             execution_date = st.date_input(label=":blue[Execution Date]", value=default_date, format="DD/MM/YYYY")
 
             # Quantity

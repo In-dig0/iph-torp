@@ -325,10 +325,10 @@ def create_workitem(conn)-> None:
 
             # Execution Date
             if formatted_date:
-                st.write(formatted_date)
+                #st.write(formatted_date)
                 default_date_str = formatted_date
                 default_date = date.fromisoformat(default_date_str) #Convert to date object
-                st.write(default_date)
+                #st.write(default_date)
         
             execution_date = st.date_input(label=":blue[Execution Date]", value=default_date, format="DD/MM/YYYY")
 

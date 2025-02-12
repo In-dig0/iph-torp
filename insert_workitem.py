@@ -264,7 +264,12 @@ def create_workitem(conn)-> None:
     calendar_output = show_calendar()
     
     st.write(selected_tdsp_name)
-    st.write(calendar_output)#.get["dateClick"])
+    st.write(calendar_output) 
+    if calendar_output.get("callback") == "dateClick":
+        st.write(calendar_output.get("dateClick"))
+    else:
+        st.write(f"Pick a day from calendar first!")    
+    #.get["dateClick"])
     # data = calendar_output.get("dateClick")
 
     # if data is None:

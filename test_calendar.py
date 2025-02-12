@@ -89,7 +89,13 @@ def show_calendar(conn):
         }
     """
 
-
+    events: [
+        {
+        id: 'W25-0012',
+        title: 'User Meeting',
+        start: '2025-02-12'
+        }
+    ]
 # Configurazione del calendario con stile personalizzato
     try:
         calendar_output = calendar(

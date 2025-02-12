@@ -91,18 +91,18 @@ def show_calendar(conn):
 
     calendar_events = [
         {
-        "id": 'W25-0012',
-        "title": '[W25-0012] Update Scania project -> 2H',
-        "start": '2025-02-12',
-        "backgroundColor": "#FF6C6C",
-        "borderColor": "#FF6C6C"
+        "id" : 'W25-0012',
+        "title" : '[W25-0012] Update Scania project -> 2H',
+        "start" : '2025-02-12',
+        "backgroundColor" : '#FF6C6C',
+        "borderColor" : '#FF6C6C'
         },
         {
-        "id": 'W25-0017',
-        "title": '[W25-0017] Update Volvo project -> 4H',
-        "start": '2025-02-12'
-        "backgroundColor": "#FF6C6C",
-        "borderColor": "#FF6C6C"        
+        "id" : 'W25-0017',
+        "title" : '[W25-0017] Update Volvo project -> 4H',
+        "start" : '2025-02-12'
+        "backgroundColor" : '#FF6C6C',
+        "borderColor" : '#FF6C6C'       
         }
     ]
     

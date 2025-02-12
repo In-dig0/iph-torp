@@ -277,19 +277,19 @@ def create_workitem(conn)-> None:
                 key="tdsp_form"
             )
         else:
-            selected_td_specialist_form = st.selectbox(
+            selected_tdsp_name = st.selectbox(
                 label=":blue[TD Specialist](:red[*])",
                 options=tdsp_woassignedto_names,
                 index=None,
                 key="tdsp_form"
             )
 
-        if selected_td_specialist_form:
-            selected_td_specialist_form_code = servant.get_code_from_name(st.session_state.df_users, selected_td_specialist_form, "CODE")
+        if selected_tdsp_name:
+            selected_tdsp_code = servant.get_code_from_name(st.session_state.df_users, selected_tdsp_name, "CODE")
 
             # Correctly filter and extract Work Order IDs
             filtered_workorder_df = st.session_state.df_woassignedto[
-                st.session_state.df_woassignedto["TDSPID"] == selected_td_specialist_form_code
+                st.session_state.df_woassignedto["TDSPID"] == selected_tdsp_code
             ]
 
             if not filtered_workorder_df.empty:  # Check if the DataFrame is not empty
@@ -299,7 +299,7 @@ def create_workitem(conn)-> None:
 
         else:
             filtered_workorder_list = []
-            selected_td_specialist_form_code = ""
+            selected_tdsp_code = ""
 
         selected_workorder = st.selectbox(
             label=":blue[Work Order]",

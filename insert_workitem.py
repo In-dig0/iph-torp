@@ -259,9 +259,11 @@ def create_workitem(conn)-> None:
                 grouped_workitems = df_to_display.groupby(["WOID", "TDSP_DESC", "TIME_UM"])["TIME_QTY"].sum().reset_index()
                 grouped_workitems = grouped_workitems[["WOID", "TDSP_DESC","TIME_QTY", "TIME_UM"]]
                 st.dataframe(data=grouped_workitems, use_container_width=True, hide_index=True)
-    show_calendar()
+    calendar_output = show_calendar()
+    
     st.write(selected_tdsp_name)
-    st.write()
+    st.write(calendar_output)
+    
     with st.expander(label=":orange[New Workitem]", expanded=False):
         if selected_tdsp_name:
             tdsp_index = tdsp_woassignedto_names.index(selected_tdsp_name)  # Get the index

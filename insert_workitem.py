@@ -265,6 +265,14 @@ def create_workitem(conn)-> None:
     
     st.write(selected_tdsp_name)
     st.write(calendar_output)#.get["dateClick"])
+    data = calendar_output["dateClick"].get("date")
+
+    if data is None:
+        print("Il campo 'date' non è presente nel dizionario.")
+        # Gestisci la situazione in cui il campo non è presente
+    else:
+        print(data)
+
     #st.write(calendar_output)#.get["dateClick"])
     #st.write(calendar_output.items())#.get["dateClick"])
     

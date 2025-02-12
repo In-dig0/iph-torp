@@ -15,7 +15,7 @@ def show_calendar(conn):
             "center": "title",
             "right": "dayGridMonth,timeGridWeek"
         },
-        #"initialDate": "2025-02-01",
+        "initialDate": "2025-02-01",
         #"locale": "it",  # Imposta la lingua italiana
         "locale": {
             "code": "it",

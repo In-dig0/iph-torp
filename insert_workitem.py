@@ -267,21 +267,15 @@ def create_workitem(conn)-> None:
     st.write(calendar_output) 
     if calendar_output.get("callback") == "dateClick":
         d = calendar_output.get("dateClick")
-        st.write(d.get("date"))
+        date_iso = d.get("date")
+        # 1. Converti la stringa in un oggetto datetime
+        data_datetime = datetime.fromisoformat(date_iso.replace("Z", "+00:00"))
 
+        # 2. Formatta l'oggetto datetime nel formato desiderato
+        formatted_date = data_datetime.strftime("%d/%m/%Y")
+        st.write(formatted_date)
     else:
         st.write(f"Pick a day from calendar first!")    
-    #.get["dateClick"])
-    # data = calendar_output.get("dateClick")
-
-    # if data is None:
-    #     print("Il campo 'date' non è presente nel dizionario.")
-    #     # Gestisci la situazione in cui il campo non è presente
-    # else:
-    #     print(data)
-
-    #st.write(calendar_output)#.get["dateClick"])
-    #st.write(calendar_output.items())#.get["dateClick"])
     
     if selected_tdsp_name:
         with st.expander(label=":orange[New Workitem]", expanded=False):

@@ -1,6 +1,6 @@
 import streamlit as st
-from streamlit_calendar import calendar
-#import calendar
+from streamlit_calendar import calendar as scal
+import calendar
 from datetime import datetime, timedelta
 
 
@@ -128,7 +128,7 @@ def show_calendar(conn):
     
 # Configurazione del calendario con stile personalizzato
     try:
-        calendar_output = calendar(
+        calendar_output = scal.calendar(
             events=calendar_events, 
             options=calendar_options, 
             custom_css=custom_css,

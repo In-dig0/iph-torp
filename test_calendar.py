@@ -92,9 +92,14 @@ def show_calendar(conn):
     calendar_events = [
         {
         "id": 'W25-0012',
-        "title": 'User Meeting',
+        "title": '[W25-0012] Update Scania project',
         "start": '2025-02-12'
-        }
+        },
+        {
+        "id": 'W25-0017',
+        "title": '[W25-0017] Update Volvo project',
+        "start": '2025-02-12'
+        },
     ]
     
 # Configurazione del calendario con stile personalizzato

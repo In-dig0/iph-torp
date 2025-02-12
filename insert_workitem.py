@@ -269,7 +269,7 @@ def create_workitem(conn)-> None:
 
     with st.expander(label=":orange[New Workitem]", expanded=False):
     # Dummy widget to force re-render
-        _ = st.text(f"Selected TDSP: {selected_tdsp_name}", visible=False)
+        _ = st.text_input(value=f"{selected_tdsp_name}", label_visibility = "visible")
         with st.expander(label=":orange[New Workitem]", expanded=False):
             if selected_tdsp_name:
                 tdsp_index = tdsp_woassignedto_names.index(selected_tdsp_name)

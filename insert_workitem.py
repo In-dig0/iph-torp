@@ -275,7 +275,8 @@ def create_workitem(conn)-> None:
         formatted_date = data_datetime.strftime("%d/%m/%Y")
         #st.write(formatted_date)
     else:
-        st.write(f"Pick a day from calendar first!")    
+        st.write(f"Pick a day from calendar first!")
+        formatted_date = ""    
     
     if selected_tdsp_name:
         with st.expander(label=":orange[New Workitem]", expanded=False):

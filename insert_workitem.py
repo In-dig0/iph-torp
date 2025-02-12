@@ -176,12 +176,13 @@ def create_workitem(conn)-> None:
     # Reload workitems if needed
     if 'reload_needed' in st.session_state and st.session_state.reload_needed:
         st.session_state.df_workitems = sqlite_db.load_workitems_data(conn)
-        st.session_state.df_out = st.session_state.df_workitems[st.session_state.df_workitems["REFDATE"] > previus_xdays].copy()
+        st.session_state.df_out = st.session_state.df_workitems[st.session_state.df_workitems["REFDATE"].dt.date > previus_xdays].copy()
         del st.session_state.reload_needed
 
     tdsp_woassignedto_names_df = st.session_state.df_users[st.session_state.df_users["DEPTCODE"]=="DTD"]["NAME"]
     tdsp_woassignedto_names_list = list(tdsp_woassignedto_names_df)
     tdsp_woassignedto_names = sorted(tdsp_woassignedto_names_list)
+
 
     selected_tdsp_name = st.sidebar.selectbox(
         label=":blue[Tech Dept Specialist]",
@@ -196,6 +197,7 @@ def create_workitem(conn)-> None:
         st.session_state.selected_tdsp_code = selected_tdsp_code  # Store in session state
     else:
         st.session_state.selected_tdsp_code = None
+
 
     # Filter workitems based on the stored code in session state
     if st.session_state.selected_tdsp_code:

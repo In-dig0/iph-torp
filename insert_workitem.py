@@ -129,7 +129,7 @@ def create_workitem(conn)-> None:
                 key='calendar' # Assign a widget key to prevent state loss
                 #style=custom_style
             )
-            st.write(calendar_output)  # Only write if successful
+            #st.write(calendar_output)  # Only write if successful
         except Exception as e:
             st.error(f"Error displaying calendar: {e}")  # Display error in Streamlit
             st.write("Check your event data and calendar options.") # Provide user-friendly feedback

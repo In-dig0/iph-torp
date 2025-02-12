@@ -1,6 +1,6 @@
 import streamlit as st
-from streamlit_calendar import calendar as scal
-import calendar
+from streamlit_calendar import calendar
+import calendar as std_cal
 from datetime import datetime, timedelta
 
 
@@ -11,7 +11,7 @@ def show_calendar(conn):
     # Ottieni la data corrente
     now = datetime.now()
     # Ottieni l'ultimo giorno del mese corrente
-    ultimo_giorno = calendar.monthrange(now.year, now.month)[1]
+    ultimo_giorno = std_cal.monthrange(now.year, now.month)[1]
     # Crea la data completa per l'ultimo giorno del mese corrente
     last_day_current_month = datetime(now.year, now.month, ultimo_giorno)
   

@@ -6,6 +6,20 @@ def show_calendar(conn):
     # Titolo
     st.title("Esempio di Calendario Streamlit")
 
+    # Ottieni la data corrente
+    now = datetime.now()
+    # Ottieni l'ultimo giorno del mese corrente
+    ultimo_giorno = calendar.monthrange(now.year, now.month)[1]
+    # Crea la data completa per l'ultimo giorno del mese corrente
+    last_day_current_month = datetime(now.year, now.month, ultimo_giorno)
+  
+    # Calcola il primo giorno del mese corrente
+    first_day_current_month = datetime(now.year, now.month, 1)   
+    # Calcola l'ultimo giorno del mese precedente
+    last_day_previous_month = first_day_current_month - timedelta(days=1)   
+    # Calcola il primo giorno del mese precedente
+    first_day_previous_month = datetime(last_day_previous_month.year, last_day_previous_month.month, 1)
+    
     calendar_options = {
         "editable": True,
         "navLinks": True,
@@ -16,10 +30,10 @@ def show_calendar(conn):
             "right": "dayGridMonth,timeGridWeek"
         },
         #"initialDate": "2025-02-01",
-        "initialDate": "2025-02-01",
+        #"initialDate": f"2025-02-01",
         "validRange": {
-            "start": "2025-02-01",
-            "end": "2025-02-14"
+            "start": f"{first_day_previous_month}",
+            "end": f"{last_day_current_month}"
         },
         "hiddenDays": [0, 6],  # Nasconde le domeniche (0) e i sabati (6)
         #"locale": "it",  # Imposta la lingua italiana

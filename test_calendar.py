@@ -128,7 +128,7 @@ def show_calendar(conn):
     
 # Configurazione del calendario con stile personalizzato
     try:
-        calendar_output = scal.calendar(
+        calendar_output = calendar(
             events=calendar_events, 
             options=calendar_options, 
             custom_css=custom_css,

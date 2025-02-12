@@ -91,9 +91,9 @@ def show_calendar(conn):
 
     calendar_events = [
         {
-        id: 'W25-0012',
-        title: 'User Meeting',
-        start: '2025-02-12'
+        "id": 'W25-0012',
+        "title": 'User Meeting',
+        "start": '2025-02-12'
         }
     ]
     
@@ -102,7 +102,8 @@ def show_calendar(conn):
         calendar_output = calendar(
             events=calendar_events, 
             options=calendar_options, 
-            custom_css=custom_css
+            custom_css=custom_css,
+            key='calendar' # Assign a widget key to prevent state loss
             #style=custom_style
         )
         st.write(calendar_output)  # Only write if successful

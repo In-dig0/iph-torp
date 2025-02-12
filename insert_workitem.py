@@ -6,7 +6,7 @@ import time
 from typing import Optional, Tuple, Dict, List
 from streamlit_calendar import calendar
 import calendar as std_cal
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, date
 
 # Internal app module
 import servant

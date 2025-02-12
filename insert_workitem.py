@@ -354,7 +354,7 @@ def create_workitem(conn)-> None:
                 witem = {
                     "wi_refdate": execution_date,
                     "wo_woid": selected_workorder,
-                    "wi_tdspid": selected_td_specialist_form_code,
+                    "wi_tdspid": selected_tdsp_code,
                     "wi_status": "ACTIVE",
                     "wi_tskgrl1": selected_tskgrl1_code,
                     "wi_tskgrl2": selected_tskgrl2_code,

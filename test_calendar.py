@@ -21,6 +21,7 @@ def show_calendar(conn):
             "start": "2025-02-01",
             "end": "2025-02-14"
         },
+        "hiddenDays": [0, 6],  # Nasconde le domeniche (0) e i sabati (6)
         #"locale": "it",  # Imposta la lingua italiana
         "locale": {
             "code": "it",

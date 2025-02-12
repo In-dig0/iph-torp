@@ -92,7 +92,7 @@ def show_calendar(conn):
             white-space: pre-wrap; /* Forza il testo a capo */
         }
         .fc-col-header-cell {
-        background-color: #aeb6bf !important; /* Colore di sfondo per le intestazioni dei giorni della settimana */
+        background-color: #2e4053 !important; /* Colore di sfondo per le intestazioni dei giorni della settimana */
         color: #000000; /* Colore del testo per le intestazioni dei giorni della settimana */
         }
     """

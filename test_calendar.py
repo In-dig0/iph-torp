@@ -95,14 +95,14 @@ def show_calendar(conn):
         "id":'W25-0012',
         "title": f'[W25-0012] Update Scania project\n-> {time_wo1}',
         "start": '2025-02-12',
-        "backgroundColor": '#FF4B4B',
+        #"backgroundColor": '#FF4B4B',
         "borderColor": '#FF6C6C'
         },
         {
         "id": 'W25-0017',
         "title": f'[W25-0017] Update Volvo project\n-> {time_wo2}',
         "start": '2025-02-12',
-        "backgroundColor": '#FF4B4B',
+        #"backgroundColor": '#FF4B4B',
         "borderColor": '#FF6C6C'       
         }
     ]

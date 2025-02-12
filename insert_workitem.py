@@ -266,103 +266,99 @@ def create_workitem(conn)-> None:
     st.write(selected_tdsp_name)
     st.write(calendar_output)
     
+
     with st.expander(label=":orange[New Workitem]", expanded=False):
-        if selected_tdsp_name is not None:
-            tdsp_index = tdsp_woassignedto_names.index(selected_tdsp_name)  # Get the index
-            st.write(tdsp_index)
-            selected_td_specialist_form = st.selectbox(
-                label=":blue[TD Specialist](:red[*])",
-                options=selected_tdsp_name,
-                index=0,  # Use index to set the default selection
-                key="tdsp_form"
-            )
-        else:
-            selected_tdsp_name = st.selectbox(
-                label=":blue[TD Specialist](:red[*])",
-                options=tdsp_woassignedto_names,
-                index=None,
-                key="tdsp_form"
-            )
+    # Dummy widget to force re-render
+        _ = st.text(f"Selected TDSP: {selected_tdsp_name}", visible=False)
+        with st.expander(label=":orange[New Workitem]", expanded=False):
+            if selected_tdsp_name:
+                tdsp_index = tdsp_woassignedto_names.index(selected_tdsp_name)
+                selected_td_specialist_form = st.selectbox(
+                    label=":blue[TD Specialist](:red[*])",
+                    options=tdsp_woassignedto_names,
+                    index=tdsp_index if selected_tdsp_name else None,  # Use index or None
+                    key="tdsp_form"
+                )
 
-        if selected_tdsp_name:
-            selected_tdsp_code = servant.get_code_from_name(st.session_state.df_users, selected_tdsp_name, "CODE")
+            if selected_tdsp_name:
+                selected_tdsp_code = servant.get_code_from_name(st.session_state.df_users, selected_tdsp_name, "CODE")
 
-            # Correctly filter and extract Work Order IDs
-            filtered_workorder_df = st.session_state.df_woassignedto[
-                st.session_state.df_woassignedto["TDSPID"] == selected_tdsp_code
-            ]
+                # Correctly filter and extract Work Order IDs
+                filtered_workorder_df = st.session_state.df_woassignedto[
+                    st.session_state.df_woassignedto["TDSPID"] == selected_tdsp_code
+                ]
 
-            if not filtered_workorder_df.empty:  # Check if the DataFrame is not empty
-                filtered_workorder_list = sorted(filtered_workorder_df["WOID"].tolist())  # Extract WOIDs and convert to a sorted list
+                if not filtered_workorder_df.empty:  # Check if the DataFrame is not empty
+                    filtered_workorder_list = sorted(filtered_workorder_df["WOID"].tolist())  # Extract WOIDs and convert to a sorted list
+                else:
+                    filtered_workorder_list = []  # Handle the case where no work orders are found
+
             else:
-                filtered_workorder_list = []  # Handle the case where no work orders are found
+                filtered_workorder_list = []
+                selected_tdsp_code = ""
 
-        else:
-            filtered_workorder_list = []
-            selected_tdsp_code = ""
+            selected_workorder = st.selectbox(
+                label=":blue[Work Order]",
+                options=filtered_workorder_list,
+                index=None,
+                key="sb_wo"
+                )
 
-        selected_workorder = st.selectbox(
-            label=":blue[Work Order]",
-            options=filtered_workorder_list,
-            index=None,
-            key="sb_wo"
-            )
+            # Task Group Level 1 dropdown
+            tskgrl1_options = st.session_state.df_tskgrl1["NAME"].tolist()
+            selected_tskgrl1 = st.selectbox(label=":blue[TaskGroup L1]", options=tskgrl1_options, index=None, key="sb_tskgrl1")
+            selected_tskgrl1_code = servant.get_code_from_name(st.session_state.df_tskgrl1, selected_tskgrl1, "CODE")
 
-        # Task Group Level 1 dropdown
-        tskgrl1_options = st.session_state.df_tskgrl1["NAME"].tolist()
-        selected_tskgrl1 = st.selectbox(label=":blue[TaskGroup L1]", options=tskgrl1_options, index=None, key="sb_tskgrl1")
-        selected_tskgrl1_code = servant.get_code_from_name(st.session_state.df_tskgrl1, selected_tskgrl1, "CODE")
+            # Task Group Level 2 dropdown (dependent on Level 1)
+            tskgrl2_options = st.session_state.df_tskgrl2[st.session_state.df_tskgrl2['PCODE'] == selected_tskgrl1_code]['NAME'].unique()
+            selected_tskgrl2 = st.selectbox(label=":blue[TaskGroup L2]", options=tskgrl2_options, index=None, key="sb_tskgrl2")
+            selected_tskgrl2_code = servant.get_code_from_name(st.session_state.df_tskgrl2, selected_tskgrl2, "CODE")
 
-        # Task Group Level 2 dropdown (dependent on Level 1)
-        tskgrl2_options = st.session_state.df_tskgrl2[st.session_state.df_tskgrl2['PCODE'] == selected_tskgrl1_code]['NAME'].unique()
-        selected_tskgrl2 = st.selectbox(label=":blue[TaskGroup L2]", options=tskgrl2_options, index=None, key="sb_tskgrl2")
-        selected_tskgrl2_code = servant.get_code_from_name(st.session_state.df_tskgrl2, selected_tskgrl2, "CODE")
+            # Execution Date
+            execution_date = st.date_input(label=":blue[Execution Date]", value=datetime.now(), format="DD/MM/YYYY")
 
-        # Execution Date
-        execution_date = st.date_input(label=":blue[Execution Date]", value=datetime.now(), format="DD/MM/YYYY")
+            # Quantity
+            quantity = st.number_input(label=":blue[Time]", min_value=0.0, step=0.5, value=0.0, key="in_time_qty")
 
-        # Quantity
-        quantity = st.number_input(label=":blue[Time]", min_value=0.0, step=0.5, value=0.0, key="in_time_qty")
+            # Description
+            desc = st.text_input(label=":blue[Description]", key="ti_description")
 
-        # Description
-        desc = st.text_input(label=":blue[Description]", key="ti_description")
+            # Note
+            note = st.text_area(label=":blue[Notes]", key="ta_note")
 
-        # Note
-        note = st.text_area(label=":blue[Notes]", key="ta_note")
+            save_button_disabled = not all([  # Use all() for cleaner logic
+                execution_date,
+                selected_td_specialist_form_code,
+                selected_workorder,
+                selected_tskgrl1_code,
+                selected_tskgrl2_code,
+                quantity
+            ])
 
-        save_button_disabled = not all([  # Use all() for cleaner logic
-            execution_date,
-            selected_td_specialist_form_code,
-            selected_workorder,
-            selected_tskgrl1_code,
-            selected_tskgrl2_code,
-            quantity
-        ])
+            if st.button("Save Work Item", disabled=save_button_disabled):
+                witem = {
+                    "wi_refdate": execution_date,
+                    "wo_woid": selected_workorder,
+                    "wi_tdspid": selected_td_specialist_form_code,
+                    "wi_status": "ACTIVE",
+                    "wi_tskgrl1": selected_tskgrl1_code,
+                    "wi_tskgrl2": selected_tskgrl2_code,
+                    "wi_desc": desc,
+                    "wi_note": note,
+                    "wi_time_qty": quantity,
+                    "wi_time_um": "H"
+                }
 
-        if st.button("Save Work Item", disabled=save_button_disabled):
-            witem = {
-                "wi_refdate": execution_date,
-                "wo_woid": selected_workorder,
-                "wi_tdspid": selected_td_specialist_form_code,
-                "wi_status": "ACTIVE",
-                "wi_tskgrl1": selected_tskgrl1_code,
-                "wi_tskgrl2": selected_tskgrl2_code,
-                "wi_desc": desc,
-                "wi_note": note,
-                "wi_time_qty": quantity,
-                "wi_time_um": "H"
-            }
-
-            success = sqlite_db.save_workitem(witem, conn)
-            if success:
-                st.success("New workitem created!")
-                # Set a flag in session state to indicate that a reload is needed
-                st.session_state.reload_needed = True
-                # Set default values for the form fields
-                st.session_state.form_reset = True
-                time.sleep(1)
-                st.rerun()
+                success = sqlite_db.save_workitem(witem, conn)
+                if success:
+                    st.success("New workitem created!")
+                    # Set a flag in session state to indicate that a reload is needed
+                    st.session_state.reload_needed = True
+                    # Set default values for the form fields
+                    st.session_state.form_reset = True
+                    time.sleep(1)
+                    st.rerun()
 
 
 
-        
+            

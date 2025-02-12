@@ -91,6 +91,10 @@ def show_calendar(conn):
         .fc-event-title {
             white-space: pre-wrap; /* Forza il testo a capo */
         }
+        .fc-col-header-cell {
+        background-color: #FFD700; /* Colore di sfondo per le intestazioni dei giorni della settimana */
+        color: #000000; /* Colore del testo per le intestazioni dei giorni della settimana */
+        }
     """
     time_wo1 = "2H"
     time_wo2 = "4H"

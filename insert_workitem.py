@@ -326,7 +326,7 @@ def create_workitem(conn)-> None:
             if formatted_date:
                 default_date = formatted_date
             else:
-                default_date = datetime.now()    
+                default_date = datetime.now().strftime("%d/%m/%Y")    
             execution_date = st.date_input(label=":blue[Execution Date]", value=default_date, format="DD/MM/YYYY")
 
             # Quantity

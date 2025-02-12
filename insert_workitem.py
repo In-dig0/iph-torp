@@ -263,8 +263,8 @@ def create_workitem(conn)-> None:
                 st.dataframe(data=grouped_workitems, use_container_width=True, hide_index=True)
     calendar_output = show_calendar()
     
-    st.write(selected_tdsp_name)
-    st.write(calendar_output) 
+    #st.write(selected_tdsp_name)
+    #st.write(calendar_output) 
     if calendar_output.get("callback") == "dateClick":
         d = calendar_output.get("dateClick")
         date_iso = d.get("date")

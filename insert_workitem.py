@@ -444,26 +444,29 @@ def create_workitem(conn)-> None:
                 event_data = st.session_state.event_details[st.session_state.selected_event]
                 
                 # Crea il dialog
-                with st.dialog("Dettagli Workitem"):  # Rimosso clear_on_close
-                    col1, col2 = st.columns(2)
-                    with col1:
-                        st.write("**Work Order ID:**", st.session_state.selected_event)
-                        st.write("**Specialist:**", event_data["tdsp"])
-                        st.write("**Data:**", event_data["date"])
-                        st.write("**Tempo:**", f"{event_data['time_qty']} {event_data['time_um']}")
-                    
-                    with col2:
-                        st.write("**Task Group 1:**", event_data["tskgrl1"])
-                        st.write("**Task Group 2:**", event_data["tskgrl2"])
-                    
-                    if event_data["description"]:
-                        st.write("**Descrizione:**", event_data["description"])
-                    if event_data["note"]:
-                        st.write("**Note:**", event_data["note"])
-                    
-                    if st.button("Chiudi", key="close_modal"):
-                        st.session_state.show_modal = False
-                        st.rerun()
+                dialog_container = st.empty()
+                dialog_container.container().markdown("### Dettagli Workitem")
+                
+                col1, col2 = st.columns(2)
+                with col1:
+                    st.write("**Work Order ID:**", st.session_state.selected_event)
+                    st.write("**Specialist:**", event_data["tdsp"])
+                    st.write("**Data:**", event_data["date"])
+                    st.write("**Tempo:**", f"{event_data['time_qty']} {event_data['time_um']}")
+                
+                with col2:
+                    st.write("**Task Group 1:**", event_data["tskgrl1"])
+                    st.write("**Task Group 2:**", event_data["tskgrl2"])
+                
+                if event_data["description"]:
+                    st.write("**Descrizione:**", event_data["description"])
+                if event_data["note"]:
+                    st.write("**Note:**", event_data["note"])
+                
+                if st.button("Chiudi", key="close_modal"):
+                    st.session_state.show_modal = False
+                    dialog_container.empty()
+                    st.rerun()
 
         except Exception as e:
             st.error(f"Error displaying calendar: {e}")

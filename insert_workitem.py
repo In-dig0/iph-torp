@@ -123,7 +123,7 @@ def create_workitem(conn)-> None:
             }
             calendar_events.append(event)
         st.write(calendar_events)
-        return ""
+        return {}
 
                                 # calendar_events = [
                                 #     {

@@ -122,7 +122,7 @@ def create_workitem(conn)-> None:
             },
             {
             "id": 'W25-0017',
-            "title": f'[W25-0017] Update Volvo project}',
+            "title": f'[W25-0017] Update Volvo project',
             "start": '2025-02-12',
             "backgroundColor": '#d4efdf',
             "borderColor": '#a2d9ce',

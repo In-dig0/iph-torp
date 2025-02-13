@@ -444,9 +444,7 @@ def create_workitem(conn)-> None:
                 event_data = st.session_state.event_details[st.session_state.selected_event]
                 
                 # Crea il dialog
-                dialog = st.dialog("Dettagli Workitem", clear_on_close=True)
-                
-                with dialog:
+                with st.dialog("Dettagli Workitem"):  # Rimosso clear_on_close
                     col1, col2 = st.columns(2)
                     with col1:
                         st.write("**Work Order ID:**", st.session_state.selected_event)

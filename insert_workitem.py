@@ -277,7 +277,7 @@ def create_workitem(conn)-> None:
     else:
         filtered_workitems = st.session_state.df_workitems.copy() #.copy() is crucial here as well
     
-    filtered_workitems = filtered_workitems.sort_values(['REFDATE','TDSPID'], ascending=[False, True])
+    filtered_workitems = filtered_workitems.sort_values(['REFDATE','TDSPID','WOID'], ascending=[False, True, True])
     
 
     st.session_state.df_out = pd.DataFrame(filtered_workitems)  # No need to drop columns here

@@ -117,7 +117,7 @@ def create_workitem(conn)-> None:
             event = {
                 "id": row['WOID'],
                 "title": f"[{row['WOID']}]-{row['DESC']}",
-                "start": row['REFDATE'],
+                "start": row['REFDATE'].dt.strftime('%Y-%m-%d'),
                 "backgroundColor": '#d4efdf',
                 "borderColor": '#a2d9ce',
             }

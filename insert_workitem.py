@@ -172,14 +172,11 @@ def create_workitem(conn)-> None:
             tdsp_name = servant.get_description_from_code(st.session_state.df_users, row['TDSPID'], "NAME")
             event = {
                 "id": row['WOID'],
-                "title": f"[{row['WOID']}] - {row['TIME_QTY']} H",
+                "title": f"[{row['WOID']}] - {row['TIME_QTY']} H - {tdsp_name}",
                 "start": row['REFDATE'],
                 "backgroundColor": '#d4efdf',
                 "borderColor": '#a2d9ce',
-                "extendedProps": {
-                    "tdsp": tdsp_name,
-                    "description": f"Specialist: {tdsp_name}\nTime: {row['TIME_QTY']} H"
-                }
+                "display": "block"  # Assicura che l'evento sia sempre visibile
             }
             calendar_events.append(event)
 
@@ -225,14 +222,7 @@ def create_workitem(conn)-> None:
                         'month': '2-digit',
                     }
                 }
-            },
-            "eventDidMount": """
-                function(info) {
-                    if (info.event.extendedProps.description) {
-                        info.el.title = info.event.extendedProps.description;
-                    }
-                }
-            """
+            }
         }
 
         custom_css = """
@@ -264,8 +254,7 @@ def create_workitem(conn)-> None:
                 events=calendar_events, 
                 options=calendar_options, 
                 custom_css=custom_css,
-                #key=f'calendar_{st.session_state.selected_tdsp_code or "all"}'  # Unique key based on filter
-                key = f'cal'
+                key=f'calendar_{st.session_state.selected_tdsp_code or "all"}'  # Unique key based on filter
             )
         except Exception as e:
             st.error(f"Error displaying calendar: {e}")

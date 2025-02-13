@@ -111,7 +111,7 @@ def create_workitem(conn)-> None:
         calendar_events = [
             {
             "id":'W25-0012',
-            "title": f'[W25-0012] Update Scania project-> {time_wo1}',
+            "title": f'[W25-0012] Update Scania project',
             "start": '2025-02-12',
             "backgroundColor": '#d4efdf',
             "borderColor": '#a2d9ce',
@@ -122,7 +122,7 @@ def create_workitem(conn)-> None:
             },
             {
             "id": 'W25-0017',
-            "title": f'[W25-0017] Update Volvo project-> {time_wo2}',
+            "title": f'[W25-0017] Update Volvo project}',
             "start": '2025-02-12',
             "backgroundColor": '#d4efdf',
             "borderColor": '#a2d9ce',

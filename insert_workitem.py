@@ -13,24 +13,176 @@ import servant
 
 def create_workitem(conn)-> None:
     
-    def show_calendar():
-        # Titolo
-        #st.title("Esempio di Calendario Streamlit")
+    # def show_calendar():
+    #     # Titolo
+    #     #st.title("Esempio di Calendario Streamlit")
 
-        # Ottieni la data corrente
-        now = datetime.now()
-        # Ottieni l'ultimo giorno del mese corrente
-        ultimo_giorno = std_cal.monthrange(now.year, now.month)[1]
-        # Crea la data completa per l'ultimo giorno del mese corrente
-        last_day_current_month = datetime(now.year, now.month, ultimo_giorno)
+    #     # Ottieni la data corrente
+    #     now = datetime.now()
+    #     # Ottieni l'ultimo giorno del mese corrente
+    #     ultimo_giorno = std_cal.monthrange(now.year, now.month)[1]
+    #     # Crea la data completa per l'ultimo giorno del mese corrente
+    #     last_day_current_month = datetime(now.year, now.month, ultimo_giorno)
     
-        # Calcola il primo giorno del mese corrente
+    #     # Calcola il primo giorno del mese corrente
+    #     first_day_current_month = datetime(now.year, now.month, 1)   
+    #     # Calcola l'ultimo giorno del mese precedente
+    #     last_day_previous_month = first_day_current_month - timedelta(days=1)   
+    #     # Calcola il primo giorno del mese precedente
+    #     first_day_previous_month = datetime(last_day_previous_month.year, last_day_previous_month.month, 1)
+        
+    #     calendar_options = {
+    #         "editable": True,
+    #         "navLinks": True,
+    #         "selectable": True,
+    #         "headerToolbar": {
+    #             "left": "today prev,next",
+    #             "center": "title",
+    #             "right": "dayGridMonth,timeGridWeek"
+    #         },
+    #         "validRange": {
+    #             "start": f"{first_day_previous_month}",
+    #             "end": f"{last_day_current_month}"
+    #         },
+    #         "hiddenDays": [0, 6],  # Nasconde le domeniche (0) e i sabati (6)
+    #         "locale": {
+    #             "code": "it",
+    #             "week": {
+    #             "dow": 1,  # Inizia la settimana da lunedì
+    #             "doy": 4
+    #             }
+    #         },
+    #         "timeZone": "Europe/Rome",  # Forza il fuso orario a UTC+1
+    #         "buttonText": {
+    #             "today": "Oggi",
+    #             "month": "Mese",
+    #             "week": "Settimana"
+    #         },
+    #         'views': {
+    #         'dayGridMonth': {
+    #             'buttonText': 'Mese',
+    #             'dayHeaderFormat': {
+    #                 'weekday': 'short'  # Solo abbreviazione giorno per vista mensile
+    #             }
+    #         },
+    #         'timeGridWeek': {
+    #             'buttonText': 'Settimana',
+    #             'dayHeaderFormat': {
+    #                 'weekday': 'short',
+    #                 'day': '2-digit',
+    #                 'month': '2-digit',
+    #             }
+    #         }
+    #         }
+    #     }
+    #     custom_css = """
+    #         .fc-event-past {
+    #             opacity: 0.8;
+    #         }
+    #         .fc-event-time {
+    #             font-style: italic;
+    #         }
+    #         .fc-event-title {
+    #             font-weight: 700;
+    #             color: #000000; /* Imposta il colore del titolo degli eventi in nero */
+    #         }            
+    #         .fc-event-title {
+    #             font-weight: 700;
+    #         }
+    #         .fc-toolbar-title {
+    #             font-size: 2rem;
+    #         }
+    #         .fc-daygrid-day.fc-day-other {
+    #             display: none;
+    #         }
+    #         .fc-daygrid-day.fc-day-other {
+    #             display: none;
+    #         }
+    #         .fc-event-title {
+    #             white-space: pre-wrap; /* Forza il testo a capo */
+    #         }
+    #         .fc-col-header-cell {
+    #         background-color: #DAF7A6 !important; /* Colore di sfondo per le intestazioni dei giorni della settimana */
+    #         color: #000000; /* Colore del testo per le intestazioni dei giorni della settimana */
+    #         }
+    #     """
+    #     # time_wo1 = "2H"
+    #     # time_wo2 = "4H"
+    #     if st.session_state.selected_tdsp_code:
+    #         df_filtered_witems = st.session_state.df_workitems[st.session_state.df_workitems["TDSPID"]==st.session_state.selected_tdsp_code]
+    #     else:
+    #         df_filtered_witems = st.session_state.df_workitems
+
+    #     # Converti il campo 'REFDATE' in una data con formato YYYY-MM-DD
+    #     df_filtered_witems['REFDATE'] = pd.to_datetime(df_filtered_witems['REFDATE']).dt.strftime('%Y-%m-%d')
+    #     #st.write(df_filtered_witems)
+        
+    #     calendar_events = []
+    #     for index, row in df_filtered_witems.iterrows():
+    #         event = {
+    #             "id": row['WOID'],
+    #             "title": f"[{row['WOID']}] - {row['TIME_QTY']} H",
+    #             "start": row['REFDATE'],
+    #             "backgroundColor": '#d4efdf',
+    #             "borderColor": '#a2d9ce',
+    #         }
+    #         calendar_events.append(event)
+        
+    # # Configurazione del calendario con stile personalizzato
+    #     try:
+    #         calendar_output = calendar(
+    #             events=calendar_events, 
+    #             options=calendar_options, 
+    #             custom_css=custom_css,
+    #             key='calendar' # Assign a widget key to prevent state loss
+    #             #style=custom_style
+    #         )
+    #         #st.write(calendar_output)  # Only write if successful
+    #     except Exception as e:
+    #         st.error(f"Error displaying calendar: {e}")  # Display error in Streamlit
+    #         st.write("Check your event data and calendar options.") # Provide user-friendly feedback
+    #         import traceback
+    #         st.write(traceback.format_exc()) # Print the full traceback for debugging
+        
+    #     return calendar_output
+
+    def show_calendar():
+        now = datetime.now()
+        ultimo_giorno = std_cal.monthrange(now.year, now.month)[1]
+        last_day_current_month = datetime(now.year, now.month, ultimo_giorno)
         first_day_current_month = datetime(now.year, now.month, 1)   
-        # Calcola l'ultimo giorno del mese precedente
         last_day_previous_month = first_day_current_month - timedelta(days=1)   
-        # Calcola il primo giorno del mese precedente
         first_day_previous_month = datetime(last_day_previous_month.year, last_day_previous_month.month, 1)
         
+        # Filtra i workitem in base al TD Specialist selezionato
+        if st.session_state.selected_tdsp_code:
+            df_filtered_witems = st.session_state.df_workitems[
+                st.session_state.df_workitems["TDSPID"] == st.session_state.selected_tdsp_code
+            ].copy()
+        else:
+            df_filtered_witems = st.session_state.df_workitems.copy()
+
+        # Converti il campo 'REFDATE' in formato YYYY-MM-DD
+        df_filtered_witems['REFDATE'] = pd.to_datetime(df_filtered_witems['REFDATE']).dt.strftime('%Y-%m-%d')
+        
+        # Crea gli eventi per il calendario
+        calendar_events = []
+        for index, row in df_filtered_witems.iterrows():
+            # Aggiungi informazioni addizionali dal df_users per il tooltip
+            tdsp_name = servant.get_description_from_code(st.session_state.df_users, row['TDSPID'], "NAME")
+            event = {
+                "id": row['WOID'],
+                "title": f"[{row['WOID']}] - {row['TIME_QTY']} H",
+                "start": row['REFDATE'],
+                "backgroundColor": '#d4efdf',
+                "borderColor": '#a2d9ce',
+                "extendedProps": {
+                    "tdsp": tdsp_name,
+                    "description": f"Specialist: {tdsp_name}\nTime: {row['TIME_QTY']} H"
+                }
+            }
+            calendar_events.append(event)
+
         calendar_options = {
             "editable": True,
             "navLinks": True,
@@ -44,37 +196,45 @@ def create_workitem(conn)-> None:
                 "start": f"{first_day_previous_month}",
                 "end": f"{last_day_current_month}"
             },
-            "hiddenDays": [0, 6],  # Nasconde le domeniche (0) e i sabati (6)
+            "hiddenDays": [0, 6],
             "locale": {
                 "code": "it",
                 "week": {
-                "dow": 1,  # Inizia la settimana da lunedì
-                "doy": 4
+                    "dow": 1,
+                    "doy": 4
                 }
             },
-            "timeZone": "Europe/Rome",  # Forza il fuso orario a UTC+1
+            "timeZone": "Europe/Rome",
             "buttonText": {
                 "today": "Oggi",
                 "month": "Mese",
                 "week": "Settimana"
             },
             'views': {
-            'dayGridMonth': {
-                'buttonText': 'Mese',
-                'dayHeaderFormat': {
-                    'weekday': 'short'  # Solo abbreviazione giorno per vista mensile
+                'dayGridMonth': {
+                    'buttonText': 'Mese',
+                    'dayHeaderFormat': {
+                        'weekday': 'short'
+                    }
+                },
+                'timeGridWeek': {
+                    'buttonText': 'Settimana',
+                    'dayHeaderFormat': {
+                        'weekday': 'short',
+                        'day': '2-digit',
+                        'month': '2-digit',
+                    }
                 }
             },
-            'timeGridWeek': {
-                'buttonText': 'Settimana',
-                'dayHeaderFormat': {
-                    'weekday': 'short',
-                    'day': '2-digit',
-                    'month': '2-digit',
+            "eventDidMount": """
+                function(info) {
+                    if (info.event.extendedProps.description) {
+                        info.el.title = info.event.extendedProps.description;
+                    }
                 }
-            }
-            }
+            """
         }
+
         custom_css = """
             .fc-event-past {
                 opacity: 0.8;
@@ -84,65 +244,33 @@ def create_workitem(conn)-> None:
             }
             .fc-event-title {
                 font-weight: 700;
-                color: #000000; /* Imposta il colore del titolo degli eventi in nero */
+                color: #000000;
+                white-space: pre-wrap;
             }            
-            .fc-event-title {
-                font-weight: 700;
-            }
             .fc-toolbar-title {
                 font-size: 2rem;
             }
             .fc-daygrid-day.fc-day-other {
                 display: none;
             }
-            .fc-daygrid-day.fc-day-other {
-                display: none;
-            }
-            .fc-event-title {
-                white-space: pre-wrap; /* Forza il testo a capo */
-            }
             .fc-col-header-cell {
-            background-color: #DAF7A6 !important; /* Colore di sfondo per le intestazioni dei giorni della settimana */
-            color: #000000; /* Colore del testo per le intestazioni dei giorni della settimana */
+                background-color: #DAF7A6 !important;
+                color: #000000;
             }
         """
-        # time_wo1 = "2H"
-        # time_wo2 = "4H"
-        if st.session_state.selected_tdsp_code:
-            df_filtered_witems = st.session_state.df_workitems[st.session_state.df_workitems["TDSPID"]==st.session_state.selected_tdsp_code]
-        else:
-            df_filtered_witems = st.session_state.df_workitems
 
-        # Converti il campo 'REFDATE' in una data con formato YYYY-MM-DD
-        df_filtered_witems['REFDATE'] = pd.to_datetime(df_filtered_witems['REFDATE']).dt.strftime('%Y-%m-%d')
-        #st.write(df_filtered_witems)
-        
-        calendar_events = []
-        for index, row in df_filtered_witems.iterrows():
-            event = {
-                "id": row['WOID'],
-                "title": f"[{row['WOID']}] - {row['TIME_QTY']} H",
-                "start": row['REFDATE'],
-                "backgroundColor": '#d4efdf',
-                "borderColor": '#a2d9ce',
-            }
-            calendar_events.append(event)
-        
-    # Configurazione del calendario con stile personalizzato
         try:
             calendar_output = calendar(
                 events=calendar_events, 
                 options=calendar_options, 
                 custom_css=custom_css,
-                key='calendar' # Assign a widget key to prevent state loss
-                #style=custom_style
+                key=f'calendar_{st.session_state.selected_tdsp_code or "all"}'  # Unique key based on filter
             )
-            #st.write(calendar_output)  # Only write if successful
         except Exception as e:
-            st.error(f"Error displaying calendar: {e}")  # Display error in Streamlit
-            st.write("Check your event data and calendar options.") # Provide user-friendly feedback
+            st.error(f"Error displaying calendar: {e}")
+            st.write("Check your event data and calendar options.")
             import traceback
-            st.write(traceback.format_exc()) # Print the full traceback for debugging
+            st.write(traceback.format_exc())
         
         return calendar_output
 

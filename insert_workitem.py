@@ -108,8 +108,11 @@ def create_workitem(conn)-> None:
         """
         # time_wo1 = "2H"
         # time_wo2 = "4H"
+        if st.session_state.selected_tdsp_code:
+            df_filtered_witems = st.session_state.df_workitems[st.session_state.df_workitems["TDSPID"]==st.session_state.selected_tdsp_code]
+        else:
+            df_filtered_witems = st.session_state.df_workitems
 
-        df_filtered_witems = st.session_state.df_workitems[st.session_state.df_workitems["TDSPID"]=='BNMR']
         # Converti il campo 'REFDATE' in una data con formato YYYY-MM-DD
         df_filtered_witems['REFDATE'] = pd.to_datetime(df_filtered_witems['REFDATE']).dt.strftime('%Y-%m-%d')
         #st.write(df_filtered_witems)

@@ -110,14 +110,16 @@ def create_workitem(conn)-> None:
         # time_wo2 = "4H"
 
         df_filtered_witems = st.session_state.df_workitems[st.session_state.df_workitems["TDSPID"]=='BNMR']
-        st.write(df_filtered_witems)
+        # Converti il campo 'REFDATE' in una data con formato YYYY-MM-DD
+        df_filtered_witems['REFDATE'] = pd.to_datetime(df_filtered_witems['REFDATE']).dt.strftime('%Y-%m-%d')
+        #st.write(df_filtered_witems)
         
         calendar_events = []
         for index, row in df_filtered_witems.iterrows():
             event = {
                 "id": row['WOID'],
                 "title": f"[{row['WOID']}]-{row['DESC']}",
-                "start": row['REFDATE'].dt.strftime('%Y-%m-%d'),
+                "start": row['REFDATE'],
                 "backgroundColor": '#d4efdf',
                 "borderColor": '#a2d9ce',
             }

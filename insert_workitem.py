@@ -387,7 +387,7 @@ def create_workitem(conn)-> None:
     # Reset form fields if needed
     if 'form_reset' in st.session_state and st.session_state.form_reset:
         #st.session_state.tdsp_form = st.session_state.tdsp_sidebar
-        st.session_state.tdsp_form = t.session_state.selected_tdsp_code
+        st.session_state.tdsp_form = st.session_state.selected_tdsp_code
         st.session_state.sb_wo = None
         st.session_state.sb_tskgrl1 = None
         st.session_state.sb_tskgrl2 = None

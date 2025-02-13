@@ -108,8 +108,10 @@ def create_workitem(conn)-> None:
         """
         # time_wo1 = "2H"
         # time_wo2 = "4H"
-        df_filtered_witems = st.session_state.df_workitems[st.session_state.df_workitems["REFDATE"=="2025-02-13"] and st.session_state.df_workitems["TDSID"==st.session_state.selected_tdsp_code]]
- 
+        st.write(st.session_state.selected_tdsp_code)
+        df_filtered_witems = st.session_state.df_workitems[st.session_state.df_workitems["TDSID"==st.session_state.selected_tdsp_code]]
+        st.write(df_filtered_witems)
+        
         calendar_events = []
         for index, row in df_filtered_witems.iterrows():
             event = {

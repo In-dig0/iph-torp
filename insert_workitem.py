@@ -106,32 +106,38 @@ def create_workitem(conn)-> None:
             color: #000000; /* Colore del testo per le intestazioni dei giorni della settimana */
             }
         """
-        time_wo1 = "2H"
-        time_wo2 = "4H"
-        calendar_events = [
-            {
-            "id":'W25-0012',
-            "title": f'[W25-0012] Update Scania project',
-            "start": '2025-02-12',
-            "backgroundColor": '#d4efdf',
-            "borderColor": '#a2d9ce',
-            "extendedProps": 
-                {
-                "duration": '4h'
-                }
-            },
-            {
-            "id": 'W25-0017',
-            "title": f'[W25-0017] Update Volvo project',
-            "start": '2025-02-12',
-            "backgroundColor": '#d4efdf',
-            "borderColor": '#a2d9ce',
-            "extendedProps": 
-                {
-                "duration": '1.5h'
-                } 
+        # time_wo1 = "2H"
+        # time_wo2 = "4H"
+        df_filtered_witems = st.session_state.df_workitems[st.session_state.df_workitems["REFDATE"=="2025-02-13"] and st.session_state.df_workitems["TDSID"==st.session_state.selected_tdsp_code]]
+ 
+        calendar_events = []
+        for index, row in df_filtered_witems.iterrows():
+            event = {
+                "id": row['WOID'],
+                "title": f"[{row['WOID']}]-{row['TITLE']}",
+                "start": row['REFDATE'],
+                "backgroundColor": '#d4efdf',
+                "borderColor": '#a2d9ce',
             }
-        ]
+            calendar_events.append(event)
+        st.write(calendar_events)
+
+        # calendar_events = [
+        #     {
+        #     "id":'W25-0012',
+        #     "title": f'[W25-0012] Update Scania project',
+        #     "start": '2025-02-12',
+        #     "backgroundColor": '#d4efdf',
+        #     "borderColor": '#a2d9ce',
+        #     },
+        #     {
+        #     "id": 'W25-0017',
+        #     "title": f'[W25-0017] Update Volvo project',
+        #     "start": '2025-02-12',
+        #     "backgroundColor": '#d4efdf',
+        #     "borderColor": '#a2d9ce',
+        #     }
+        # ]
         
     # Configurazione del calendario con stile personalizzato
         try:

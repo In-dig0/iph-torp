@@ -13,6 +13,124 @@ import servant
 
 def create_workitem(conn)-> None:
     
+    # def show_calendar():
+    #     now = datetime.now()
+    #     ultimo_giorno = std_cal.monthrange(now.year, now.month)[1]
+    #     last_day_current_month = datetime(now.year, now.month, ultimo_giorno)
+    #     first_day_current_month = datetime(now.year, now.month, 1)   
+    #     last_day_previous_month = first_day_current_month - timedelta(days=1)   
+    #     first_day_previous_month = datetime(last_day_previous_month.year, last_day_previous_month.month, 1)
+        
+    #     # Filtra i workitem in base al TD Specialist selezionato
+    #     if st.session_state.selected_tdsp_code:
+    #         df_filtered_witems = st.session_state.df_workitems[
+    #             st.session_state.df_workitems["TDSPID"] == st.session_state.selected_tdsp_code
+    #         ].copy()
+    #     else:
+    #         df_filtered_witems = st.session_state.df_workitems.copy()
+
+    #     # Converti il campo 'REFDATE' in formato YYYY-MM-DD
+    #     df_filtered_witems['REFDATE'] = pd.to_datetime(df_filtered_witems['REFDATE']).dt.strftime('%Y-%m-%d')
+        
+    #     # Crea gli eventi per il calendario
+    #     calendar_events = []
+    #     for index, row in df_filtered_witems.iterrows():
+    #         # Aggiungi informazioni addizionali dal df_users per il tooltip
+    #         tdsp_name = servant.get_description_from_code(st.session_state.df_users, row['TDSPID'], "NAME")
+    #         event = {
+    #             "id": row['WOID'],
+    #             "title": f"[{row['WOID']}] - {row['TIME_QTY']} H - {tdsp_name}",
+    #             "start": row['REFDATE'],
+    #             "backgroundColor": '#d4efdf',
+    #             "borderColor": '#a2d9ce',
+    #             "display": "block"  # Assicura che l'evento sia sempre visibile
+    #         }
+    #         calendar_events.append(event)
+
+    #     calendar_options = {
+    #         "editable": True,
+    #         "navLinks": True,
+    #         "selectable": True,
+    #         "headerToolbar": {
+    #             "left": "today prev,next",
+    #             "center": "title",
+    #             "right": "dayGridMonth,timeGridWeek"
+    #         },
+    #         "validRange": {
+    #             "start": f"{first_day_previous_month}",
+    #             "end": f"{last_day_current_month}"
+    #         },
+    #         "hiddenDays": [0, 6],
+    #         "locale": {
+    #             "code": "it",
+    #             "week": {
+    #                 "dow": 1,
+    #                 "doy": 4
+    #             }
+    #         },
+    #         "timeZone": "Europe/Rome",
+    #         "buttonText": {
+    #             "today": "Oggi",
+    #             "month": "Mese",
+    #             "week": "Settimana"
+    #         },
+    #         'views': {
+    #             'dayGridMonth': {
+    #                 'buttonText': 'Mese',
+    #                 'dayHeaderFormat': {
+    #                     'weekday': 'short'
+    #                 }
+    #             },
+    #             'timeGridWeek': {
+    #                 'buttonText': 'Settimana',
+    #                 'dayHeaderFormat': {
+    #                     'weekday': 'short',
+    #                     'day': '2-digit',
+    #                     'month': '2-digit',
+    #                 }
+    #             }
+    #         }
+    #     }
+
+    #     custom_css = """
+    #         .fc-event-past {
+    #             opacity: 0.8;
+    #         }
+    #         .fc-event-time {
+    #             font-style: italic;
+    #         }
+    #         .fc-event-title {
+    #             font-weight: 700;
+    #             color: #000000;
+    #             white-space: pre-wrap;
+    #         }            
+    #         .fc-toolbar-title {
+    #             font-size: 2rem;
+    #         }
+    #         .fc-daygrid-day.fc-day-other {
+    #             display: none;
+    #         }
+    #         .fc-col-header-cell {
+    #             background-color: #DAF7A6 !important;
+    #             color: #000000;
+    #         }
+    #     """
+
+    #     # try:
+    #     #     calendar_output = calendar(
+    #     #         events=calendar_events, 
+    #     #         options=calendar_options, 
+    #     #         custom_css=custom_css,
+    #     #         key=f'calendar_{st.session_state.selected_tdsp_code or "all"}'  # Unique key based on filter
+    #     #     )
+    #     # except Exception as e:
+    #     #     st.error(f"Error displaying calendar: {e}")
+    #     #     st.write("Check your event data and calendar options.")
+    #     #     import traceback
+    #     #     st.write(traceback.format_exc())
+        
+    #     # return calendar_output
+
     def show_calendar():
         now = datetime.now()
         ultimo_giorno = std_cal.monthrange(now.year, now.month)[1]
@@ -20,6 +138,10 @@ def create_workitem(conn)-> None:
         first_day_current_month = datetime(now.year, now.month, 1)   
         last_day_previous_month = first_day_current_month - timedelta(days=1)   
         first_day_previous_month = datetime(last_day_previous_month.year, last_day_previous_month.month, 1)
+        
+        # Inizializza il dizionario degli eventi nella session state se non esiste
+        if 'event_details' not in st.session_state:
+            st.session_state.event_details = {}
         
         # Filtra i workitem in base al TD Specialist selezionato
         if st.session_state.selected_tdsp_code:
@@ -32,18 +154,34 @@ def create_workitem(conn)-> None:
         # Converti il campo 'REFDATE' in formato YYYY-MM-DD
         df_filtered_witems['REFDATE'] = pd.to_datetime(df_filtered_witems['REFDATE']).dt.strftime('%Y-%m-%d')
         
-        # Crea gli eventi per il calendario
+        # Crea gli eventi per il calendario e memorizza i dettagli
         calendar_events = []
+        st.session_state.event_details = {}  # Reset dei dettagli degli eventi
+        
         for index, row in df_filtered_witems.iterrows():
-            # Aggiungi informazioni addizionali dal df_users per il tooltip
             tdsp_name = servant.get_description_from_code(st.session_state.df_users, row['TDSPID'], "NAME")
+            woid = str(row['WOID'])
+            
+            # Salva i dettagli dell'evento nel dizionario della session state
+            st.session_state.event_details[woid] = {
+                "tdsp": tdsp_name,
+                "time_qty": row['TIME_QTY'],
+                "time_um": row.get('TIME_UM', 'H'),
+                "tskgrl1": servant.get_description_from_code(st.session_state.df_tskgrl1, row.get('TSKGRL1', ''), "NAME"),
+                "tskgrl2": servant.get_description_from_code(st.session_state.df_tskgrl2, row.get('TSKGRL2', ''), "NAME"),
+                "description": row.get('DESC', ''),
+                "note": row.get('NOTE', ''),
+                "date": row['REFDATE']
+            }
+
+            # Crea l'evento per il calendario
             event = {
-                "id": row['WOID'],
-                "title": f"[{row['WOID']}] - {row['TIME_QTY']} H - {tdsp_name}",
+                "id": woid,
+                "title": f"[{woid}] - {row['TIME_QTY']} H - {tdsp_name}",
                 "start": row['REFDATE'],
                 "backgroundColor": '#d4efdf',
                 "borderColor": '#a2d9ce',
-                "display": "block"  # Assicura che l'evento sia sempre visibile
+                "display": "block"
             }
             calendar_events.append(event)
 
@@ -103,6 +241,7 @@ def create_workitem(conn)-> None:
                 font-weight: 700;
                 color: #000000;
                 white-space: pre-wrap;
+                cursor: pointer;
             }            
             .fc-toolbar-title {
                 font-size: 2rem;
@@ -116,22 +255,45 @@ def create_workitem(conn)-> None:
             }
         """
 
-        # try:
-        #     calendar_output = calendar(
-        #         events=calendar_events, 
-        #         options=calendar_options, 
-        #         custom_css=custom_css,
-        #         key=f'calendar_{st.session_state.selected_tdsp_code or "all"}'  # Unique key based on filter
-        #     )
-        # except Exception as e:
-        #     st.error(f"Error displaying calendar: {e}")
-        #     st.write("Check your event data and calendar options.")
-        #     import traceback
-        #     st.write(traceback.format_exc())
+        try:
+            calendar_output = calendar(
+                events=calendar_events, 
+                options=calendar_options, 
+                custom_css=custom_css,
+                key=f'calendar_{st.session_state.selected_tdsp_code or "all"}'
+            )
+
+            # Gestione del click sull'evento
+            if calendar_output.get("eventClick"):
+                event_id = calendar_output["eventClick"]["event"]["id"]
+                if event_id in st.session_state.event_details:
+                    event_data = st.session_state.event_details[event_id]
+                    
+                    # Crea un popup con i dettagli dell'evento
+                    with st.expander(f"Dettagli Workitem [{event_id}]", expanded=True):
+                        col1, col2 = st.columns(2)
+                        with col1:
+                            st.write("**Work Order ID:**", event_id)
+                            st.write("**Specialist:**", event_data["tdsp"])
+                            st.write("**Data:**", event_data["date"])
+                            st.write("**Tempo:**", f"{event_data['time_qty']} {event_data['time_um']}")
+                        
+                        with col2:
+                            st.write("**Task Group 1:**", event_data["tskgrl1"])
+                            st.write("**Task Group 2:**", event_data["tskgrl2"])
+                        
+                        if event_data["description"]:
+                            st.write("**Descrizione:**", event_data["description"])
+                        if event_data["note"]:
+                            st.write("**Note:**", event_data["note"])
+
+        except Exception as e:
+            st.error(f"Error displaying calendar: {e}")
+            st.write("Check your event data and calendar options.")
+            import traceback
+            st.write(traceback.format_exc())
         
-        # return calendar_output
-
-
+        return calendar_output
 
 
     def show_workitem_dataframe():

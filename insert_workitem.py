@@ -249,13 +249,53 @@ def create_workitem(conn)-> None:
             }
         """
 
+        # try:
+        #     calendar_output = calendar(
+        #         events=calendar_events, 
+        #         options=calendar_options, 
+        #         custom_css=custom_css,
+        #         key=f'calendar_{st.session_state.selected_tdsp_code or "all"}'  # Unique key based on filter
+        #     )
+        # except Exception as e:
+        #     st.error(f"Error displaying calendar: {e}")
+        #     st.write("Check your event data and calendar options.")
+        #     import traceback
+        #     st.write(traceback.format_exc())
+        
+        # return calendar_output
+
         try:
             calendar_output = calendar(
                 events=calendar_events, 
                 options=calendar_options, 
                 custom_css=custom_css,
-                key=f'calendar_{st.session_state.selected_tdsp_code or "all"}'  # Unique key based on filter
+                key=f'calendar_{st.session_state.selected_tdsp_code or "all"}'
             )
+
+            # Gestione del click sull'evento
+            if calendar_output.get("eventClick"):
+                event_id = calendar_output["eventClick"]["event"]["id"]
+                event_data = next((event for event in calendar_events if event["id"] == event_id), None)
+                
+                if event_data:
+                    # Crea un popup con i dettagli dell'evento
+                    with st.expander(f"Dettagli Workitem [{event_id}]", expanded=True):
+                        col1, col2 = st.columns(2)
+                        with col1:
+                            st.write("**Work Order ID:**", event_id)
+                            st.write("**Specialist:**", event_data["extendedProps"]["tdsp"])
+                            st.write("**Data:**", event_data["start"])
+                            st.write("**Tempo:**", f"{event_data['extendedProps']['time_qty']} {event_data['extendedProps']['time_um']}")
+                        
+                        with col2:
+                            st.write("**Task Group 1:**", event_data["extendedProps"]["tskgrl1"])
+                            st.write("**Task Group 2:**", event_data["extendedProps"]["tskgrl2"])
+                        
+                        if event_data["extendedProps"]["description"]:
+                            st.write("**Descrizione:**", event_data["extendedProps"]["description"])
+                        if event_data["extendedProps"]["note"]:
+                            st.write("**Note:**", event_data["extendedProps"]["note"])
+
         except Exception as e:
             st.error(f"Error displaying calendar: {e}")
             st.write("Check your event data and calendar options.")
@@ -263,6 +303,7 @@ def create_workitem(conn)-> None:
             st.write(traceback.format_exc())
         
         return calendar_output
+
 
     def show_workitem_dataframe():
         with st.container(border=True):

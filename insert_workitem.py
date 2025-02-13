@@ -171,7 +171,7 @@ def create_workitem(conn)-> None:
             with st.expander(label=":orange[Last Workitem]", expanded=False):
                 with st.container():
                     # Format the REFDATE column for display
-                    st.session_state.df_out['REFDATE'] = st.session_state.df_out['REFDATE'].dt.date  # Convert to date objects            
+                    st.session_state.df_out['REFDATE'] = st.session_state.df_out['REFDATE'].dt.strftime('%Y-%m-%d')#.dt.date  # Convert to date objects            
                     
                     # Apply the function to get descriptions
                     st.session_state.df_out['TSKGRL1_DESC'] = st.session_state.df_out['TSKGRL1'].apply(

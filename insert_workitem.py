@@ -108,8 +108,8 @@ def create_workitem(conn)-> None:
         """
         # time_wo1 = "2H"
         # time_wo2 = "4H"
-        st.write(st.session_state.selected_tdsp_code)
-        df_filtered_witems = st.session_state.df_workitems[st.session_state.df_workitems["TDSID"==st.session_state.selected_tdsp_code]]
+
+        df_filtered_witems = st.session_state.df_workitems[st.session_state.df_workitems["TDSID"=='BNMR']]
         st.write(df_filtered_witems)
         
         calendar_events = []

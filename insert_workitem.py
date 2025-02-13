@@ -276,6 +276,9 @@ def create_workitem(conn)-> None:
         ].copy()  # .copy() is crucial here as well
     else:
         filtered_workitems = st.session_state.df_workitems.copy() #.copy() is crucial here as well
+    
+    filtered_workitems = filtered_workitems.sort_values(['REFDATE'], ascending=[False])
+    
 
     st.session_state.df_out = pd.DataFrame(filtered_workitems)  # No need to drop columns here
 

@@ -121,31 +121,12 @@ def create_workitem(conn)-> None:
         for index, row in df_filtered_witems.iterrows():
             event = {
                 "id": row['WOID'],
-                "title": f"[{row['WOID']}]-{row['DESC']}",
+                "title": f"[{row['WOID']}] - {row['TIME_QTY']} H",
                 "start": row['REFDATE'],
                 "backgroundColor": '#d4efdf',
                 "borderColor": '#a2d9ce',
             }
             calendar_events.append(event)
-#        st.write(calendar_events)
-#        return {}
-
-                                # calendar_events = [
-                                #     {
-                                #     "id":'W25-0012',
-                                #     "title": f'[W25-0012] Update Scania project',
-                                #     "start": '2025-02-12',
-                                #     "backgroundColor": '#d4efdf',
-                                #     "borderColor": '#a2d9ce',
-                                #     },
-                                #     {
-                                #     "id": 'W25-0017',
-                                #     "title": f'[W25-0017] Update Volvo project',
-                                #     "start": '2025-02-12',
-                                #     "backgroundColor": '#d4efdf',
-                                #     "borderColor": '#a2d9ce',
-                                #     }
-                                # ]
         
     # Configurazione del calendario con stile personalizzato
         try:

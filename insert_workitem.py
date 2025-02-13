@@ -116,7 +116,7 @@ def create_workitem(conn)-> None:
         for index, row in df_filtered_witems.iterrows():
             event = {
                 "id": row['WOID'],
-                "title": f"[{row['WOID']}]-{row['DESCRIPTION']}",
+                "title": f"[{row['WOID']}]-{row['DESC']}",
                 "start": row['REFDATE'],
                 "backgroundColor": '#d4efdf',
                 "borderColor": '#a2d9ce',

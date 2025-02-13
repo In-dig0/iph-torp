@@ -264,7 +264,8 @@ def create_workitem(conn)-> None:
                 events=calendar_events, 
                 options=calendar_options, 
                 custom_css=custom_css,
-                key=f'calendar_{st.session_state.selected_tdsp_code or "all"}'  # Unique key based on filter
+                #key=f'calendar_{st.session_state.selected_tdsp_code or "all"}'  # Unique key based on filter
+                key = f'cal'
             )
         except Exception as e:
             st.error(f"Error displaying calendar: {e}")

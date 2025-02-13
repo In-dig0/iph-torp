@@ -122,8 +122,8 @@ def create_workitem(conn)-> None:
                 "borderColor": '#a2d9ce',
             }
             calendar_events.append(event)
-        st.write(calendar_events)
-        return {}
+#        st.write(calendar_events)
+#        return {}
 
                                 # calendar_events = [
                                 #     {
@@ -142,23 +142,23 @@ def create_workitem(conn)-> None:
                                 #     }
                                 # ]
         
-    # # Configurazione del calendario con stile personalizzato
-    #     try:
-    #         calendar_output = calendar(
-    #             events=calendar_events, 
-    #             options=calendar_options, 
-    #             custom_css=custom_css,
-    #             key='calendar' # Assign a widget key to prevent state loss
-    #             #style=custom_style
-    #         )
-    #         #st.write(calendar_output)  # Only write if successful
-    #     except Exception as e:
-    #         st.error(f"Error displaying calendar: {e}")  # Display error in Streamlit
-    #         st.write("Check your event data and calendar options.") # Provide user-friendly feedback
-    #         import traceback
-    #         st.write(traceback.format_exc()) # Print the full traceback for debugging
+    # Configurazione del calendario con stile personalizzato
+        try:
+            calendar_output = calendar(
+                events=calendar_events, 
+                options=calendar_options, 
+                custom_css=custom_css,
+                key='calendar' # Assign a widget key to prevent state loss
+                #style=custom_style
+            )
+            #st.write(calendar_output)  # Only write if successful
+        except Exception as e:
+            st.error(f"Error displaying calendar: {e}")  # Display error in Streamlit
+            st.write("Check your event data and calendar options.") # Provide user-friendly feedback
+            import traceback
+            st.write(traceback.format_exc()) # Print the full traceback for debugging
         
-    #     return calendar_output
+        return calendar_output
 
     def show_workitem_dataframe():
         with st.container(border=True):

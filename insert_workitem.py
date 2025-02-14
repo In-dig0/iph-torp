@@ -256,24 +256,27 @@ def create_workitem(conn)-> None:
                                 
                                 # Qui dovresti aggiungere il codice per salvare nel database
                                 # Ad esempio:
-                                tdspid = servant.get_code_from_name(st.session_state.df_users, event_data['tdsp'], "CODE"),
+                                tdspid = servant.get_code_from_name(st.session_state.df_users, event_data['tdsp'], "CODE")
+                                if tdspid:
+                                    tdspcode = list(tdspid)[0]
+
                                 
                                 workitem_dict = {
                                     "REFDATE": event_data['date'],
                                     "WOID": event_data['woid'],
-                                    "TDSPID": tdspid,
+                                    "TDSPID": tdspcode,
                                     "TIME_QTY": new_time_qty,
                                     "DESC": new_description,
                                     "NOTE": new_note
                                     }
                                 st.write(workitem_dict)
-                                time.sleep(5)
+                                time.sleep(10)
                                 sqlite_db.update_workitem(
                                     workitem_dict,
                                     conn
                                 )
                                 
-                                time.sleep(5)
+                                time.sleep(10)
 
                                 # Debugging: stampa i valori aggiornati
                                 st.write("DataFrame aggiornato:", st.session_state.df_workitems)

@@ -256,7 +256,7 @@ def create_workitem(conn)-> None:
                                 
                                 # Qui dovresti aggiungere il codice per salvare nel database
                                 # Ad esempio:
-                                sqlite_db.update_workitem_in_db(
+                                sqlite_db.update_workitem(
                                     {"REFDATE": date,
                                     "WOID": woid,
                                     "TDSPID": tdspid,

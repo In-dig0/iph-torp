@@ -294,10 +294,9 @@ def create_workitem(conn)-> None:
                     'timeGridWeek': {
                         'buttonText': 'Settimana',
                         'allDaySlot': True,  # Nasconde lo slot "all-day"
-                        'dayHeaderFormat': {
-                            'weekday': 'short',
-                            'day': '2-digit',
-                            'month': '2-digit',
+                        'slotLabelFormat': {
+                            'hour': '',
+                            'minute': ''
                         }
                     }
                 }

@@ -209,17 +209,6 @@ def create_workitem(conn)-> None:
                         st.markdown(f"**Specialist:** {event_data['tdsp']}")
                         st.markdown(f"**Data:** {event_data['date']}")
 
-                        # Campo editabile per il tempo
-                        new_time_qty = st.number_input(
-                            "Tempo",
-                            min_value=0.0,
-                            max_value=24.0,
-                            value=float(event_data['time_qty']),
-                            step=0.5,
-                            format="%.1f"
-                        )
-
-
                         tskgrl1_opt = st.session_state.df_tskgrl1["NAME"].tolist()
                         tskgrl1_options = sorted(tskgrl1_opt)
                         selected_tskgrl1 = st.selectbox(
@@ -240,26 +229,36 @@ def create_workitem(conn)-> None:
                             key="sb_tskgrl2m"
                         )
                         selected_tskgrl2_code = servant.get_code_from_name(st.session_state.df_tskgrl2, selected_tskgrl2, "CODE")
+                       
+                       # Campo editabile per il tempo
+                        new_time_qty = st.number_input(
+                            ":blue[Time]",
+                            min_value=0.0,
+                            max_value=24.0,
+                            value=float(event_data['time_qty']),
+                            step=0.5,
+                            format="%.1f"
+                        )
 
                         # st.markdown(f"**Task Group 1:** {event_data['tskgrl1']}")
                         # st.markdown(f"**Task Group 2:** {event_data['tskgrl2']}")
 
                         # Campo editabile per la descrizione
                         new_description = st.text_area(
-                            "Descrizione",
+                            ":blue[Description]",
                             value=event_data['description'],
                             height=100
                         )
 
                         # Campo editabile per le note
                         new_note = st.text_area(
-                            "Note",
+                            ":blue[Note]",
                             value=event_data['note'],
                             height=100
                         )
 
                         # Pulsante per salvare le modifiche
-                        submitted = st.form_submit_button("Salva Modifiche")
+                        submitted = st.form_submit_button("Save")
 
                         if submitted:
                             try:
@@ -274,14 +273,9 @@ def create_workitem(conn)-> None:
                                 st.session_state.event_details[event_key]['description'] = new_description
                                 st.session_state.event_details[event_key]['note'] = new_note
 
-
-                                
-                                # Qui dovresti aggiungere il codice per salvare nel database
-                                # Ad esempio:
                                 tdspid = servant.get_code_from_name(st.session_state.df_users, event_data['tdsp'], "CODE")
                                 if tdspid:
                                     tdspcode = tdspid
-
                                 
                                 workitem_dict = {
                                     "REFDATE": event_data['date'],
@@ -294,19 +288,12 @@ def create_workitem(conn)-> None:
                                     "NOTE": new_note
                                     }
                                 st.write(workitem_dict)
-                                #time.sleep(10)
                                 sqlite_db.update_workitem(
                                     workitem_dict,
                                     conn
                                 )
                                 
-                                #time.sleep(10)
-
-                                # Debugging: stampa i valori aggiornati
-                                st.write("DataFrame aggiornato:", st.session_state.df_workitems)
-                                st.write("Event Details aggiornati:", st.session_state.event_details)
-
-                                st.success("Modifiche salvate con successo!")
+                                st.success("Update successfully!")
                                 # Set the flag to trigger calendar update
                                 st.session_state.calendar_needs_update = True
 
@@ -314,7 +301,7 @@ def create_workitem(conn)-> None:
                                 st.rerun()  # Use st.rerun()
 
                             except Exception as e:
-                                st.error(f"Errore durante il salvataggio: {str(e)}")
+                                st.error(f"ERROR saving workitem data: {str(e)}")
 
             # with cal_col:
             #     if st.session_state.calendar_needs_update:

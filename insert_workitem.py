@@ -287,7 +287,7 @@ def create_workitem(conn)-> None:
                                     "DESC": new_description,
                                     "NOTE": new_note
                                     }
-                                st.write(workitem_dict)
+                                #st.write(workitem_dict)
                                 sqlite_db.update_workitem(
                                     workitem_dict,
                                     conn

@@ -271,7 +271,12 @@ def create_workitem(conn)-> None:
                 if calendar_output.get("eventClick"):
                     event_key = calendar_output["eventClick"]["event"]["id"]
                     st.session_state.selected_event_key = event_key
-
+            except Exception as e:
+                st.error(f"Error displaying calendar: {e}")
+                st.write("Check your event data and calendar options.")
+                import traceback
+                st.write(traceback.format_exc())
+                
         # Pannello dei dettagli a destra
         with details_col:
             if hasattr(st.session_state, 'selected_event_key'):
@@ -341,6 +346,7 @@ def create_workitem(conn)-> None:
                                 st.error(f"Errore durante il salvataggio: {str(e)}")
 
             return calendar_output
+
 
     def show_workitem_dataframe():
         with st.container(border=True):

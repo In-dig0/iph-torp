@@ -871,7 +871,7 @@ def update_workitem(witem: dict, conn) ->  bool:
             cursor = conn.cursor()        
 
         sql = """
-            UPDATE TORP_WORKITEMS SET description = ? note = ? time_qty = ? WHERE refdate=? and woid =? and tdspid=?
+            UPDATE TORP_WORKITEMS SET description = ?, note = ?, time_qty = ? WHERE refdate=? and woid =? and tdspid=?
         """
         values = (
             witem["DESC"], witem["NOTE"], witem["TIME_QTY"], 

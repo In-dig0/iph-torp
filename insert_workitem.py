@@ -258,7 +258,7 @@ def create_workitem(conn)-> None:
                                 # Ad esempio:
                                 tdspid = servant.get_code_from_name(st.session_state.df_users, event_data['tdsp'], "CODE")
                                 if tdspid:
-                                    tdspcode = list(tdspid)[0]
+                                    tdspcode = list(tdspid)
 
                                 
                                 workitem_dict = {

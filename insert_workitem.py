@@ -219,8 +219,28 @@ def create_workitem(conn)-> None:
                             format="%.1f"
                         )
 
-                        st.markdown(f"**Task Group 1:** {event_data['tskgrl1']}")
-                        st.markdown(f"**Task Group 2:** {event_data['tskgrl2']}")
+
+                        tskgrl1_options = st.session_state.df_tskgrl1["NAME"].tolist()
+                        selected_tskgrl1 = st.selectbox(
+                            label=":blue[TaskGroup L1]", 
+                            options=tskgrl1_options, 
+                            index=tskgrl1_options.index(event_data['tskgrl1']), 
+                            key="sb_tskgrl1m"
+                        )
+                        selected_tskgrl1_code = servant.get_code_from_name(st.session_state.df_tskgrl1, selected_tskgrl1, "CODE")
+
+                        # Task Group Level 2 dropdown (dependent on Level 1)
+                        tskgrl2_options = st.session_state.df_tskgrl2[st.session_state.df_tskgrl2['PCODE'] == selected_tskgrl1_code]['NAME'].unique()
+                        selected_tskgrl2 = st.selectbox(
+                            label=":blue[TaskGroup L2]", 
+                            options=tskgrl2_options, 
+                            index=tskgrl2_options.index(event_data['tskgrl2']), 
+                            key="sb_tskgrl2b"
+                        )
+                        selected_tskgrl2_code = servant.get_code_from_name(st.session_state.df_tskgrl2, selected_tskgrl2, "CODE")
+
+                        # st.markdown(f"**Task Group 1:** {event_data['tskgrl1']}")
+                        # st.markdown(f"**Task Group 2:** {event_data['tskgrl2']}")
 
                         # Campo editabile per la descrizione
                         new_description = st.text_area(

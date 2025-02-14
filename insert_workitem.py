@@ -416,6 +416,7 @@ def create_workitem(conn)-> None:
                                 st.error(f"Errore durante il salvataggio: {str(e)}")
 
         return calendar_output
+        
         # # Pannello dei dettagli a destra
         # with details_col:
         #     if hasattr(st.session_state, 'selected_event_key'):

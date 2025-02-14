@@ -13,185 +13,6 @@ import servant
 
 def create_workitem(conn)-> None:
 
-    # # --V0--
-    # def show_calendar():
-    #     now = datetime.now()
-    #     ultimo_giorno = std_cal.monthrange(now.year, now.month)[1]
-    #     last_day_current_month = datetime(now.year, now.month, ultimo_giorno)
-    #     first_day_current_month = datetime(now.year, now.month, 1)   
-    #     last_day_previous_month = first_day_current_month - timedelta(days=1)   
-    #     first_day_previous_month = datetime(last_day_previous_month.year, last_day_previous_month.month, 1)
-        
-    #     # Inizializza il dizionario degli eventi nella session state se non esiste
-    #     if 'event_details' not in st.session_state:
-    #         st.session_state.event_details = {}
-        
-    #     # Usa la sidebar di Streamlit per i dettagli
-    #     details_container = st.sidebar
-        
-    #     # Container principale per il calendario
-    #     calendar_container = st.container()
-        
-    #     with calendar_container:
-    #         # Filtra i workitem in base al TD Specialist selezionato
-    #         if st.session_state.selected_tdsp_code:
-    #             df_filtered_witems = st.session_state.df_workitems[
-    #                 st.session_state.df_workitems["TDSPID"] == st.session_state.selected_tdsp_code
-    #             ].copy()
-    #         else:
-    #             df_filtered_witems = st.session_state.df_workitems.copy()
-
-    #         # Converti il campo 'REFDATE' in formato YYYY-MM-DD
-    #         df_filtered_witems['REFDATE'] = pd.to_datetime(df_filtered_witems['REFDATE']).dt.strftime('%Y-%m-%d')
-            
-    #         # Crea gli eventi per il calendario e memorizza i dettagli
-    #         calendar_events = []
-    #         st.session_state.event_details = {}  # Reset dei dettagli degli eventi
-            
-    #         for index, row in df_filtered_witems.iterrows():
-    #             tdsp_name = servant.get_description_from_code(st.session_state.df_users, row['TDSPID'], "NAME")
-    #             woid = str(row['WOID'])
-    #             date = row['REFDATE']
-                
-    #             # Crea una chiave univoca combinando WOID e data
-    #             event_key = f"{woid}_{date}"
-                
-    #             # Salva i dettagli dell'evento nel dizionario della session state usando la chiave univoca
-    #             st.session_state.event_details[event_key] = {
-    #                 "woid": woid,
-    #                 "tdsp": tdsp_name,
-    #                 "time_qty": row['TIME_QTY'],
-    #                 "time_um": row.get('TIME_UM', 'H'),
-    #                 "tskgrl1": servant.get_description_from_code(st.session_state.df_tskgrl1, row.get('TSKGRL1', ''), "NAME"),
-    #                 "tskgrl2": servant.get_description_from_code(st.session_state.df_tskgrl2, row.get('TSKGRL2', ''), "NAME"),
-    #                 "description": row.get('DESC', ''),
-    #                 "note": row.get('NOTE', ''),
-    #                 "date": date
-    #             }
-
-    #             # Crea l'evento per il calendario usando la chiave univoca
-    #             event = {
-    #                 "id": event_key,  # Usa la chiave univoca come ID dell'evento
-    #                 "title": f"[{woid}] - {row['TIME_QTY']} H - {tdsp_name}",
-    #                 "start": date,
-    #                 "backgroundColor": '#d4efdf',
-    #                 "borderColor": '#a2d9ce',
-    #                 "display": "block"
-    #             }
-    #             calendar_events.append(event)
-
-    #         calendar_options = {
-    #             "editable": True,
-    #             "navLinks": True,
-    #             "selectable": True,
-    #             "headerToolbar": {
-    #                 "left": "today prev,next",
-    #                 "center": "title",
-    #                 "right": "dayGridMonth,timeGridWeek"
-    #             },
-    #             "validRange": {
-    #                 "start": f"{first_day_previous_month}",
-    #                 "end": f"{last_day_current_month}"
-    #             },
-    #             "hiddenDays": [0, 6],
-    #             "locale": {
-    #                 "code": "it",
-    #                 "week": {
-    #                     "dow": 1,
-    #                     "doy": 4
-    #                 }
-    #             },
-    #             "timeZone": "Europe/Rome",
-    #             "buttonText": {
-    #                 "today": "Oggi",
-    #                 "month": "Mese",
-    #                 "week": "Settimana"
-    #             },
-    #             'views': {
-    #                 'dayGridMonth': {
-    #                     'buttonText': 'Mese',
-    #                     'dayHeaderFormat': {
-    #                         'weekday': 'short'
-    #                     }
-    #                 },
-    #                 'timeGridWeek': {
-    #                     'buttonText': 'Settimana',
-    #                     'dayHeaderFormat': {
-    #                         'weekday': 'short',
-    #                         'day': '2-digit',
-    #                         'month': '2-digit',
-    #                     }
-    #                 }
-    #             }
-    #         }
-
-    #         custom_css = """
-    #             .fc-event-past {
-    #                 opacity: 0.8;
-    #             }
-    #             .fc-event-time {
-    #                 font-style: italic;
-    #             }
-    #             .fc-event-title {
-    #                 font-weight: 700;
-    #                 color: #000000;
-    #                 white-space: pre-wrap;
-    #                 cursor: pointer;
-    #             }            
-    #             .fc-toolbar-title {
-    #                 font-size: 2rem;
-    #             }
-    #             .fc-daygrid-day.fc-day-other {
-    #                 display: none;
-    #             }
-    #             .fc-col-header-cell {
-    #                 background-color: #DAF7A6 !important;
-    #                 color: #000000;
-    #             }
-    #         """
-
-    #         try:
-    #             calendar_output = calendar(
-    #                 events=calendar_events, 
-    #                 options=calendar_options, 
-    #                 custom_css=custom_css,
-    #                 key=f'calendar_{st.session_state.selected_tdsp_code or "all"}'
-    #             )
-
-    #             # Gestione del click sull'evento
-    #             if calendar_output.get("eventClick"):
-    #                 event_key = calendar_output["eventClick"]["event"]["id"]
-    #                 # Salva la chiave dell'evento selezionato nella session state
-    #                 st.session_state.selected_event_key = event_key
-
-    #                 # Mostra i dettagli dell'evento nella sidebar
-    #                 with details_container:
-    #                     if event_key in st.session_state.event_details:
-    #                         event_data = st.session_state.event_details[event_key]
-                            
-    #                         st.markdown("### Dettagli Workitem")
-    #                         st.markdown(f"**Work Order ID:** {event_data['woid']}")
-    #                         st.markdown(f"**Specialist:** {event_data['tdsp']}")
-    #                         st.markdown(f"**Data:** {event_data['date']}")
-    #                         st.markdown(f"**Tempo:** {event_data['time_qty']} {event_data['time_um']}")
-    #                         st.markdown(f"**Task Group 1:** {event_data['tskgrl1']}")
-    #                         st.markdown(f"**Task Group 2:** {event_data['tskgrl2']}")
-                            
-    #                         if event_data["description"]:
-    #                             st.markdown("---")
-    #                             st.markdown(f"**Descrizione:** {event_data['description']}")
-    #                         if event_data["note"]:
-    #                             st.markdown("---")
-    #                             st.markdown(f"**Note:** {event_data['note']}")
-
-    #         except Exception as e:
-    #             st.error(f"Error displaying calendar: {e}")
-    #             st.write("Check your event data and calendar options.")
-    #             import traceback
-    #             st.write(traceback.format_exc())
-            
-    #         return calendar_output
-
     def show_calendar():
         if 'calendar_needs_update' not in st.session_state:
             st.session_state.calendar_needs_update = False
@@ -346,23 +167,31 @@ def create_workitem(conn)-> None:
             """
 
 
-            try:
+
+            if st.session_state.calendar_needs_update:
+                st.session_state.calendar_needs_update = False  # Reset the flag
+
+                # Display a spinner while the calendar updates
+                with st.spinner("Aggiornamento calendario..."):
+                    calendar_output = calendar(
+                        events=calendar_events,
+                        options=calendar_options,
+                        custom_css=custom_css,
+                        key=f'calendar_{st.session_state.selected_tdsp_code or "all"}'
+                    )
+            else:
                 calendar_output = calendar(
-                    events=calendar_events, 
-                    options=calendar_options, 
+                    events=calendar_events,
+                    options=calendar_options,
                     custom_css=custom_css,
                     key=f'calendar_{st.session_state.selected_tdsp_code or "all"}'
                 )
 
-                # Gestione del click sull'evento
-                if calendar_output.get("eventClick"):
-                    event_key = calendar_output["eventClick"]["event"]["id"]
-                    st.session_state.selected_event_key = event_key
-            except Exception as e:
-                st.error(f"Error displaying calendar: {e}")
-                st.write("Check your event data and calendar options.")
-                import traceback
-                st.write(traceback.format_exc())
+            # Gestione del click sull'evento
+            if calendar_output.get("eventClick"):
+                event_key = calendar_output["eventClick"]["event"]["id"]
+                st.session_state.selected_event_key = event_key
+
 
     # Pannello dei dettagli a destra
         with details_col:
@@ -435,23 +264,23 @@ def create_workitem(conn)-> None:
                             except Exception as e:
                                 st.error(f"Errore durante il salvataggio: {str(e)}")
 
-            with cal_col:
-                if st.session_state.calendar_needs_update:
-                    # Reset the flag
-                    st.session_state.calendar_needs_update = False
+            # with cal_col:
+            #     if st.session_state.calendar_needs_update:
+            #         # Reset the flag
+            #         st.session_state.calendar_needs_update = False
 
-                    # Regenerate calendar events
-                    calendar_events, calendar_options, custom_css = get_calendar_data(
-                        st.session_state.df_workitems, st.session_state.selected_tdsp_code
-                    )
+            #         # Regenerate calendar events
+            #         calendar_events, calendar_options, custom_css = get_calendar_data(
+            #             st.session_state.df_workitems, st.session_state.selected_tdsp_code
+            #         )
 
-                    # Display the updated calendar
-                    calendar_output = calendar(
-                        events=calendar_events,
-                        options=calendar_options,
-                        custom_css=custom_css,
-                        key=f'calendar_{st.session_state.selected_tdsp_code or "all"}'
-                    )
+            #         # Display the updated calendar
+            #         calendar_output = calendar(
+            #             events=calendar_events,
+            #             options=calendar_options,
+            #             custom_css=custom_css,
+            #             key=f'calendar_{st.session_state.selected_tdsp_code or "all"}'
+            #         )
         
         return calendar_output
 

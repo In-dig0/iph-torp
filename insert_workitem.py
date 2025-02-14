@@ -273,6 +273,7 @@ def create_workitem(conn)-> None:
                                     conn
                                 )
                                 
+                                time.sleep(5)
 
                                 # Debugging: stampa i valori aggiornati
                                 st.write("DataFrame aggiornato:", st.session_state.df_workitems)

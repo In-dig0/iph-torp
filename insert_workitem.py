@@ -287,6 +287,8 @@ def create_workitem(conn)-> None:
                                     "REFDATE": event_data['date'],
                                     "WOID": event_data['woid'],
                                     "TDSPID": tdspcode,
+                                    "TSKGRL1": selected_tskgrl1_code,
+                                    "TSKGRL2": selected_tskgrl2_code,
                                     "TIME_QTY": new_time_qty,
                                     "DESC": new_description,
                                     "NOTE": new_note

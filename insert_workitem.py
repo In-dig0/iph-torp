@@ -335,6 +335,10 @@ def create_workitem(conn)-> None:
                 .fc-timegrid-slot-lane {
                     display: none;
                 }
+                /* Nasconde le etichette degli slot orari */
+                .fc-timegrid-slot-label {
+                    display: none;
+                }
             """
 
 

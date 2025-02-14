@@ -256,14 +256,17 @@ def create_workitem(conn)-> None:
                                 
                                 # Qui dovresti aggiungere il codice per salvare nel database
                                 # Ad esempio:
-                                sqlite_db.update_workitem(
-                                    {"REFDATE": date,
-                                    "WOID": woid,
-                                    "TDSPID": tdspid,
+                                workitem_dict = {
+                                    "REFDATE": event_data['date'],
+                                    "WOID": event_data['woid'],
+                                    "TDSPID": event_data['tdspid'],
                                     "TIME_QTY": new_time_qty,
                                     "DESC": new_description,
                                     "NOTE": new_note
-                                    },
+                                    }
+                                st.write(workitem_dict)
+                                sqlite_db.update_workitem(
+                                    workitem_dict,
                                     conn
                                 )
                                 

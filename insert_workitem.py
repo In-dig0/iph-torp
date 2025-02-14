@@ -620,7 +620,7 @@ def create_workitem(conn)-> None:
         st.session_state.ta_note = ""
         del st.session_state.form_reset
     
-    show_workitem_dataframe()
+    #show_workitem_dataframe()
     calendar_output = show_calendar()
     
     #st.write(selected_tdsp_name)

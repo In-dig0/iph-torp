@@ -426,7 +426,7 @@ def create_workitem(conn)-> None:
                                 st.success("Modifiche salvate con successo!")
 
                                 # Forza il refresh della pagina per aggiornare il calendario
-                                st.rerun()
+                                st.experimental_rerun()
 
                             except Exception as e:
                                 st.error(f"Errore durante il salvataggio: {str(e)}")

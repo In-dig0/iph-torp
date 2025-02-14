@@ -303,6 +303,8 @@ def create_workitem(conn)-> None:
                             'hour': '',
                             'minute': ''
                         },
+                        # The key change for weekly view height:
+                        'height': 300,  # or a specific pixel value like 300
                         'slotMinTime': '00:00:00',  # Imposta l'ora di inizio della griglia fuori dalla vista
                         'slotMaxTime': '00:00:00'   # Imposta l'ora di fine della griglia fuori dalla vista
                         }

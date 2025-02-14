@@ -303,8 +303,8 @@ def create_workitem(conn)-> None:
                             'hour': '',
                             'minute': ''
                         },
-                        'slotMinTime': '24:00:00',  # Imposta l'ora di inizio della griglia fuori dalla vista
-                        'slotMaxTime': '24:00:00'   # Imposta l'ora di fine della griglia fuori dalla vista
+                        'slotMinTime': '00:00:00',  # Imposta l'ora di inizio della griglia fuori dalla vista
+                        'slotMaxTime': '00:00:00'   # Imposta l'ora di fine della griglia fuori dalla vista
                         }
                 }
             }
@@ -331,6 +331,9 @@ def create_workitem(conn)-> None:
                 .fc-col-header-cell {
                     background-color: #DAF7A6 !important;
                     color: #000000;
+                }
+                .fc-timegrid-slot-lane {
+                    display: none;
                 }
             """
 

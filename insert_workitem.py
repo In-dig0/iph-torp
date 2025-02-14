@@ -270,13 +270,13 @@ def create_workitem(conn)-> None:
                                     "NOTE": new_note
                                     }
                                 st.write(workitem_dict)
-                                time.sleep(10)
+                                #time.sleep(10)
                                 sqlite_db.update_workitem(
                                     workitem_dict,
                                     conn
                                 )
                                 
-                                time.sleep(10)
+                                #time.sleep(10)
 
                                 # Debugging: stampa i valori aggiornati
                                 st.write("DataFrame aggiornato:", st.session_state.df_workitems)

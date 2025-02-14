@@ -299,9 +299,8 @@ def create_workitem(conn)-> None:
                             'day': '2-digit',
                             'month': '2-digit',
                         },
-                        'slotDuration': '00:15:00',  # Imposta la durata dello slot a 15 minuti
                         'slotMinTime': '08:00:00',  # Imposta l'ora di inizio della griglia
-                        'slotMaxTime': '09:00:00'   # Imposta l'ora di fine della griglia
+                        'slotMaxTime': '08:00:00'   # Imposta l'ora di fine della griglia
                     }
                 }
             }

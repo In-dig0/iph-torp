@@ -51,9 +51,10 @@ def create_workitem(conn)-> None:
                 tdsp_name = servant.get_description_from_code(st.session_state.df_users, row['TDSPID'], "NAME")
                 woid = str(row['WOID'])
                 date = row['REFDATE']
+                tdspid = row['TDSPID']
                 
                 # Crea una chiave univoca combinando WOID e data
-                event_key = f"{woid}_{date}"
+                event_key = f"{woid}_{date}_{tdspid}"
                 
                 # Salva i dettagli dell'evento nel dizionario della session state usando la chiave univoca
                 st.session_state.event_details[event_key] = {
@@ -249,6 +250,24 @@ def create_workitem(conn)-> None:
                                 st.session_state.event_details[event_key]['time_qty'] = new_time_qty
                                 st.session_state.event_details[event_key]['description'] = new_description
                                 st.session_state.event_details[event_key]['note'] = new_note
+
+
+                                
+                                # Qui dovresti aggiungere il codice per salvare nel database
+                                # Ad esempio:
+                                update_workitem_in_db(event_data['woid'], {
+                                     'TIME_QTY': new_time_qty,
+                                     'DESC': new_description,
+                                     'NOTE': new_note
+                                 })
+                                
+        #                         st.success("Modifiche salvate con successo!")
+                                
+        #                         # Forza il refresh della pagina per aggiornare il calendario
+        #                         st.rerun()
+                                
+        #                     except Exception as e:
+        #                         st.error(f"Errore durante il salvataggio: {str(e)}")
 
                                 # Debugging: stampa i valori aggiornati
                                 st.write("DataFrame aggiornato:", st.session_state.df_workitems)

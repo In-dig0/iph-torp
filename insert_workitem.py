@@ -416,7 +416,7 @@ def create_workitem(conn)-> None:
                                 st.error(f"Errore durante il salvataggio: {str(e)}")
 
         return calendar_output
-        
+
         # # Pannello dei dettagli a destra
         # with details_col:
         #     if hasattr(st.session_state, 'selected_event_key'):
@@ -641,30 +641,38 @@ def create_workitem(conn)-> None:
     if selected_tdsp_name:
         with st.expander(label=":orange[New Workitem]", expanded=False):
             if selected_tdsp_name:
-                tdsp_index = tdsp_woassignedto_names.index(selected_tdsp_name)
+                # Verifica se selected_tdsp_name è nella lista
+                if selected_tdsp_name in tdsp_woassignedto_names:
+                    tdsp_index = tdsp_woassignedto_names.index(selected_tdsp_name)
+                    selected_tdsp_code = servant.get_code_from_name(st.session_state.df_users, selected_tdsp_name, "CODE")
+                else:
+                    # Gestisci il caso in cui selected_tdsp_name non è nella lista
+                    tdsp_index = 0  # o un altro valore predefinito
+
                 selected_td_specialist_form = st.selectbox(
                     label=":blue[TD Specialist](:red[*])",
                     options=tdsp_woassignedto_names,
-                    index=tdsp_index if selected_tdsp_name else None,  # Use index or None
-                    key="tdsp_form"
+                    index=tdsp_index
                 )
-
-            if selected_tdsp_name:
-                selected_tdsp_code = servant.get_code_from_name(st.session_state.df_users, selected_tdsp_name, "CODE")
-
-                # Correctly filter and extract Work Order IDs
-                filtered_workorder_df = st.session_state.df_woassignedto[
-                    st.session_state.df_woassignedto["TDSPID"] == selected_tdsp_code
-                ]
-
-                if not filtered_workorder_df.empty:  # Check if the DataFrame is not empty
-                    filtered_workorder_list = sorted(filtered_workorder_df["WOID"].tolist())  # Extract WOIDs and convert to a sorted list
-                else:
-                    filtered_workorder_list = []  # Handle the case where no work orders are found
-
             else:
-                filtered_workorder_list = []
-                selected_tdsp_code = ""
+                # Gestisci il caso in cui selected_tdsp_name è None o vuoto
+                selected_td_specialist_form = st.selectbox(
+                    label=":blue[TD Specialist](:red[*])",
+                    options=tdsp_woassignedto_names,
+                    index=0  # o un altro valore predefinito
+                )
+                selected_tdsp_code = servant.get_code_from_name(st.session_state.df_users, selected_td_specialist_form, "CODE")
+
+
+            # Correctly filter and extract Work Order IDs
+            filtered_workorder_df = st.session_state.df_woassignedto[
+                st.session_state.df_woassignedto["TDSPID"] == selected_tdsp_code
+            ]
+
+            if not filtered_workorder_df.empty:  # Check if the DataFrame is not empty
+                filtered_workorder_list = sorted(filtered_workorder_df["WOID"].tolist())  # Extract WOIDs and convert to a sorted list
+            else:
+                filtered_workorder_list = []  # Handle the case where no work orders are found
 
             selected_workorder = st.selectbox(
                 label=":blue[Work Order]",

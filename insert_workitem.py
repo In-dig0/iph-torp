@@ -346,6 +346,7 @@ def create_workitem(conn)-> None:
                 import traceback
                 st.write(traceback.format_exc())
 
+    # Pannello dei dettagli a destra
         with details_col:
             if hasattr(st.session_state, 'selected_event_key'):
                 event_key = st.session_state.selected_event_key
@@ -402,6 +403,10 @@ def create_workitem(conn)-> None:
                                 st.session_state.event_details[event_key]['description'] = new_description
                                 st.session_state.event_details[event_key]['note'] = new_note
 
+                                # Debugging: stampa i valori aggiornati
+                                st.write("DataFrame aggiornato:", st.session_state.df_workitems)
+                                st.write("Event Details aggiornati:", st.session_state.event_details)
+
                                 st.success("Modifiche salvate con successo!")
 
                                 # Forza il refresh della pagina per aggiornare il calendario
@@ -411,7 +416,6 @@ def create_workitem(conn)-> None:
                                 st.error(f"Errore durante il salvataggio: {str(e)}")
 
         return calendar_output
-
         # # Pannello dei dettagli a destra
         # with details_col:
         #     if hasattr(st.session_state, 'selected_event_key'):

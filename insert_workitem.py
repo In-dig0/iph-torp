@@ -220,7 +220,8 @@ def create_workitem(conn)-> None:
                         )
 
 
-                        tskgrl1_options = st.session_state.df_tskgrl1["NAME"].tolist()
+                        tskgrl1_opt = st.session_state.df_tskgrl1["NAME"].tolist()
+                        tskgrl1_options = sorted(tskgrl1_opt)
                         selected_tskgrl1 = st.selectbox(
                             label=":blue[TaskGroup L1]", 
                             options=tskgrl1_options, 
@@ -230,12 +231,13 @@ def create_workitem(conn)-> None:
                         selected_tskgrl1_code = servant.get_code_from_name(st.session_state.df_tskgrl1, selected_tskgrl1, "CODE")
 
                         # Task Group Level 2 dropdown (dependent on Level 1)
-                        tskgrl2_options = st.session_state.df_tskgrl2[st.session_state.df_tskgrl2['PCODE'] == selected_tskgrl1_code]['NAME'].unique()
+                        tskgrl2_opt = st.session_state.df_tskgrl2[st.session_state.df_tskgrl2['PCODE'] == selected_tskgrl1_code]['NAME'].tolist()
+                        tskgrl2_options = sorted(tskgrl2_opt)
                         selected_tskgrl2 = st.selectbox(
                             label=":blue[TaskGroup L2]", 
                             options=tskgrl2_options, 
                             index=tskgrl2_options.index(event_data['tskgrl2']), 
-                            key="sb_tskgrl2b"
+                            key="sb_tskgrl2m"
                         )
                         selected_tskgrl2_code = servant.get_code_from_name(st.session_state.df_tskgrl2, selected_tskgrl2, "CODE")
 

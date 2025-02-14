@@ -193,6 +193,8 @@ def create_workitem(conn)-> None:
     #         return calendar_output
 
     def show_calendar():
+        if 'calendar_needs_update' not in st.session_state:
+            st.session_state.calendar_needs_update = False
         now = datetime.now()
         ultimo_giorno = std_cal.monthrange(now.year, now.month)[1]
         last_day_current_month = datetime(now.year, now.month, ultimo_giorno)
@@ -424,13 +426,33 @@ def create_workitem(conn)-> None:
                                 st.write("Event Details aggiornati:", st.session_state.event_details)
 
                                 st.success("Modifiche salvate con successo!")
+                                # Set the flag to trigger calendar update
+                                st.session_state.calendar_needs_update = True
 
                                 # Forza il refresh della pagina per aggiornare il calendario
-                                st.experimental_rerun()
+                                st.rerun()  # Use st.rerun()
 
                             except Exception as e:
                                 st.error(f"Errore durante il salvataggio: {str(e)}")
 
+            with cal_col:
+                if st.session_state.calendar_needs_update:
+                    # Reset the flag
+                    st.session_state.calendar_needs_update = False
+
+                    # Regenerate calendar events
+                    calendar_events, calendar_options, custom_css = get_calendar_data(
+                        st.session_state.df_workitems, st.session_state.selected_tdsp_code
+                    )
+
+                    # Display the updated calendar
+                    calendar_output = calendar(
+                        events=calendar_events,
+                        options=calendar_options,
+                        custom_css=custom_css,
+                        key=f'calendar_{st.session_state.selected_tdsp_code or "all"}'
+            
+        
         return calendar_output
 
         # # Pannello dei dettagli a destra

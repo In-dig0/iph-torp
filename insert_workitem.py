@@ -256,10 +256,12 @@ def create_workitem(conn)-> None:
                                 
                                 # Qui dovresti aggiungere il codice per salvare nel database
                                 # Ad esempio:
+                                tdspid = servant.get_code_from_name(st.session_state.df_users, event_data['tdsp'], "CODE"),
+                                
                                 workitem_dict = {
                                     "REFDATE": event_data['date'],
                                     "WOID": event_data['woid'],
-                                    "TDSPID": event_data['tdspid'],
+                                    "TDSPID": tdspid,
                                     "TIME_QTY": new_time_qty,
                                     "DESC": new_description,
                                     "NOTE": new_note

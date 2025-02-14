@@ -263,7 +263,8 @@ def create_workitem(conn)-> None:
                                     "TIME_QTY": new_time_qty,
                                     "DESC": new_description,
                                     "NOTE": new_note
-                                    }
+                                    },
+                                    conn
                                 )
                                 
 

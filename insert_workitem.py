@@ -49,7 +49,8 @@ def create_workitem(conn)-> None:
             
             for index, row in df_filtered_witems.iterrows():
                 tdsp_name = servant.get_description_from_code(st.session_state.df_users, row['TDSPID'], "NAME")
-                woid = str(row['WOID'])
+                tdspid = row['TDSPID']
+                woid = row['WOID']
                 date = row['REFDATE']
                 tdspid = row['TDSPID']
                 
@@ -255,19 +256,16 @@ def create_workitem(conn)-> None:
                                 
                                 # Qui dovresti aggiungere il codice per salvare nel database
                                 # Ad esempio:
-                                update_workitem_in_db(event_data['woid'], {
-                                     'TIME_QTY': new_time_qty,
-                                     'DESC': new_description,
-                                     'NOTE': new_note
-                                 })
+                                update_workitem_in_db(
+                                    {"REFDATE": date,
+                                    "WOID": woid,
+                                    "TDSPID": tdspid,
+                                    "TIME_QTY": new_time_qty,
+                                    "DESC": new_description,
+                                    "NOTE": new_note
+                                    }
+                                )
                                 
-        #                         st.success("Modifiche salvate con successo!")
-                                
-        #                         # Forza il refresh della pagina per aggiornare il calendario
-        #                         st.rerun()
-                                
-        #                     except Exception as e:
-        #                         st.error(f"Errore durante il salvataggio: {str(e)}")
 
                                 # Debugging: stampa i valori aggiornati
                                 st.write("DataFrame aggiornato:", st.session_state.df_workitems)

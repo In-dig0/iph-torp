@@ -863,6 +863,34 @@ def save_workitem(witem: dict, conn) ->  bool:
 
     return True
 
+def update_workitem(witem: dict, conn) ->  bool:
+    """Save request to database and return request number and status"""
+    try:
+        with conn:
+            cursor = conn.cursor()        
+
+        sql = """
+            UPDATE TORP_WORKITEM SET description = ? note = ? tme_qty = ? WHERE refdate=? and woid =? and tdspid=?
+        """
+        values = (
+            witem["DESC"], witem["NOTE"], witem["TIME_QTY"], witem["wi_status"],
+            witem["REFDATE"], witem["WOID"], witem["TDSPID"], witem["wi_note"], 
+        )
+        cursor.execute(sql, values)
+        conn.commit()
+        return True
+    
+    except Exception as e:
+        st.error(f"**ERROR inserting data in table TORP_WORKITEM: \n{e}", icon="🚨")
+        conn.rollback()
+        return False
+
+    finally:
+        if cursor:
+            cursor.close() # Close the cursor in a finally block
+
+    return True
+
 def initialize_session_state(conn): #passo la connessione
         # Load data only once and store in session state
     session_data = {

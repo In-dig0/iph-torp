@@ -451,7 +451,7 @@ def create_workitem(conn)-> None:
                         options=calendar_options,
                         custom_css=custom_css,
                         key=f'calendar_{st.session_state.selected_tdsp_code or "all"}'
-            
+                    )
         
         return calendar_output
 

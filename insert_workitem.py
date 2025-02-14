@@ -299,9 +299,13 @@ def create_workitem(conn)-> None:
                             'day': '2-digit',
                             'month': '2-digit',
                         },
-                        'slotMinTime': '08:00:00',  # Imposta l'ora di inizio della griglia
-                        'slotMaxTime': '08:00:00'   # Imposta l'ora di fine della griglia
-                    }
+                        'slotLabelFormat': {  # Nasconde le etichette delle ore
+                            'hour': '',
+                            'minute': ''
+                        },
+                        'slotMinTime': '24:00:00',  # Imposta l'ora di inizio della griglia fuori dalla vista
+                        'slotMaxTime': '24:00:00'   # Imposta l'ora di fine della griglia fuori dalla vista
+                        }
                 }
             }
 

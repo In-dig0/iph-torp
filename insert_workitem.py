@@ -346,20 +346,19 @@ def create_workitem(conn)-> None:
                 import traceback
                 st.write(traceback.format_exc())
 
-        # Pannello dei dettagli a destra
         with details_col:
             if hasattr(st.session_state, 'selected_event_key'):
                 event_key = st.session_state.selected_event_key
                 if event_key in st.session_state.event_details:
                     event_data = st.session_state.event_details[event_key]
-                    
+
                     # Crea un form per l'editing
                     with st.form(key=f"edit_form_{event_key}"):
                         st.markdown("### Modifica Workitem")
                         st.markdown(f"**Work Order ID:** {event_data['woid']}")
                         st.markdown(f"**Specialist:** {event_data['tdsp']}")
                         st.markdown(f"**Data:** {event_data['date']}")
-                        
+
                         # Campo editabile per il tempo
                         new_time_qty = st.number_input(
                             "Tempo",
@@ -369,27 +368,27 @@ def create_workitem(conn)-> None:
                             step=0.5,
                             format="%.1f"
                         )
-                        
+
                         st.markdown(f"**Task Group 1:** {event_data['tskgrl1']}")
                         st.markdown(f"**Task Group 2:** {event_data['tskgrl2']}")
-                        
+
                         # Campo editabile per la descrizione
                         new_description = st.text_area(
                             "Descrizione",
                             value=event_data['description'],
                             height=100
                         )
-                        
+
                         # Campo editabile per le note
                         new_note = st.text_area(
                             "Note",
                             value=event_data['note'],
                             height=100
                         )
-                        
+
                         # Pulsante per salvare le modifiche
                         submitted = st.form_submit_button("Salva Modifiche")
-                        
+
                         if submitted:
                             try:
                                 # Aggiorna il DataFrame originale
@@ -397,24 +396,91 @@ def create_workitem(conn)-> None:
                                 st.session_state.df_workitems.at[df_index, 'TIME_QTY'] = new_time_qty
                                 st.session_state.df_workitems.at[df_index, 'DESC'] = new_description
                                 st.session_state.df_workitems.at[df_index, 'NOTE'] = new_note
-                                
-                                # Qui dovresti aggiungere il codice per salvare nel database
-                                # Ad esempio:
-                                # update_workitem_in_db(event_data['woid'], {
-                                #     'TIME_QTY': new_time_qty,
-                                #     'DESC': new_description,
-                                #     'NOTE': new_note
-                                # })
-                                
+
+                                # Aggiorna lo stato della sessione
+                                st.session_state.event_details[event_key]['time_qty'] = new_time_qty
+                                st.session_state.event_details[event_key]['description'] = new_description
+                                st.session_state.event_details[event_key]['note'] = new_note
+
                                 st.success("Modifiche salvate con successo!")
-                                
+
                                 # Forza il refresh della pagina per aggiornare il calendario
                                 st.rerun()
-                                
+
                             except Exception as e:
                                 st.error(f"Errore durante il salvataggio: {str(e)}")
 
-            return calendar_output
+        return calendar_output
+
+        # # Pannello dei dettagli a destra
+        # with details_col:
+        #     if hasattr(st.session_state, 'selected_event_key'):
+        #         event_key = st.session_state.selected_event_key
+        #         if event_key in st.session_state.event_details:
+        #             event_data = st.session_state.event_details[event_key]
+                    
+        #             # Crea un form per l'editing
+        #             with st.form(key=f"edit_form_{event_key}"):
+        #                 st.markdown("### Modifica Workitem")
+        #                 st.markdown(f"**Work Order ID:** {event_data['woid']}")
+        #                 st.markdown(f"**Specialist:** {event_data['tdsp']}")
+        #                 st.markdown(f"**Data:** {event_data['date']}")
+                        
+        #                 # Campo editabile per il tempo
+        #                 new_time_qty = st.number_input(
+        #                     "Tempo",
+        #                     min_value=0.0,
+        #                     max_value=24.0,
+        #                     value=float(event_data['time_qty']),
+        #                     step=0.5,
+        #                     format="%.1f"
+        #                 )
+                        
+        #                 st.markdown(f"**Task Group 1:** {event_data['tskgrl1']}")
+        #                 st.markdown(f"**Task Group 2:** {event_data['tskgrl2']}")
+                        
+        #                 # Campo editabile per la descrizione
+        #                 new_description = st.text_area(
+        #                     "Descrizione",
+        #                     value=event_data['description'],
+        #                     height=100
+        #                 )
+                        
+        #                 # Campo editabile per le note
+        #                 new_note = st.text_area(
+        #                     "Note",
+        #                     value=event_data['note'],
+        #                     height=100
+        #                 )
+                        
+        #                 # Pulsante per salvare le modifiche
+        #                 submitted = st.form_submit_button("Salva Modifiche")
+                        
+        #                 if submitted:
+        #                     try:
+        #                         # Aggiorna il DataFrame originale
+        #                         df_index = event_data['index']
+        #                         st.session_state.df_workitems.at[df_index, 'TIME_QTY'] = new_time_qty
+        #                         st.session_state.df_workitems.at[df_index, 'DESC'] = new_description
+        #                         st.session_state.df_workitems.at[df_index, 'NOTE'] = new_note
+                                
+        #                         # Qui dovresti aggiungere il codice per salvare nel database
+        #                         # Ad esempio:
+        #                         # update_workitem_in_db(event_data['woid'], {
+        #                         #     'TIME_QTY': new_time_qty,
+        #                         #     'DESC': new_description,
+        #                         #     'NOTE': new_note
+        #                         # })
+                                
+        #                         st.success("Modifiche salvate con successo!")
+                                
+        #                         # Forza il refresh della pagina per aggiornare il calendario
+        #                         st.rerun()
+                                
+        #                     except Exception as e:
+        #                         st.error(f"Errore durante il salvataggio: {str(e)}")
+
+        #     return calendar_output
 
 
     def show_workitem_dataframe():

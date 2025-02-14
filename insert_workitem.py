@@ -257,7 +257,76 @@ def create_workitem(conn)-> None:
                 }
                 calendar_events.append(event)
 
-            # ... [il resto del codice del calendario rimane invariato] ...
+            calendar_options = {
+                "editable": True,
+                "navLinks": True,
+                "selectable": True,
+                "headerToolbar": {
+                    "left": "today prev,next",
+                    "center": "title",
+                    "right": "dayGridMonth,timeGridWeek"
+                },
+                "validRange": {
+                    "start": f"{first_day_previous_month}",
+                    "end": f"{last_day_current_month}"
+                },
+                "hiddenDays": [0, 6],
+                "locale": {
+                    "code": "it",
+                    "week": {
+                        "dow": 1,
+                        "doy": 4
+                    }
+                },
+                "timeZone": "Europe/Rome",
+                "buttonText": {
+                    "today": "Oggi",
+                    "month": "Mese",
+                    "week": "Settimana"
+                },
+                'views': {
+                    'dayGridMonth': {
+                        'buttonText': 'Mese',
+                        'dayHeaderFormat': {
+                            'weekday': 'short'
+                        }
+                    },
+                    'timeGridWeek': {
+                        'buttonText': 'Settimana',
+                        'dayHeaderFormat': {
+                            'weekday': 'short',
+                            'day': '2-digit',
+                            'month': '2-digit',
+                        }
+                    }
+                }
+            }
+
+            custom_css = """
+                .fc-event-past {
+                    opacity: 0.8;
+                }
+                .fc-event-time {
+                    font-style: italic;
+                }
+                .fc-event-title {
+                    font-weight: 700;
+                    color: #000000;
+                    white-space: pre-wrap;
+                    cursor: pointer;
+                }            
+                .fc-toolbar-title {
+                    font-size: 2rem;
+                }
+                .fc-daygrid-day.fc-day-other {
+                    display: none;
+                }
+                .fc-col-header-cell {
+                    background-color: #DAF7A6 !important;
+                    color: #000000;
+                }
+            """
+
 
             try:
                 calendar_output = calendar(
@@ -276,7 +345,7 @@ def create_workitem(conn)-> None:
                 st.write("Check your event data and calendar options.")
                 import traceback
                 st.write(traceback.format_exc())
-                
+
         # Pannello dei dettagli a destra
         with details_col:
             if hasattr(st.session_state, 'selected_event_key'):

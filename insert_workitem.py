@@ -236,7 +236,14 @@ def create_workitem(conn)-> None:
                             height=100
                         )
 
-                        submitted = st.form_submit_button("Save")
+                        # Pulsanti Save e Delete
+                        col1, col2 = st.columns(2)
+                        with col1:
+                            save_submitted = st.form_submit_button("Save")
+                        with col2:
+                            delete_submitted = st.form_submit_button("Delete")
+
+                        save_submitted = st.form_submit_button("Save")
                         if submitted:
                             try:
                                 # Aggiorna il DataFrame originale
@@ -276,6 +283,35 @@ def create_workitem(conn)-> None:
 
                             except Exception as e:
                                 st.error(f"ERROR saving workitem data: {str(e)}")
+        
+                        if delete_submitted:
+                            try:
+                                # Prepara il dizionario per la cancellazione
+                                workitem_dict = {
+                                    "REFDATE": event_data['date'],
+                                    "WOID": event_data['woid'],
+                                    "TDSPID": event_data['tdspid']
+                                }
+
+                                # Cancella l'evento dal database
+                                rc = sqlite_db.delete_workitem(workitem_dict, conn)
+                                st.success("Work item deleted successfully!")
+
+                                # Aggiorna lo stato della sessione
+                                st.session_state.calendar_needs_update = True
+                                st.session_state.selected_event_key = None  # Imposta esplicitamente a None
+                                if 'selected_event_key' in st.session_state:  # Forse non serve più, ma per sicurezza
+                                    del st.session_state.selected_event_key
+                                if 'event_details' in st.session_state:
+                                    del st.session_state.event_details
+
+                                # Forza il refresh del calendario
+                                st.session_state.df_workitems = sqlite_db.load_workitems_data(conn)
+                                time.sleep(0.1)
+                                st.rerun()
+                            except Exception as e:
+                                st.error(f"ERROR deleting workitem data: {str(e)}")
+        
         return calendar_output
 
 

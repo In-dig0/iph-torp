@@ -268,10 +268,7 @@ def create_workitem(conn)-> None:
 
                                 st.success("Update successfully!")
                                 st.session_state.calendar_needs_update = True
-
-                                # Rimuovi l'evento selezionato dalla session state per pulire il pannello di destra
-                                if hasattr(st.session_state, 'selected_event_key'):
-                                    del st.session_state.selected_event_key
+                                st.session_state.selected_event_key = None  # Invece di eliminare la chiave, la settiamo a None
 
                                 time.sleep(2)  # Breve pausa per mostrare il messaggio di successo
                                 st.rerun()

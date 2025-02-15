@@ -816,7 +816,7 @@ def save_workorder_assignments(woid, tdtl_code, assigned_users, df_users, df_woa
                     )
             
                 conn.commit()
-
+                return True
     
     except Exception as e:
         st.error(f"Error updating TORP_WOASSIGNEDTO: {str(e)}", icon="🚨")
@@ -827,7 +827,7 @@ def save_workorder_assignments(woid, tdtl_code, assigned_users, df_users, df_woa
         if cursor:
             cursor.close() # Close the cursor in a finally block
 
-    return True
+
 
 
 def save_workitem(witem: dict, conn) ->  bool:
@@ -861,37 +861,27 @@ def save_workitem(witem: dict, conn) ->  bool:
         if cursor:
             cursor.close() # Close the cursor in a finally block
 
-    return True
 
-
-def update_workitem(witem: dict, conn) ->  bool:
-    """Save request to database and return request number and status"""
+def delete_workitem(witem: dict, conn) ->  bool:
+    """Delete workitem """
     try:
-        with conn:
-            cursor = conn.cursor()        
-
-        sql = """
-            UPDATE TORP_WORKITEMS SET tskgrl1 = ?, tskgrl2 = ?, description = ?, note = ?, time_qty = ? WHERE refdate=? and woid =? and tdspid=?
+        cursor = conn.cursor()
+        query = """
+            DELETE FROM workitems
+            WHERE REFDATE = ? AND WOID = ? AND TDSPID = ?
         """
-        values = (
-            witem["TSKGRL1"], witem["TSKGRL2"], 
-            witem["DESC"], witem["NOTE"], witem["TIME_QTY"], 
-            witem["REFDATE"], witem["WOID"], witem["TDSPID"]
-        )
-        cursor.execute(sql, values)
+        cursor.execute(query, (workitem_dict["REFDATE"], workitem_dict["WOID"], workitem_dict["TDSPID"]))
         conn.commit()
         return True
-    
     except Exception as e:
-        st.error(f"**ERROR updating data in table TORP_WORKITEM: \n{e}", icon="🚨")
-        conn.rollback()
+        print(f"Error deleting workitem: {e}")
         return False
 
     finally:
         if cursor:
             cursor.close() # Close the cursor in a finally block
 
-    return True
+
 
 
 def initialize_session_state(conn): #passo la connessione

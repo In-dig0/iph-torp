@@ -424,7 +424,7 @@ def create_workitem(conn)-> None:
                                 }
 
                                 # Aggiorna il database
-                                sqlite_db.update_workitem(conn, workitem_dict)  # Modificato l'ordine dei parametri
+                                sqlite_db.update_workitem(workitem_dict, conn)  # Modificato l'ordine dei parametri
 
                                 # Aggiorna i dettagli dell'evento nella sessione
                                 st.session_state.event_details[event_key].update({

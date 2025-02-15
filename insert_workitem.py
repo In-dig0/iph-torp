@@ -256,6 +256,7 @@ def create_workitem(conn)-> None:
                                     "REFDATE": event_data['date'],
                                     "WOID": event_data['woid'],
                                     "TDSPID": event_data['tdspid'],
+                                    "STATUS": "ACTIVE",
                                     "TSKGRL1": event_data['tskgrl1'],
                                     "TSKGRL2": event_data['tskgrl2'],
                                     "TIME_QTY": new_time_qty,
@@ -289,11 +290,17 @@ def create_workitem(conn)-> None:
                                 workitem_dict = {
                                     "REFDATE": event_data['date'],
                                     "WOID": event_data['woid'],
-                                    "TDSPID": event_data['tdspid']
+                                    "TDSPID": event_data['tdspid'],
+                                    "STATUS": "DELETED",
+                                    "TSKGRL1": event_data['tskgrl1'],
+                                    "TSKGRL2": event_data['tskgrl2'],
+                                    "TIME_QTY": new_time_qty,
+                                    "DESC": new_description,
+                                    "NOTE": new_note
                                 }
 
                                 # Cancella l'evento dal database
-                                rc = sqlite_db.delete_workitem(workitem_dict, conn)
+                                rc = sqlite_db.save_workitem(workitem_dict, conn)
                                 st.success("Work item deleted successfully!")
 
                                 # Aggiorna lo stato della sessione

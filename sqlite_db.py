@@ -862,6 +862,35 @@ def save_workitem(witem: dict, conn) ->  bool:
             cursor.close() # Close the cursor in a finally block
 
 
+def update_workitem(witem: dict, conn) -> bool:
+    try:
+        with conn:
+            cursor = conn.cursor()        
+
+        sql = """
+        UPDATE TORP_WORKITEMS SET
+            status = ?, tskgrl1 = ?, tskgrl2 = ?, 
+            time_qty = ?, description = ?,  note = ?
+        WHERE woid = ?
+        AND tdspid = ?
+        AND refdate = ?
+        """
+        values = (
+            witem["STATUS"], witem["TSKGRL1"], witem["TSKGRL2"],
+            witem["TIME_QTY"], witem["DESCRIPTION"], witem["NOTE"],
+            witem["WOID"], wo["TDSPID"], wo["REFDATE"]  
+        )
+        return True
+    except Exception as e:
+        st.error(f"**ERROR updating data in table TORP_WORKITEM: \n{e}", icon="🚨")
+        conn.rollback()
+        return False
+
+    finally:
+        if cursor:
+            cursor.close() # Close the cursor in a finally block
+
+
 def delete_workitem(witem: dict, conn) ->  bool:
     """Delete workitem """
     try:
@@ -870,11 +899,12 @@ def delete_workitem(witem: dict, conn) ->  bool:
             DELETE FROM workitems
             WHERE REFDATE = ? AND WOID = ? AND TDSPID = ?
         """
-        cursor.execute(query, (workitem_dict["REFDATE"], workitem_dict["WOID"], workitem_dict["TDSPID"]))
+        cursor.execute(query, (witem["REFDATE"], witem["WOID"], witem["TDSPID"]))
         conn.commit()
         return True
     except Exception as e:
-        print(f"Error deleting workitem: {e}")
+        conn.rollback()
+        st.error(f"**ERROR deleting data in table TORP_WORKITEM: \n{e}", icon="🚨")
         return False
 
     finally:

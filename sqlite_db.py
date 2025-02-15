@@ -836,25 +836,48 @@ def save_workitem(witem: dict, conn) ->  bool:
     try:
         with conn:
             cursor = conn.cursor()        
+            # Check if a workorder with the given woid already exists
+            cursor.execute("SELECT 1 FROM TORP_WORKITEMS WHERE refdate = ? AND woid = ? AND tdspid = ?", (witem["refdate"], witem["woid"], witem["tdspid"]))
+            existing_workorder = cursor.fetchone()
 
-        sql = """
-            INSERT INTO TORP_WORKITEMS (
-                refdate, woid, tdspid, status, 
-                tskgrl1, tskgrl2, description, note, 
-                time_qty, time_um
-            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-        """
-        values = (
-            witem["wi_refdate"], witem["wo_woid"], witem["wi_tdspid"], witem["wi_status"],
-            witem["wi_tskgrl1"], witem["wi_tskgrl2"], witem["wi_desc"], witem["wi_note"], 
-            witem["wi_time_qty"], witem["wi_time_um"]
-        )
-        cursor.execute(sql, values)
-        conn.commit()
-        return True
+            if existing_workorder:
+                # UPDATE
+                sql = """
+                UPDATE TORP_WORKITEMS SET
+                    status = ?, tskgrl1 = ?, tskgrl2 = ?, 
+                    time_qty = ?, description = ?, note = ?
+                WHERE woid = ?
+                AND tdspid = ?
+                AND refdate = ?
+                """
+                values = (
+                    witem["STATUS"], witem["TSKGRL1"], witem["TSKGRL2"],
+                    witem["TIME_QTY"], witem["DESCRIPTION"], witem["NOTE"],
+                    witem["WOID"], witem["TDSPID"], witem["REFDATE"]  
+                )
+                cursor.execute(sql, values)
+                conn.commit()
+                return True                  
+
+            else:
+                sql = """
+                    INSERT INTO TORP_WORKITEMS (
+                        refdate, woid, tdspid, status, 
+                        tskgrl1, tskgrl2, description, note, 
+                        time_qty, time_um
+                    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                """
+                values = (
+                    witem["wi_refdate"], witem["wo_woid"], witem["wi_tdspid"], witem["wi_status"],
+                    witem["wi_tskgrl1"], witem["wi_tskgrl2"], witem["wi_desc"], witem["wi_note"], 
+                    witem["wi_time_qty"], witem["wi_time_um"]
+                )
+                cursor.execute(sql, values)
+                conn.commit()
+                return True
     
     except Exception as e:
-        st.error(f"**ERROR inserting data in table TORP_WORKITEM: \n{e}", icon="🚨")
+        st.error(f"**ERROR inserting/updating data in table TORP_WORKITEM: \n{e}", icon="🚨")
         conn.rollback()
         return False
 

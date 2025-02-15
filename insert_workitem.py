@@ -265,7 +265,7 @@ def create_workitem(conn)-> None:
                                 }
                                 st.write(workitem_dict)
                                 # Aggiorna il database
-                                rc = sqlite_db.update_workitem(workitem_dict, conn)
+                                rc = sqlite_db.save_workitem(workitem_dict, conn)
                                 st.success("Update successfully!")
 
                                 st.session_state.calendar_needs_update = True
@@ -300,7 +300,7 @@ def create_workitem(conn)-> None:
                                 }
 
                                 # Cancella l'evento dal database
-                                rc = sqlite_db.update_workitem(workitem_dict, conn)
+                                rc = sqlite_db.save_workitem(workitem_dict, conn)
                                 st.success("Work item deleted successfully!")
 
                                 # Aggiorna lo stato della sessione

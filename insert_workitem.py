@@ -522,11 +522,11 @@ def create_workitem(conn)-> None:
 
                                 # Aggiorna il database
                                 rc = sqlite_db.update_workitem(workitem_dict, conn)
-
-                                # Reset completo dello stato della sessione
                                 st.success("Update successfully!")
+
                                 st.session_state.calendar_needs_update = True
-                                if 'selected_event_key' in st.session_state:
+                                st.session_state.selected_event_key = None  # Imposta esplicitamente a None
+                                if 'selected_event_key' in st.session_state: # Forse non serve più, ma per sicurezza
                                     del st.session_state.selected_event_key
                                 if 'event_details' in st.session_state:
                                     del st.session_state.event_details

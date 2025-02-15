@@ -416,9 +416,9 @@ def create_workitem(conn)-> None:
                                 workitem_dict = {
                                     "REFDATE": event_data['date'],
                                     "WOID": event_data['woid'],
-                                    "TDSPID": servant.get_code_from_description(st.session_state.df_users, event_data['tdsp'], "NAME"),  # Ottieni l'ID dal nome
-                                    "TSKGRL1": servant.get_code_from_description(st.session_state.df_tskgrl1, event_data['tskgrl1'], "NAME"),  # Ottieni l'ID dalla descrizione
-                                    "TSKGRL2": servant.get_code_from_description(st.session_state.df_tskgrl2, event_data['tskgrl2'], "NAME"),  # Ottieni l'ID dalla descrizione
+                                    "TDSPID": servant.get_code_from_name(st.session_state.df_users, event_data['tdsp'], "NAME"),  # Ottieni l'ID dal nome
+                                    "TSKGRL1": servant.get_code_from_name(st.session_state.df_tskgrl1, event_data['tskgrl1'], "NAME"),  # Ottieni l'ID dalla descrizione
+                                    "TSKGRL2": servant.get_code_from_name(st.session_state.df_tskgrl2, event_data['tskgrl2'], "NAME"),  # Ottieni l'ID dalla descrizione
                                     "TIME_QTY": new_time_qty,
                                     "DESC": new_description,
                                     "NOTE": new_note

@@ -855,7 +855,6 @@ def save_workitem(witem: dict, conn) ->  bool:
     
     except Exception as e:
         st.error(f"**ERROR inserting data in table TORP_WORKITEM: \n{e}", icon="🚨")
-        time.sleep(5)
         conn.rollback()
         return False
 
@@ -880,7 +879,7 @@ def update_workitem(witem: dict, conn) -> bool:
         values = (
             witem["STATUS"], witem["TSKGRL1"], witem["TSKGRL2"],
             witem["TIME_QTY"], witem["DESCRIPTION"], witem["NOTE"],
-            witem["WOID"], wo["TDSPID"], wo["REFDATE"]  
+            witem["WOID"], witem["TDSPID"], witem["REFDATE"]  
         )
         return True
     except Exception as e:

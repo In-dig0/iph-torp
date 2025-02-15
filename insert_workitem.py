@@ -259,20 +259,34 @@ def create_workitem(conn)-> None:
                                 # Aggiorna il database
                                 rc = sqlite_db.update_workitem(workitem_dict, conn)  # Modificato l'ordine dei parametri
 
-                                # Aggiorna i dettagli dell'evento nella sessione
-                                st.session_state.event_details[event_key].update({
-                                    'time_qty': new_time_qty,
-                                    'description': new_description,
-                                    'note': new_note
-                                })
+                                # # Aggiorna i dettagli dell'evento nella sessione
+                                # st.session_state.event_details[event_key].update({
+                                #     'time_qty': new_time_qty,
+                                #     'description': new_description,
+                                #     'note': new_note
+                                # })
 
+                                # st.success("Update successfully!")
+                                # st.session_state.calendar_needs_update = True
+                                # st.session_state.selected_event_key = None  # Invece di eliminare la chiave, la settiamo a None
+
+                                # time.sleep(2)  # Breve pausa per mostrare il messaggio di successo
+                                # st.rerun()
+
+
+                                # Reset completo
                                 st.success("Update successfully!")
                                 st.session_state.calendar_needs_update = True
-                                st.session_state.selected_event_key = None  # Invece di eliminare la chiave, la settiamo a None
-
-                                time.sleep(2)  # Breve pausa per mostrare il messaggio di successo
+                                if 'selected_event_key' in st.session_state:
+                                    del st.session_state.selected_event_key
+                                if 'event_details' in st.session_state:
+                                    del st.session_state.event_details
+                                    
+                                # Forza il refresh del calendario
+                                st.session_state.df_workitems = sqlite_db.load_workitems_data(conn)
+                                time.sleep(0.1)
                                 st.rerun()
-
+                                
                             except Exception as e:
                                 st.error(f"ERROR saving workitem data: {str(e)}")
 

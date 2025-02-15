@@ -4,6 +4,7 @@ import pandas as pd
 from typing import Optional, Tuple, Dict, List
 import base64
 from datetime import datetime, date
+import time
 
 # Global constants
 ACTIVE_STATUS = "ACTIVE"
@@ -854,6 +855,7 @@ def save_workitem(witem: dict, conn) ->  bool:
     
     except Exception as e:
         st.error(f"**ERROR inserting data in table TORP_WORKITEM: \n{e}", icon="🚨")
+        time.sleep(5)
         conn.rollback()
         return False
 
@@ -870,7 +872,7 @@ def update_workitem(witem: dict, conn) -> bool:
         sql = """
         UPDATE TORP_WORKITEMS SET
             status = ?, tskgrl1 = ?, tskgrl2 = ?, 
-            time_qty = ?, description = ?,  note = ?
+            time_qty = ?, description = ?, note = ?
         WHERE woid = ?
         AND tdspid = ?
         AND refdate = ?

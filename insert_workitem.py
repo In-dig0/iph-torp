@@ -243,8 +243,7 @@ def create_workitem(conn)-> None:
                         with col2:
                             delete_submitted = st.form_submit_button("Delete")
 
-                        save_submitted = st.form_submit_button("Save")
-                        if submitted:
+                        if save_submitted:
                             try:
                                 # Aggiorna il DataFrame originale
                                 df_index = event_data['index']

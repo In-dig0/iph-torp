@@ -431,7 +431,6 @@ def load_workitems_data(conn):
             A.time_qty AS TIME_QTY,
             A.time_um AS TIME_UM
         FROM TORP_WORKITEMS A  
-        WHERE A.status = 'ACTIVE'
         ORDER BY WOID
         """, conn)
         df_workitem['REFDATE'] = pd.to_datetime(df_workitem['REFDATE']) 

@@ -65,6 +65,7 @@ def create_workitem(conn)-> None:
                     "woid": woid,
                     "tdspid": tdspid,
                     "tdsp_name": tdsp_name,
+                    "status": row['STATUS'],
                     "time_qty": row['TIME_QTY'],
                     "time_um": row.get('TIME_UM', 'H'),
                     "tskgrl1": row.get('TSKGRL1', ''),
@@ -78,12 +79,19 @@ def create_workitem(conn)-> None:
                 }
 
                 # Crea l'evento per il calendario
+                if row['STATUS'] == "ACTIVE":
+                    back_color = '#d4efdf'
+                    border_color = '#a2d9ce'
+                else:
+                    back_color = '#efd4d7'
+                    border_color = '#da9ca3'
+                
                 event = {
                     "id": event_key,
                     "title": f"[{woid}] - {row['TIME_QTY']} H - {tdsp_name}",
                     "start": date,
-                    "backgroundColor": '#d4efdf',
-                    "borderColor": '#a2d9ce',
+                    "backgroundColor": back_color,
+                    "borderColor": border_color,
                     "display": "block"
                 }
                 calendar_events.append(event)
@@ -260,6 +268,7 @@ def create_workitem(conn)-> None:
                                     "TSKGRL1": event_data['tskgrl1'],
                                     "TSKGRL2": event_data['tskgrl2'],
                                     "TIME_QTY": new_time_qty,
+                                    "TIME_UM": "H",
                                     "DESCRIPTION": new_description,
                                     "NOTE": new_note
                                 }
@@ -295,6 +304,7 @@ def create_workitem(conn)-> None:
                                     "TSKGRL1": event_data['tskgrl1'],
                                     "TSKGRL2": event_data['tskgrl2'],
                                     "TIME_QTY": new_time_qty,
+                                    "TIME_UM": "H",
                                     "DESCRIPTION": new_description,
                                     "NOTE": new_note
                                 }

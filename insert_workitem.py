@@ -217,7 +217,7 @@ def create_workitem(conn)-> None:
                     event_data = st.session_state.event_details[event_key]
 
                     with st.form(key=f"edit_form_{event_key}"):
-                        st.markdown("#### <ins>Modifica Workitem")
+                        st.markdown("#### <ins>Modifica Workitem</ins>")
                         st.markdown(f"**Work Order ID:** {event_data['woid']}")
                         if event_data['status'] == 'ACTIVE':
                             st.markdown(f"**Status:** :green-background[{event_data['status']}]")

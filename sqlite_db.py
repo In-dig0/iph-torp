@@ -837,7 +837,7 @@ def save_workitem(witem: dict, conn) ->  bool:
         with conn:
             cursor = conn.cursor()        
             # Check if a workorder with the given woid already exists
-            cursor.execute("SELECT 1 FROM TORP_WORKITEMS WHERE refdate = ? AND woid = ? AND tdspid = ?", (witem["refdate"], witem["woid"], witem["tdspid"]))
+            cursor.execute("SELECT 1 FROM TORP_WORKITEMS WHERE refdate = ? AND woid = ? AND tdspid = ?", (witem["REFDATE"], witem["WOID"], witem["TDSPID"]))
             existing_workorder = cursor.fetchone()
 
             if existing_workorder:

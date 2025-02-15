@@ -203,7 +203,7 @@ def create_workitem(conn)-> None:
 
         # Pannello dei dettagli a destra
         with details_col:
-            if hasattr(st.session_state, 'selected_event_key'):
+            if hasattr(st.session_state, 'selected_event_key') and st.session_state.selected_event_key is not None:
                 event_key = st.session_state.selected_event_key
                 if event_key in st.session_state.event_details:
                     event_data = st.session_state.event_details[event_key]
@@ -238,44 +238,33 @@ def create_workitem(conn)-> None:
 
                         submitted = st.form_submit_button("Save")
                         if submitted:
-                            try:
-                                # Aggiorna il DataFrame originale
-                                df_index = event_data['index']
-                                st.session_state.df_workitems.at[df_index, 'TIME_QTY'] = new_time_qty
-                                st.session_state.df_workitems.at[df_index, 'DESC'] = new_description
-                                st.session_state.df_workitems.at[df_index, 'NOTE'] = new_note
+                            # Aggiorna il DataFrame originale
+                            df_index = event_data['index']
+                            st.session_state.df_workitems.at[df_index, 'TIME_QTY'] = new_time_qty
+                            st.session_state.df_workitems.at[df_index, 'DESC'] = new_description
+                            st.session_state.df_workitems.at[df_index, 'NOTE'] = new_note
 
-                                # Prepara il dizionario per l'aggiornamento
-                                workitem_dict = {
-                                    "REFDATE": event_data['date'],
-                                    "WOID": event_data['woid'],
-                                    "TDSPID": event_data['tdspid'],
-                                    "TSKGRL1": event_data['tskgrl1'],
-                                    "TSKGRL2": event_data['tskgrl2'],
-                                    "TIME_QTY": new_time_qty,
-                                    "DESC": new_description,
-                                    "NOTE": new_note
-                                }
+                            # Prepara il dizionario per l'aggiornamento
+                            workitem_dict = {
+                                "REFDATE": event_data['date'],
+                                "WOID": event_data['woid'],
+                                "TDSPID": event_data['tdspid'],
+                                "TSKGRL1": event_data['tskgrl1'],
+                                "TSKGRL2": event_data['tskgrl2'],
+                                "TIME_QTY": new_time_qty,
+                                "DESC": new_description,
+                                "NOTE": new_note
+                            }
 
-                                # Aggiorna il database
-                                rc = sqlite_db.update_workitem(workitem_dict, conn)  # Modificato l'ordine dei parametri
-
-                                # Reset completo
+                            # Aggiorna il database
+                            if update_workitem_in_database(workitem_dict, conn):
                                 st.success("Update successfully!")
                                 st.session_state.calendar_needs_update = True
-                                if 'selected_event_key' in st.session_state:
-                                    del st.session_state.selected_event_key
-                                if 'event_details' in st.session_state:
-                                    del st.session_state.event_details
-                                    
-                                # Forza il refresh del calendario
-                                st.session_state.df_workitems = sqlite_db.load_workitems_data(conn)
-                                time.sleep(0.1)
+                                st.session_state.selected_event_key = None  # Invece di eliminare la chiave, la settiamo a None
+
+                                time.sleep(2)  # Breve pausa per mostrare il messaggio di successo
                                 st.rerun()
-
-                            except Exception as e:
-                                st.error(f"ERROR saving workitem data: {str(e)}")
-
+        return calendar_output
     
     # Load data only once and store in session state
     session_data = {

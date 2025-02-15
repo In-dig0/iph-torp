@@ -29,6 +29,10 @@ def create_workitem(conn)-> None:
         if 'event_details' not in st.session_state:
             st.session_state.event_details = {}
 
+        # Aggiungi un pulsante di refresh
+        if st.button("🔄 Refresh Calendario"):
+            st.session_state.calendar_needs_update = True
+
         cal_col, details_col = st.columns([4, 1])
 
         with cal_col:
@@ -169,13 +173,17 @@ def create_workitem(conn)-> None:
             # Mostra il calendario
             if st.session_state.calendar_needs_update:
                 with st.spinner("Aggiornamento calendario..."):
+                    # Ricarica i dati dal database
+                    st.session_state.df_workitems = sqlite_db.load_workitems_data(conn)
+                    st.session_state.calendar_needs_update = False  # Reset del flag
+
+                    # Rigenera il calendario
                     calendar_output = calendar(
                         events=calendar_events,
                         options=calendar_options,
                         custom_css=custom_css,
                         key=f'calendar_{st.session_state.selected_tdsp_code or "all"}'
                     )
-                st.session_state.calendar_needs_update = False  # Reset del flag
             else:
                 calendar_output = calendar(
                     events=calendar_events,
@@ -259,7 +267,7 @@ def create_workitem(conn)-> None:
                             except Exception as e:
                                 st.error(f"ERROR saving workitem data: {str(e)}")
 
-        return calendar_output    
+        return calendar_output
     # def show_calendar():
     #     if 'calendar_needs_update' not in st.session_state:
     #         st.session_state.calendar_needs_update = False

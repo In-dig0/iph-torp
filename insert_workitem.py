@@ -259,21 +259,6 @@ def create_workitem(conn)-> None:
                                 # Aggiorna il database
                                 rc = sqlite_db.update_workitem(workitem_dict, conn)  # Modificato l'ordine dei parametri
 
-                                # # Aggiorna i dettagli dell'evento nella sessione
-                                # st.session_state.event_details[event_key].update({
-                                #     'time_qty': new_time_qty,
-                                #     'description': new_description,
-                                #     'note': new_note
-                                # })
-
-                                # st.success("Update successfully!")
-                                # st.session_state.calendar_needs_update = True
-                                # st.session_state.selected_event_key = None  # Invece di eliminare la chiave, la settiamo a None
-
-                                # time.sleep(2)  # Breve pausa per mostrare il messaggio di successo
-                                # st.rerun()
-
-
                                 # Reset completo
                                 st.success("Update successfully!")
                                 st.session_state.calendar_needs_update = True
@@ -286,42 +271,10 @@ def create_workitem(conn)-> None:
                                 st.session_state.df_workitems = sqlite_db.load_workitems_data(conn)
                                 time.sleep(0.1)
                                 st.rerun()
-                                
+
                             except Exception as e:
                                 st.error(f"ERROR saving workitem data: {str(e)}")
 
-                        # if submitted:
-                        #     try:
-                        #         # Aggiorna il DataFrame originale
-                        #         df_index = event_data['index']
-                        #         st.session_state.df_workitems.at[df_index, 'TIME_QTY'] = new_time_qty
-                        #         st.session_state.df_workitems.at[df_index, 'DESC'] = new_description
-                        #         st.session_state.df_workitems.at[df_index, 'NOTE'] = new_note
-
-                        #         # Aggiorna i dettagli dell'evento nella sessione
-                        #         st.session_state.event_details[event_key]['time_qty'] = new_time_qty
-                        #         st.session_state.event_details[event_key]['description'] = new_description
-                        #         st.session_state.event_details[event_key]['note'] = new_note
-
-                        #         # Aggiorna il database
-                        #         workitem_dict = {
-                        #             "REFDATE": event_data['date'],
-                        #             "WOID": event_data['woid'],
-                        #             "TDSPID": event_data['tdsp'],
-                        #             "TSKGRL1": event_data['tskgrl1'],
-                        #             "TSKGRL2": event_data['tskgrl2'],
-                        #             "TIME_QTY": new_time_qty,
-                        #             "DESC": new_description,
-                        #             "NOTE": new_note
-                        #         }
-                        #         sqlite_db.update_workitem(workitem_dict, conn)
-
-                        #         st.success("Update successfully!")
-                        #         st.session_state.calendar_needs_update = True  # Imposta il flag per aggiornare il calendario
-                        #         st.rerun()  # Ricarica la pagina
-
-                        #     except Exception as e:
-                        #         st.error(f"ERROR saving workitem data: {str(e)}")
 
         return calendar_output
 

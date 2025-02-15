@@ -423,7 +423,7 @@ def create_workitem(conn)-> None:
                                     "NOTE": new_note
                                 }
                                 st.write(workitem_dict)
-                                time.sleep(5)
+                                time.sleep(10)
                                 # Aggiorna il database
                                 rc = sqlite_db.update_workitem(workitem_dict, conn)  # Modificato l'ordine dei parametri
 
@@ -436,7 +436,7 @@ def create_workitem(conn)-> None:
 
                                 st.success("Update successfully!")
                                 st.session_state.calendar_needs_update = True
-                                time.sleep(3)  # Breve pausa per mostrare il messaggio di successo
+                                time.sleep(5)  # Breve pausa per mostrare il messaggio di successo
                                 st.rerun()
 
                             except Exception as e:

@@ -263,7 +263,7 @@ def create_workitem(conn)-> None:
                                     "DESCRIPTION": new_description,
                                     "NOTE": new_note
                                 }
-
+                                st.write(workitem_dict)
                                 # Aggiorna il database
                                 rc = sqlite_db.update_workitem(workitem_dict, conn)
                                 st.success("Update successfully!")

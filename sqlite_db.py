@@ -881,6 +881,8 @@ def update_workitem(witem: dict, conn) -> bool:
             witem["TIME_QTY"], witem["DESCRIPTION"], witem["NOTE"],
             witem["WOID"], witem["TDSPID"], witem["REFDATE"]  
         )
+        cursor.execute(sql, values)
+        conn.commit()        
         return True
     except Exception as e:
         st.error(f"**ERROR updating data in table TORP_WORKITEM: \n{e}", icon="🚨")

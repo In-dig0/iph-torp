@@ -14,6 +14,7 @@ import servant
 def create_workitem(conn)-> None:
 
     def show_calendar():
+        # Inizializza il flag se non esiste
         if 'calendar_needs_update' not in st.session_state:
             st.session_state.calendar_needs_update = False
 
@@ -24,12 +25,14 @@ def create_workitem(conn)-> None:
         last_day_previous_month = first_day_current_month - timedelta(days=1)
         first_day_previous_month = datetime(last_day_previous_month.year, last_day_previous_month.month, 1)
 
+        # Inizializza il dizionario degli eventi se non esiste
         if 'event_details' not in st.session_state:
             st.session_state.event_details = {}
 
         cal_col, details_col = st.columns([4, 1])
 
         with cal_col:
+            # Filtra i workitem in base al TD Specialist selezionato
             if st.session_state.selected_tdsp_code:
                 df_filtered_witems = st.session_state.df_workitems[
                     st.session_state.df_workitems["TDSPID"] == st.session_state.selected_tdsp_code
@@ -39,18 +42,20 @@ def create_workitem(conn)-> None:
 
             df_filtered_witems['REFDATE'] = pd.to_datetime(df_filtered_witems['REFDATE']).dt.strftime('%Y-%m-%d')
 
+            # Crea gli eventi per il calendario
             calendar_events = []
-            st.session_state.event_details = {}
+            st.session_state.event_details = {}  # Reset dei dettagli degli eventi
 
             for index, row in df_filtered_witems.iterrows():
                 tdsp_name = servant.get_description_from_code(st.session_state.df_users, row['TDSPID'], "NAME")
                 tdspid = row['TDSPID']
                 woid = row['WOID']
                 date = row['REFDATE']
-                tdspid = row['TDSPID']
 
+                # Crea una chiave univoca per l'evento
                 event_key = f"{woid}_{date}_{tdspid}"
 
+                # Salva i dettagli dell'evento nella sessione
                 st.session_state.event_details[event_key] = {
                     "woid": woid,
                     "tdsp": tdsp_name,
@@ -64,6 +69,7 @@ def create_workitem(conn)-> None:
                     "index": index
                 }
 
+                # Crea l'evento per il calendario
                 event = {
                     "id": event_key,
                     "title": f"[{woid}] - {row['TIME_QTY']} H - {tdsp_name}",
@@ -74,6 +80,7 @@ def create_workitem(conn)-> None:
                 }
                 calendar_events.append(event)
 
+            # Opzioni del calendario
             calendar_options = {
                 "editable": True,
                 "navLinks": True,
@@ -127,6 +134,7 @@ def create_workitem(conn)-> None:
                 }
             }
 
+            # CSS personalizzato
             custom_css = """
                 .fc-event-past {
                     opacity: 0.8;
@@ -158,9 +166,8 @@ def create_workitem(conn)-> None:
                 }
             """
 
+            # Mostra il calendario
             if st.session_state.calendar_needs_update:
-                st.session_state.calendar_needs_update = False
-
                 with st.spinner("Aggiornamento calendario..."):
                     calendar_output = calendar(
                         events=calendar_events,
@@ -168,6 +175,7 @@ def create_workitem(conn)-> None:
                         custom_css=custom_css,
                         key=f'calendar_{st.session_state.selected_tdsp_code or "all"}'
                     )
+                st.session_state.calendar_needs_update = False  # Reset del flag
             else:
                 calendar_output = calendar(
                     events=calendar_events,
@@ -176,10 +184,12 @@ def create_workitem(conn)-> None:
                     key=f'calendar_{st.session_state.selected_tdsp_code or "all"}'
                 )
 
+            # Gestione del click sull'evento
             if calendar_output.get("eventClick"):
                 event_key = calendar_output["eventClick"]["event"]["id"]
                 st.session_state.selected_event_key = event_key
 
+        # Pannello dei dettagli a destra
         with details_col:
             if hasattr(st.session_state, 'selected_event_key'):
                 event_key = st.session_state.selected_event_key
@@ -192,26 +202,7 @@ def create_workitem(conn)-> None:
                         st.markdown(f"**Specialist:** {event_data['tdsp']}")
                         st.markdown(f"**Data:** {event_data['date']}")
 
-                        tskgrl1_opt = st.session_state.df_tskgrl1["NAME"].tolist()
-                        tskgrl1_options = sorted(tskgrl1_opt)
-                        selected_tskgrl1 = st.selectbox(
-                            label=":blue[TaskGroup L1]", 
-                            options=tskgrl1_options, 
-                            index=tskgrl1_options.index(event_data['tskgrl1']), 
-                            key="sb_tskgrl1m"
-                        )
-                        selected_tskgrl1_code = servant.get_code_from_name(st.session_state.df_tskgrl1, selected_tskgrl1, "CODE")
-
-                        tskgrl2_opt = st.session_state.df_tskgrl2[st.session_state.df_tskgrl2['PCODE'] == selected_tskgrl1_code]['NAME'].tolist()
-                        tskgrl2_options = sorted(tskgrl2_opt)
-                        selected_tskgrl2 = st.selectbox(
-                            label=":blue[TaskGroup L2]", 
-                            options=tskgrl2_options, 
-                            index=tskgrl2_options.index(event_data['tskgrl2']), 
-                            key="sb_tskgrl2m"
-                        )
-                        selected_tskgrl2_code = servant.get_code_from_name(st.session_state.df_tskgrl2, selected_tskgrl2, "CODE")
-
+                        # Campi modificabili
                         new_time_qty = st.number_input(
                             ":blue[Time]",
                             min_value=0.0,
@@ -237,35 +228,33 @@ def create_workitem(conn)-> None:
 
                         if submitted:
                             try:
+                                # Aggiorna il DataFrame originale
                                 df_index = event_data['index']
                                 st.session_state.df_workitems.at[df_index, 'TIME_QTY'] = new_time_qty
                                 st.session_state.df_workitems.at[df_index, 'DESC'] = new_description
                                 st.session_state.df_workitems.at[df_index, 'NOTE'] = new_note
 
+                                # Aggiorna i dettagli dell'evento nella sessione
                                 st.session_state.event_details[event_key]['time_qty'] = new_time_qty
                                 st.session_state.event_details[event_key]['description'] = new_description
                                 st.session_state.event_details[event_key]['note'] = new_note
 
-                                tdspid = servant.get_code_from_name(st.session_state.df_users, event_data['tdsp'], "CODE")
-                                if tdspid:
-                                    tdspcode = tdspid
-
+                                # Aggiorna il database
                                 workitem_dict = {
                                     "REFDATE": event_data['date'],
                                     "WOID": event_data['woid'],
-                                    "TDSPID": tdspcode,
-                                    "TSKGRL1": selected_tskgrl1_code,
-                                    "TSKGRL2": selected_tskgrl2_code,
+                                    "TDSPID": event_data['tdsp'],
+                                    "TSKGRL1": event_data['tskgrl1'],
+                                    "TSKGRL2": event_data['tskgrl2'],
                                     "TIME_QTY": new_time_qty,
                                     "DESC": new_description,
                                     "NOTE": new_note
                                 }
-
                                 sqlite_db.update_workitem(workitem_dict, conn)
 
                                 st.success("Update successfully!")
-                                st.session_state.calendar_needs_update = True
-                                st.rerun()
+                                st.session_state.calendar_needs_update = True  # Imposta il flag per aggiornare il calendario
+                                st.rerun()  # Ricarica la pagina
 
                             except Exception as e:
                                 st.error(f"ERROR saving workitem data: {str(e)}")

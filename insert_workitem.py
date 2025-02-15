@@ -260,7 +260,7 @@ def create_workitem(conn)-> None:
                                     "TSKGRL1": event_data['tskgrl1'],
                                     "TSKGRL2": event_data['tskgrl2'],
                                     "TIME_QTY": new_time_qty,
-                                    "DESC": new_description,
+                                    "DESCRIPTION": new_description,
                                     "NOTE": new_note
                                 }
 
@@ -295,7 +295,7 @@ def create_workitem(conn)-> None:
                                     "TSKGRL1": event_data['tskgrl1'],
                                     "TSKGRL2": event_data['tskgrl2'],
                                     "TIME_QTY": new_time_qty,
-                                    "DESC": new_description,
+                                    "DESCRIPTION": new_description,
                                     "NOTE": new_note
                                 }
 

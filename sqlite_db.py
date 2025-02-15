@@ -846,14 +846,14 @@ def save_workitem(witem: dict, conn) ->  bool:
                 UPDATE TORP_WORKITEMS SET
                     status = ?, tskgrl1 = ?, tskgrl2 = ?, 
                     time_qty = ?, description = ?, note = ?
-                WHERE woid = ?
+                WHERE refdate = ?
+                AND woid = ?
                 AND tdspid = ?
-                AND refdate = ?
                 """
                 values = (
                     witem["STATUS"], witem["TSKGRL1"], witem["TSKGRL2"],
                     witem["TIME_QTY"], witem["DESCRIPTION"], witem["NOTE"],
-                    witem["WOID"], witem["TDSPID"], witem["REFDATE"]  
+                    witem["REFDATE"] , witem["WOID"], witem["TDSPID"]
                 )
                 cursor.execute(sql, values)
                 conn.commit()
@@ -868,9 +868,9 @@ def save_workitem(witem: dict, conn) ->  bool:
                     ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                 """
                 values = (
-                    witem["wi_refdate"], witem["wo_woid"], witem["wi_tdspid"], witem["wi_status"],
-                    witem["wi_tskgrl1"], witem["wi_tskgrl2"], witem["wi_desc"], witem["wi_note"], 
-                    witem["wi_time_qty"], witem["wi_time_um"]
+                    witem["REFDATE"], witem["WOID"], witem["TDSPID"], witem["STATUS"],
+                    witem["TSKGRL1"], witem["TSKGRL2"], witem["DESCRIPTION"], witem["NOTE"], 
+                    witem["TIME_QTY"], witem["TIME_UM"]
                 )
                 cursor.execute(sql, values)
                 conn.commit()

@@ -259,7 +259,7 @@ def create_workitem(conn)-> None:
                             except Exception as e:
                                 st.error(f"ERROR saving workitem data: {str(e)}")
 
-        return calendar_output
+        return calendar_output    
     # def show_calendar():
     #     if 'calendar_needs_update' not in st.session_state:
     #         st.session_state.calendar_needs_update = False

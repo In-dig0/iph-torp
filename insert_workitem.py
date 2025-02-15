@@ -300,7 +300,7 @@ def create_workitem(conn)-> None:
                                 }
 
                                 # Cancella l'evento dal database
-                                rc = sqlite_db.save_workitem(workitem_dict, conn)
+                                rc = sqlite_db.update_workitem(workitem_dict, conn)
                                 st.success("Work item deleted successfully!")
 
                                 # Aggiorna lo stato della sessione

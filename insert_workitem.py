@@ -233,11 +233,14 @@ def create_workitem(conn)-> None:
                 # Salva i dettagli dell'evento nella sessione
                 st.session_state.event_details[event_key] = {
                     "woid": woid,
-                    "tdsp": tdsp_name,
+                    "tdspid": tdspid,
+                    "tdsp_name": tdsp_name,
                     "time_qty": row['TIME_QTY'],
                     "time_um": row.get('TIME_UM', 'H'),
-                    "tskgrl1": servant.get_description_from_code(st.session_state.df_tskgrl1, row.get('TSKGRL1', ''), "NAME"),
-                    "tskgrl2": servant.get_description_from_code(st.session_state.df_tskgrl2, row.get('TSKGRL2', ''), "NAME"),
+                    "tskgrl1": row.get('TSKGRL1', ''),
+                    "tskgrl1_name": servant.get_description_from_code(st.session_state.df_tskgrl1, row.get('TSKGRL1', ''), "NAME"),
+                    "tskgrl2": row.get('TSKGRL2', ''),
+                    "tskgrl2_name": servant.get_description_from_code(st.session_state.df_tskgrl2, row.get('TSKGRL2', ''), "NAME"),
                     "description": row.get('DESC', ''),
                     "note": row.get('NOTE', ''),
                     "date": date,
@@ -378,7 +381,7 @@ def create_workitem(conn)-> None:
                     with st.form(key=f"edit_form_{event_key}"):
                         st.markdown("### Modifica Workitem")
                         st.markdown(f"**Work Order ID:** {event_data['woid']}")
-                        st.markdown(f"**Specialist:** {event_data['tdsp']}")
+                        st.markdown(f"**Specialist:** {event_data['tdsp_name']}")
                         st.markdown(f"**Data:** {event_data['date']}")
 
                         # Campi modificabili
@@ -416,9 +419,9 @@ def create_workitem(conn)-> None:
                                 workitem_dict = {
                                     "REFDATE": event_data['date'],
                                     "WOID": event_data['woid'],
-                                    "TDSPID": servant.get_code_from_name(st.session_state.df_users, event_data['tdsp'], "NAME"),  # Ottieni l'ID dal nome
-                                    "TSKGRL1": servant.get_code_from_name(st.session_state.df_tskgrl1, event_data['tskgrl1'], "NAME"),  # Ottieni l'ID dalla descrizione
-                                    "TSKGRL2": servant.get_code_from_name(st.session_state.df_tskgrl2, event_data['tskgrl2'], "NAME"),  # Ottieni l'ID dalla descrizione
+                                    "TDSPID": event_data['tdspid'],
+                                    "TSKGRL1": event_data['tskgrl1'],
+                                    "TSKGRL2": event_data['tskgrl2'],
                                     "TIME_QTY": new_time_qty,
                                     "DESC": new_description,
                                     "NOTE": new_note

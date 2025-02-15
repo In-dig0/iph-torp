@@ -422,7 +422,7 @@ def create_workitem(conn)-> None:
                                     "DESC": new_description,
                                     "NOTE": new_note
                                 }
-
+                                st.write(workitem_dict)
                                 # Aggiorna il database
                                 sqlite_db.update_workitem(workitem_dict, conn)  # Modificato l'ordine dei parametri
 

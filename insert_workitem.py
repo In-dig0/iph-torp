@@ -530,6 +530,7 @@ def create_workitem(conn)-> None:
                                     del st.session_state.selected_event_key
                                 if 'event_details' in st.session_state:
                                     del st.session_state.event_details
+                                    st.write("Rerunning after save") # Debug print    
 
                                 # Forza il refresh del calendario
                                 st.session_state.df_workitems = sqlite_db.load_workitems_data(conn)

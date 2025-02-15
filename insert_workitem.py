@@ -14,6 +14,269 @@ import servant
 
 def create_workitem(conn)-> None:
 
+    # def show_calendar():
+    #     # Inizializza il flag se non esiste
+    #     if 'calendar_needs_update' not in st.session_state:
+    #         st.session_state.calendar_needs_update = False
+
+    #     now = datetime.now()
+    #     ultimo_giorno = std_cal.monthrange(now.year, now.month)[1]
+    #     last_day_current_month = datetime(now.year, now.month, ultimo_giorno)
+    #     first_day_current_month = datetime(now.year, now.month, 1)
+    #     last_day_previous_month = first_day_current_month - timedelta(days=1)
+    #     first_day_previous_month = datetime(last_day_previous_month.year, last_day_previous_month.month, 1)
+
+    #     # Inizializza il dizionario degli eventi se non esiste
+    #     if 'event_details' not in st.session_state:
+    #         st.session_state.event_details = {}
+
+    #     # Aggiungi un pulsante di refresh
+    #     if st.button("🔄 Refresh Calendario"):
+    #         st.session_state.calendar_needs_update = True
+
+    #     cal_col, details_col = st.columns([4, 1])
+
+    #     with cal_col:
+    #         # Filtra i workitem in base al TD Specialist selezionato
+    #         if st.session_state.selected_tdsp_code:
+    #             df_filtered_witems = st.session_state.df_workitems[
+    #                 st.session_state.df_workitems["TDSPID"] == st.session_state.selected_tdsp_code
+    #             ].copy()
+    #         else:
+    #             df_filtered_witems = st.session_state.df_workitems.copy()
+
+    #         df_filtered_witems['REFDATE'] = pd.to_datetime(df_filtered_witems['REFDATE']).dt.strftime('%Y-%m-%d')
+
+    #         # Crea gli eventi per il calendario
+    #         calendar_events = []
+    #         st.session_state.event_details = {}  # Reset dei dettagli degli eventi
+
+    #         for index, row in df_filtered_witems.iterrows():
+    #             tdsp_name = servant.get_description_from_code(st.session_state.df_users, row['TDSPID'], "NAME")
+    #             tdspid = row['TDSPID']
+    #             woid = row['WOID']
+    #             date = row['REFDATE']
+
+    #             # Crea una chiave univoca per l'evento
+    #             event_key = f"{woid}_{date}_{tdspid}"
+
+    #             # Salva i dettagli dell'evento nella sessione
+    #             st.session_state.event_details[event_key] = {
+    #                 "woid": woid,
+    #                 "tdspid": tdspid,
+    #                 "tdsp_name": tdsp_name,
+    #                 "time_qty": row['TIME_QTY'],
+    #                 "time_um": row.get('TIME_UM', 'H'),
+    #                 "tskgrl1": row.get('TSKGRL1', ''),
+    #                 "tskgrl1_name": servant.get_description_from_code(st.session_state.df_tskgrl1, row.get('TSKGRL1', ''), "NAME"),
+    #                 "tskgrl2": row.get('TSKGRL2', ''),
+    #                 "tskgrl2_name": servant.get_description_from_code(st.session_state.df_tskgrl2, row.get('TSKGRL2', ''), "NAME"),
+    #                 "description": row.get('DESC', ''),
+    #                 "note": row.get('NOTE', ''),
+    #                 "date": date,
+    #                 "index": index
+    #             }
+
+    #             # Crea l'evento per il calendario
+    #             event = {
+    #                 "id": event_key,
+    #                 "title": f"[{woid}] - {row['TIME_QTY']} H - {tdsp_name}",
+    #                 "start": date,
+    #                 "backgroundColor": '#d4efdf',
+    #                 "borderColor": '#a2d9ce',
+    #                 "display": "block"
+    #             }
+    #             calendar_events.append(event)
+
+    #         # Opzioni del calendario
+    #         calendar_options = {
+    #             "editable": True,
+    #             "navLinks": True,
+    #             "selectable": True,
+    #             "headerToolbar": {
+    #                 "left": "today prev,next",
+    #                 "center": "title",
+    #                 "right": "dayGridMonth,timeGridWeek"
+    #             },
+    #             "validRange": {
+    #                 "start": f"{first_day_previous_month}",
+    #                 "end": f"{last_day_current_month}"
+    #             },
+    #             "hiddenDays": [0, 6],
+    #             "locale": {
+    #                 "code": "it",
+    #                 "week": {
+    #                     "dow": 1,
+    #                     "doy": 4
+    #                 }
+    #             },
+    #             "timeZone": "Europe/Rome",
+    #             "buttonText": {
+    #                 "today": "Oggi",
+    #                 "month": "Mese",
+    #                 "week": "Settimana"
+    #             },
+    #             'views': {
+    #                 'dayGridMonth': {
+    #                     'buttonText': 'Mese',
+    #                     'dayHeaderFormat': {
+    #                         'weekday': 'short'
+    #                     }
+    #                 },
+    #                 'timeGridWeek': {
+    #                     'buttonText': 'Settimana',
+    #                     'allDaySlot': True,
+    #                     'dayHeaderFormat': {
+    #                         'weekday': 'short',
+    #                         'day': '2-digit',
+    #                         'month': '2-digit',
+    #                     },
+    #                     'slotLabelFormat': {
+    #                         'hour': '',
+    #                         'minute': ''
+    #                     },
+    #                     'height': 300,
+    #                     'slotMinTime': '00:00:00',
+    #                     'slotMaxTime': '00:00:00'
+    #                 }
+    #             }
+    #         }
+
+    #         # CSS personalizzato
+    #         custom_css = """
+    #             .fc-event-past {
+    #                 opacity: 0.8;
+    #             }
+    #             .fc-event-time {
+    #                 font-style: italic;
+    #             }
+    #             .fc-event-title {
+    #                 font-weight: 700;
+    #                 color: #000000;
+    #                 white-space: pre-wrap;
+    #                 cursor: pointer;
+    #             }            
+    #             .fc-toolbar-title {
+    #                 font-size: 2rem;
+    #             }
+    #             .fc-daygrid-day.fc-day-other {
+    #                 display: none;
+    #             }
+    #             .fc-col-header-cell {
+    #                 background-color: #DAF7A6 !important;
+    #                 color: #000000;
+    #             }
+    #             .fc-timegrid-slot-lane {
+    #                 display: none;
+    #             }
+    #             .fc-timegrid-slot-label {
+    #                 display: none;
+    #             }
+    #         """
+
+    #         # Mostra il calendario
+    #         if st.session_state.calendar_needs_update:
+    #             with st.spinner("Aggiornamento calendario..."):
+    #                 # Ricarica i dati dal database
+    #                 st.session_state.df_workitems = sqlite_db.load_workitems_data(conn)
+    #                 st.session_state.calendar_needs_update = False  # Reset del flag
+
+    #                 # Rigenera il calendario
+    #                 calendar_output = calendar(
+    #                     events=calendar_events,
+    #                     options=calendar_options,
+    #                     custom_css=custom_css,
+    #                     key=f'calendar_{st.session_state.selected_tdsp_code or "all"}'
+    #                 )
+    #         else:
+    #             calendar_output = calendar(
+    #                 events=calendar_events,
+    #                 options=calendar_options,
+    #                 custom_css=custom_css,
+    #                 key=f'calendar_{st.session_state.selected_tdsp_code or "all"}'
+    #             )
+
+    #         # Gestione del click sull'evento
+    #         if calendar_output.get("eventClick"):
+    #             event_key = calendar_output["eventClick"]["event"]["id"]
+    #             st.session_state.selected_event_key = event_key
+
+    #     # Pannello dei dettagli a destra
+    #     with details_col:
+    #         if hasattr(st.session_state, 'selected_event_key') and st.session_state.selected_event_key is not None:
+    #             event_key = st.session_state.selected_event_key
+    #             if event_key in st.session_state.event_details:
+    #                 event_data = st.session_state.event_details[event_key]
+
+    #                 with st.form(key=f"edit_form_{event_key}"):
+    #                     st.markdown("### Modifica Workitem")
+    #                     st.markdown(f"**Work Order ID:** {event_data['woid']}")
+    #                     st.markdown(f"**Specialist:** {event_data['tdsp_name']}")
+    #                     st.markdown(f"**Data:** {event_data['date']}")
+
+    #                     # Campi modificabili
+    #                     new_time_qty = st.number_input(
+    #                         ":blue[Time]",
+    #                         min_value=0.0,
+    #                         max_value=24.0,
+    #                         value=float(event_data['time_qty']),
+    #                         step=0.5,
+    #                         format="%.1f"
+    #                     )
+
+    #                     new_description = st.text_area(
+    #                         ":blue[Description]",
+    #                         value=event_data['description'],
+    #                         height=100
+    #                     )
+
+    #                     new_note = st.text_area(
+    #                         ":blue[Note]",
+    #                         value=event_data['note'],
+    #                         height=100
+    #                     )
+
+    #                     submitted = st.form_submit_button("Save")
+    #                     if submitted:
+    #                         try:
+    #                             # Aggiorna il DataFrame originale
+    #                             df_index = event_data['index']
+    #                             st.session_state.df_workitems.at[df_index, 'TIME_QTY'] = new_time_qty
+    #                             st.session_state.df_workitems.at[df_index, 'DESC'] = new_description
+    #                             st.session_state.df_workitems.at[df_index, 'NOTE'] = new_note
+
+    #                             # Prepara il dizionario per l'aggiornamento
+    #                             workitem_dict = {
+    #                                 "REFDATE": event_data['date'],
+    #                                 "WOID": event_data['woid'],
+    #                                 "TDSPID": event_data['tdspid'],
+    #                                 "TSKGRL1": event_data['tskgrl1'],
+    #                                 "TSKGRL2": event_data['tskgrl2'],
+    #                                 "TIME_QTY": new_time_qty,
+    #                                 "DESC": new_description,
+    #                                 "NOTE": new_note
+    #                             }
+
+    #                             # Aggiorna il database
+    #                             rc = sqlite_db.update_workitem(workitem_dict, conn)
+
+    #                             # Reset completo dello stato della sessione
+    #                             st.success("Update successfully!")
+    #                             st.session_state.calendar_needs_update = True
+    #                             if 'selected_event_key' in st.session_state:
+    #                                 del st.session_state.selected_event_key
+    #                             if 'event_details' in st.session_state:
+    #                                 del st.session_state.event_details
+
+    #                             # Forza il refresh del calendario
+    #                             st.session_state.df_workitems = sqlite_db.load_workitems_data(conn)
+    #                             time.sleep(0.1)
+    #                             st.rerun()
+
+    #                         except Exception as e:
+    #                             st.error(f"ERROR saving workitem data: {str(e)}")
+    #     return calendar_output  
+
     def show_calendar():
         # Inizializza il flag se non esiste
         if 'calendar_needs_update' not in st.session_state:
@@ -155,7 +418,7 @@ def create_workitem(conn)-> None:
                     color: #000000;
                     white-space: pre-wrap;
                     cursor: pointer;
-                }            
+                }
                 .fc-toolbar-title {
                     font-size: 2rem;
                 }
@@ -275,8 +538,9 @@ def create_workitem(conn)-> None:
 
                             except Exception as e:
                                 st.error(f"ERROR saving workitem data: {str(e)}")
-        return calendar_output  
-        
+        return calendar_output
+
+
     # Load data only once and store in session state
     session_data = {
         'df_depts': sqlite_db.load_dept_data,

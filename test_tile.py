@@ -68,15 +68,15 @@ def show_tile(conn):
 
 
 
-data = [
-    {"name": "Item 1", "description": "Description 1", "value": 10},
-    {"name": "Item 2", "description": "Description 2", "value": 20},
-    {"name": "Item 3", "description": "Description 3", "value": 30},
-]
+    data = [
+        {"name": "Item 1", "description": "Description 1", "value": 10},
+        {"name": "Item 2", "description": "Description 2", "value": 20},
+        {"name": "Item 3", "description": "Description 3", "value": 30},
+    ]
 
-for item in data:
-    card(
-        title=item['name'],
-        text=item['description'],
-        key=f"card_{item['name']}"
-    )
+    for item in data:
+        card(
+            title=item['name'],
+            text=item['description'],
+            key=f"card_{item['name']}"
+        )

@@ -71,7 +71,8 @@ def main():
     "🎯 Insert Workitem": lambda: insert_workitem.create_workitem(conn),
     "📅 View Workitem": lambda: view_workitem.view_workitems(conn),
     "📉 Dashboard": lambda: dashboard.dashboard(conn),
-    "TEST Calendar": lambda: test_calendar.show_calendar(conn)
+    "TEST Calendar": lambda: test_calendar.show_calendar(conn),
+    "TEST Tile": lambda: test_tile.show_tile(conn)
     # "🔐 Close db": close_sqlitecloud_db,
 }    
   demo_name = st.sidebar.selectbox(":orange[Choose a function]", page_names_to_funcs.keys())

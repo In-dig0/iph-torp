@@ -1,4 +1,5 @@
 import streamlit as st
+from streamlit_card import card
 
 def show_tile(conn):
     data = [
@@ -64,3 +65,18 @@ def show_tile(conn):
             <p><strong>Value:</strong> {item['value']}</p>
         </div>
         """, unsafe_allow_html=True)
+
+
+
+data = [
+    {"name": "Item 1", "description": "Description 1", "value": 10},
+    {"name": "Item 2", "description": "Description 2", "value": 20},
+    {"name": "Item 3", "description": "Description 3", "value": 30},
+]
+
+for item in data:
+    card(
+        title=item['name'],
+        text=item['description'],
+        key=f"card_{item['name']}"
+    )

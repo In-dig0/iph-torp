@@ -20,6 +20,7 @@ import manage_request
 import manage_workorder
 import dashboard
 import test_calendar
+import test_tile
 
 # 3th party packages
 import streamlit as st

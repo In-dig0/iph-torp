@@ -2,12 +2,13 @@ import streamlit as st
 from streamlit_card import card
 
 def show_tile(conn):
+    
+    st.title(":orange[LAYOUT A]")
     data = [
         {"name": "Item 1", "description": "Description 1", "value": 10},
         {"name": "Item 2", "description": "Description 2", "value": 20},
         {"name": "Item 3", "description": "Description 3", "value": 30},
     ]
-
     cols = st.columns(3)
     for idx, item in enumerate(data):
         with cols[idx % 3]:
@@ -15,7 +16,7 @@ def show_tile(conn):
             st.write(item['description'])
             st.write(f"**Value:** {item['value']}")
 
-
+    st.title(":orange[LAYOUT B]")
     data = [
         {"name": "Item 1", "description": "Description 1", "value": 10},
         {"name": "Item 2", "description": "Description 2", "value": 20},
@@ -51,6 +52,8 @@ def show_tile(conn):
     </style>
     """, unsafe_allow_html=True)
 
+
+    st.title(":orange[LAYOUT C]")
     data = [
         {"name": "Item 1", "description": "Description 1", "value": 10},
         {"name": "Item 2", "description": "Description 2", "value": 20},
@@ -67,7 +70,7 @@ def show_tile(conn):
         """, unsafe_allow_html=True)
 
 
-
+    st.title(":orange[LAYOUT D]")
     data = [
         {"name": "Item 1", "description": "Description 1", "value": 10},
         {"name": "Item 2", "description": "Description 2", "value": 20},

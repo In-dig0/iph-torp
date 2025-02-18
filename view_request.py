@@ -61,6 +61,7 @@ def view_requests(conn) -> None:
         'df_lk_type_category': sqlite_db.load_lk_type_category_data,
         'df_lk_category_detail': sqlite_db.load_lk_category_detail_data,
         'df_lk_pline_tdtl': sqlite_db.load_lk_pline_tdtl_data,
+        'df_permission': sqlite_db.load_permission_data,
         'df_detail': sqlite_db.load_detail_data,
         'df_requests': sqlite_db.load_requests_data,
         'df_reqassignedto': sqlite_db.load_reqassignedto_data,

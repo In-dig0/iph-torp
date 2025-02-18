@@ -290,6 +290,25 @@ def load_tskgrl2_data(conn):
     
     return df_tskgrl2
 
+
+def load_permission_data(conn):
+    """ Load TORP_PERMISSION records into df """    
+    
+    try:
+        df_permission = pd.read_sql_query("""
+            SELECT 
+                A.obj AS OBJ, 
+                A.rolecode AS ROLECODE,
+                A.action AS ACTION
+            FROM TORP_PERMISSION AS A
+            ORDER by obj
+            """, conn)
+    except Exception as errMsg:
+        st.error(f"**ERROR load data from TORP_PERMISSION: \n{errMsg}", icon="🚨")
+        return None
+    
+    return df_permission
+
 def load_requests_data(conn):
     """ Load TORP_REQUESTS records into df """    
 
@@ -892,16 +911,26 @@ def update_workitem(witem: dict, conn) -> bool:
 
         sql = """
         UPDATE TORP_WORKITEMS SET
-            status = ?, tskgrl1 = ?, tskgrl2 = ?, 
-            time_qty = ?, description = ?, note = ?
+            status = ?, 
+            tskgrl1 = ?, 
+            tskgrl2 = ?, 
+            time_qty = ?, 
+            description = ?, 
+            note = ?
         WHERE woid = ?
         AND tdspid = ?
         AND refdate = ?
         """
         values = (
-            witem["STATUS"], witem["TSKGRL1"], witem["TSKGRL2"],
-            witem["TIME_QTY"], witem["DESCRIPTION"], witem["NOTE"],
-            witem["WOID"], witem["TDSPID"], witem["REFDATE"]  
+            witem["STATUS"], 
+            witem["TSKGRL1"], 
+            witem["TSKGRL2"],
+            witem["TIME_QTY"], 
+            witem["DESCRIPTION"], 
+            witem["NOTE"],
+            witem["WOID"], 
+            witem["TDSPID"], 
+            witem["REFDATE"]  
         )
         cursor.execute(sql, values)
         conn.commit()        
@@ -922,7 +951,9 @@ def delete_workitem(witem: dict, conn) ->  bool:
         cursor = conn.cursor()
         query = """
             DELETE FROM workitems
-            WHERE REFDATE = ? AND WOID = ? AND TDSPID = ?
+            WHERE REFDATE = ? 
+            AND WOID = ? 
+            AND TDSPID = ?
         """
         cursor.execute(query, (witem["REFDATE"], witem["WOID"], witem["TDSPID"]))
         conn.commit()

@@ -265,7 +265,7 @@ def show_workorder_dialog(selected_row_dict,  # Passa un dizionario
 
         wo_type = st.selectbox(label="Type(:red[*])", options=wo_type_options, index=wo_type_index, disabled=False)
         wo_time_qty = st.number_input(
-            label=":ornage[Time estimated](:red[*])",
+            label=":orange[Time estimated](:red[*])",
             min_value=min_value, # Usa il valore minimo predefinito
             value=wo_timeqty_default if wo_timeqty_default is not None else 0, # Valore iniziale
             step=0.5

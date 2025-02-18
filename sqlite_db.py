@@ -309,6 +309,7 @@ def load_permission_data(conn):
     
     return df_permission
 
+
 def load_requests_data(conn):
     """ Load TORP_REQUESTS records into df """    
 

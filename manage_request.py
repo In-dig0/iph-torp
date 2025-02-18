@@ -84,7 +84,13 @@ def show_request_dialog(selected_row_dict, req_status_options, update_request_fn
             req_tdtl_code = []
 
         idx_status = req_status_options.index(selected_row_dict['STATUS'])  # Usa selected_row_dict
-        req_status = st.selectbox(label=":orange[Status](:red[*])", options=req_status_options, index=idx_status, disabled=False, key="status_selectbox")
+        req_status = st.selectbox(
+            label=":orange[Status](:red[*])", 
+            options=req_status_options, 
+            index=idx_status, 
+            key="status_selectbox",
+            disabled=False
+        )
         
         # Display Tech Dept Note
         default_note_td = str(st.session_state.df_requests[st.session_state.df_requests["REQID"] == reqid]["NOTE_TD"].values[0])
@@ -259,7 +265,7 @@ def show_workorder_dialog(selected_row_dict,  # Passa un dizionario
 
         wo_type = st.selectbox(label="Type(:red[*])", options=wo_type_options, index=wo_type_index, disabled=False)
         wo_time_qty = st.number_input(
-            label="Time estimated(:red[*])",
+            label=":ornage[Time estimated](:red[*])",
             min_value=min_value, # Usa il valore minimo predefinito
             value=wo_timeqty_default if wo_timeqty_default is not None else 0, # Valore iniziale
             step=0.5

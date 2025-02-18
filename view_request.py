@@ -215,8 +215,8 @@ def view_requests(conn) -> None:
         #tdtl_name_list = get_description_from_code(df_users, tdtl_code_list, "NAME")
         tdtl_name_list = [servant.get_description_from_code(st.session_state.df_users, code, "NAME") for code in tdtl_code_list]
         tdtl_name_string = "-".join(tdtl_name_list)
-        user_perm = st.session_state.df_permission[st.session_state.df_permission["OBJ"]=="vr-req_tdtl_assign" & st.session_state.df_permission["ROLECODE"]==st.session_state["USER_ROLE"]]
         st.write(st.session_state["USER_ROLE"])
+        user_perm = st.session_state.df_permission[st.session_state.df_permission["OBJ"]=="vr-req_tdtl_assign" & st.session_state.df_permission["ROLECODE"]==st.session_state["USER_ROLE"]]["ACTION"]
         st.write(user_perm)
         if user_perm == "HIDE":
             tdtl_name_string = ""

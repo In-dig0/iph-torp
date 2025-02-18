@@ -60,6 +60,7 @@ def main():
 
   # Simulate a user login with R01 role (Requester)
   st.session_state["USER_ROLE"] = "R01"
+  st.write(st.session_state["USER_ROLE"])
   
   # Add IPH logo to sidebar 
   st.sidebar.image("https://iph.it/wp-content/uploads/2020/02/logo-scritta.png", width=150)    

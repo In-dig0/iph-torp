@@ -59,7 +59,7 @@ def main():
     st.title(f"Welcome :orange[{current_username.iloc[0]}]!")
 
   # Simulate a user login with R01 role (Requester)
-  st.session_state["USER_ROLE"] = "R01"
+  st.session_state["USER_ROLE"] = "R02"
   st.write(st.session_state["USER_ROLE"])
   
   # Add IPH logo to sidebar 

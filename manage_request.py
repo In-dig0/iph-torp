@@ -263,7 +263,7 @@ def show_workorder_dialog(selected_row_dict,  # Passa un dizionario
         else:
             req_tdtl_code = None # o un valore di default che preferisci            
 
-        wo_type = st.selectbox(label="Type(:red[*])", options=wo_type_options, index=wo_type_index, disabled=False)
+        wo_type = st.selectbox(label=":orange[Type](:red[*])", options=wo_type_options, index=wo_type_index, disabled=False)
         wo_time_qty = st.number_input(
             label=":orange[Time estimated](:red[*])",
             min_value=min_value, # Usa il valore minimo predefinito
@@ -283,7 +283,7 @@ def show_workorder_dialog(selected_row_dict,  # Passa un dizionario
             wo_assignedto_default_names.append(name)
 
         wo_assignedto_option = list(df_tdusers["NAME"])
-        wo_assignedto_title = "Tech Department Specialists assigned to (:red[*])"
+        wo_assignedto_title = ":orange[Tech Department Specialists assigned to](:red[*])"
         wo_assignedto = st.multiselect(
             label=wo_assignedto_title, 
             options=wo_assignedto_option, 

@@ -762,16 +762,32 @@ def save_workorder(wo: dict, conn): # Pass connection and cursor
                 # UPDATE
                 sql = """
                     UPDATE TORP_WORKORDERS SET
-                        type = ?, title = ?, description = ?,
-                        time_qty = ?, time_um = ?, status = ?, startdate = ?,
-                        enddate = ?, reqid = ?, sequence = ?
+                        type = ?, 
+                        title = ?, 
+                        description = ?,
+                        time_qty = ?, 
+                        time_um = ?, 
+                        status = ?, 
+                        startdate = ?,
+                        enddate = ?, 
+                        reqid = ?, 
+                        sequence = ?
                     WHERE woid = ?
                     AND tdtlid = ?
                 """
                 values = (
-                    wo["type"], wo["title"], wo["description"],
-                    wo["time_qty"], wo["time_um"], wo["status"], wo["startdate"],
-                    wo["enddate"], wo["reqid"], wo["woid"], wo["tdtlid"], wo["sequence"]  # Include woid in WHERE clause
+                    wo["type"], 
+                    wo["title"], 
+                    wo["description"],
+                    wo["time_qty"], 
+                    wo["time_um"], 
+                    wo["status"], 
+                    wo["startdate"],
+                    wo["enddate"], 
+                    wo["reqid"], 
+                    wo["sequence"], 
+                    wo["woid"], 
+                    wo["tdtlid"]
                 )
                 cursor.execute(sql, values)
                 conn.commit()
@@ -786,9 +802,19 @@ def save_workorder(wo: dict, conn): # Pass connection and cursor
                     ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                 """
                 values = (
-                    wo["woid"], wo["tdtlid"], wo["type"], wo["title"], wo["description"],
-                    wo["time_qty"], wo["time_um"], wo["status"], wo["startdate"],
-                    wo["enddate"], wo["reqid"], wo["insdate"], wo["sequence"]
+                    wo["woid"], 
+                    wo["tdtlid"], 
+                    wo["type"], 
+                    wo["title"], 
+                    wo["description"],
+                    wo["time_qty"], 
+                    wo["time_um"], 
+                    wo["status"], 
+                    wo["startdate"],
+                    wo["enddate"], 
+                    wo["reqid"], 
+                    wo["insdate"], 
+                    wo["sequence"]
                 )
                 cursor.execute(sql, values)
                 conn.commit()

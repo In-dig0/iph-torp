@@ -406,7 +406,7 @@ def load_workorders_data(conn):
         ORDER BY REQID
         """, conn)
         df_workorders["INSDATE"] = pd.to_datetime(df_workorders["INSDATE"])
-        df_workorders["INSDATE"] = df_workorders["INSDATE"].strftime("%Y-%m-%d")
+        df_workorders["INSDATE"] = df_workorders["INSDATE"].dt.strftime('%Y-%m-%d')
     except Exception as errMsg:
         st.error(f"**ERROR load data from TORP_WORKORDERS: \n{errMsg}", icon="🚨")
         return None

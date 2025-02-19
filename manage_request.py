@@ -331,6 +331,7 @@ def show_workorder_dialog(selected_row_dict,  # Passa un dizionario
                 "sequence": SEQUENCE_NORMAL
             }
             st.write(wo)
+            time.sleep(10)
             wo_idrow, success = sqlite_db.save_workorder(wo, conn)
             if success:
                 #st.write(f"{woid} - {req_tdtl_code} - {wo_assignedto}- {st.session_state.df_user} - {st.session_state.df_woassignedto}")

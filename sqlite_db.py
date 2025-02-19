@@ -336,6 +336,7 @@ def load_requests_data(conn):
         ORDER by REQID desc
         """, conn)
         df_requests["INSDATE"] = pd.to_datetime(df_requests["INSDATE"])
+        df_requests["INSDATE"] = df_requests["INSDATE"].dt.strftime('%Y-%m-%d')
     except Exception as errMsg:
         st.error(f"**ERROR load data from TORP_REQUESTS: \n{errMsg}", icon="🚨")
         return None
@@ -455,6 +456,7 @@ def load_workitems_data(conn):
         ORDER BY WOID
         """, conn)
         df_workitem['REFDATE'] = pd.to_datetime(df_workitem['REFDATE']) 
+        df_workitem["REFDATE"] = df_workitem["REFDATE"].dt.strftime('%Y-%m-%d')        
     except Exception as errMsg:
         st.error(f"**ERROR load data from TORP_WORKITEMS: \n{errMsg}", icon="🚨")
         return None

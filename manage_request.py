@@ -363,7 +363,7 @@ def manage_request(conn):
     df_requests_grid = pd.DataFrame()
     df_requests_grid['REQID'] = st.session_state.df_requests['REQID']
     df_requests_grid['STATUS'] = st.session_state.df_requests['STATUS']
-    df_requests_grid['INSDATE'] = st.session_state.df_requests['INSDATE'].dt.strftime('%d/%m/%Y')
+    df_requests_grid['INSDATE'] = st.session_state.df_requests['INSDATE']#.dt.strftime('%d/%m/%Y')
 #    df_requests_grid['DEPTNAME'] = df_requests['DEPT'].apply(lambda dept_code: get_description_from_code(df_depts, dept_code, "NAME"))
     df_requests_grid['PRIORITY'] = st.session_state.df_requests['PRIORITY']
 

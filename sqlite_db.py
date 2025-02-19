@@ -837,8 +837,8 @@ def save_workorder_assignments(woid, tdtl_code, assigned_users, df_users, df_woa
         with conn:
             cursor = conn.cursor()
             cursor.execute(
-                "UPDATE TORP_WOASSIGNEDTO SET status = ? WHERE woid = ?",
-                (DISABLED_STATUS, woid)
+                "UPDATE TORP_WOASSIGNEDTO SET status = ? WHERE woid = ? AND tdtlid = ?",
+                (DISABLED_STATUS, woid, tdtl_code)
             )
             conn.commit()
             
@@ -865,7 +865,7 @@ def save_workorder_assignments(woid, tdtl_code, assigned_users, df_users, df_woa
                     )
             
                 conn.commit()
-                return True
+            return True
     
     except Exception as e:
         st.error(f"Error updating TORP_WOASSIGNEDTO: {str(e)}", icon="🚨")

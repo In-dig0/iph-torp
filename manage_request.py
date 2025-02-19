@@ -329,11 +329,11 @@ def show_workorder_dialog(selected_row_dict,  # Passa un dizionario
                 "insdate": wo_insdate_default,
                 "sequence": SEQUENCE_NORMAL
             }
-            st.write(wo)
-            time.sleep(10)
+            #st.write(wo)
+            #time.sleep(10)
             wo_idrow, success = sqlite_db.save_workorder(wo, conn)
             if success:
-                #st.write(f"{woid} - {req_tdtl_code} - {wo_assignedto}- {st.session_state.df_user} - {st.session_state.df_woassignedto}")
+                st.write(f"{woid} - {req_tdtl_code} - {wo_assignedto}- {st.session_state.df_user} - {st.session_state.df_woassignedto}")
                 success = sqlite_db.save_workorder_assignments(woid, req_tdtl_code, wo_assignedto, st.session_state.df_users, st.session_state.df_woassignedto, conn)
                 success = sqlite_db.update_request(reqid, "ASSIGNED", req_note_td, "", [req_tdtl_code], conn)
                 if success:

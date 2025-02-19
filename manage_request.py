@@ -333,7 +333,7 @@ def show_workorder_dialog(selected_row_dict,  # Passa un dizionario
             #time.sleep(10)
             wo_idrow, success = sqlite_db.save_workorder(wo, conn)
             if success:
-                st.write(f"{woid} - {req_tdtl_code} - {wo_assignedto}- {st.session_state.df_user} - {st.session_state.df_woassignedto}")
+                #st.write(f"{woid} - {req_tdtl_code} - {wo_assignedto}- {st.session_state.df_user} - {st.session_state.df_woassignedto}")
                 success = sqlite_db.save_workorder_assignments(woid, req_tdtl_code, wo_assignedto, st.session_state.df_users, st.session_state.df_woassignedto, conn)
                 success = sqlite_db.update_request(reqid, "ASSIGNED", req_note_td, "", [req_tdtl_code], conn)
                 if success:
@@ -341,6 +341,8 @@ def show_workorder_dialog(selected_row_dict,  # Passa un dizionario
                     st.session_state.grid_response = None
                     st.success(f"Work order {woid} created successfully!")
                     st.session_state.df_requests = sqlite_db.load_requests_data(conn)  # Ricarica i dati dal database
+                    st.session_state.df_workorders = sqlite_db.load_workorders_data(conn) 
+                    st.session_state.df_woassignedto = sqlite_db.load_woassignedto_data(conn) 
                     st.session_state.need_refresh = True
                     time.sleep(3)
                     reset_application_state()
@@ -352,6 +354,7 @@ def show_workorder_dialog(selected_row_dict,  # Passa un dizionario
 def manage_request(conn):
 
     # Initialize session state
+    sqlite_db.initialize_session_state(conn)
     if "grid_data" not in st.session_state:
         st.session_state.grid_data = st.session_state.df_requests.copy()
     if "grid_response" not in st.session_state:
@@ -476,6 +479,8 @@ def manage_request(conn):
         if st.button("🔄 Refresh data", type="secondary"):
             reset_application_state()
             st.session_state.df_requests = sqlite_db.load_requests_data(conn)  # Ricarica i dati dal database
+            st.session_state.df_workorders = sqlite_db.load_workorders_data(conn) 
+            st.session_state.df_woassignedto = sqlite_db.load_woassignedto_data(conn)             
     
     with col2:
         if st.button("✏️ Modify Request", type="secondary", disabled=modify_request_button_disable):

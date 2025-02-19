@@ -18,7 +18,6 @@ STATUS_WIP = "WIP"
 REQ_STATUS_OPTIONS = ['NEW', 'PENDING', 'ASSIGNED', 'WIP', 'COMPLETED', 'DELETED']
 SEQUENCE_NORMAL = ""
 
-# ... (Caricamento dei dati nello stato della sessione come prima)
 
 def reset_application_state():
     """Reset all session state variables and cached data"""

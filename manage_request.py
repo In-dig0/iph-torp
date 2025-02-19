@@ -203,6 +203,13 @@ def show_workorder_dialog(selected_row_dict,  # Passa un dizionario
         else:
             wo_type_index = 0  
 
+        wo_insdate_filtered = st.session_state.df_workorders[st.session_state.df_workorders["WOID"] == woid]["INSDATE"]
+        if not wo_insdate_filtered.empty:
+            wo_insdate_default = wo_insdate_filtered.values[0]
+        else:
+            wo_insdate_default = datetime.datetime.now().strftime("%Y-%m-%d")  # O un valore di default appropriato
+
+
         wo_startdate_filtered = st.session_state.df_workorders[st.session_state.df_workorders["WOID"] == woid]["STARTDATE"]
         if not wo_startdate_filtered.empty:
             wo_startdate_default = wo_startdate_filtered.values[0]
@@ -308,7 +315,6 @@ def show_workorder_dialog(selected_row_dict,  # Passa un dizionario
 
 
         if st.button("Salva", type="primary", disabled=disable_save_button, key="wo_save_button"):
-            insdate = datetime.datetime.now().strftime("%Y-%m-%d")
             wo = {
                 "woid": woid,
                 "tdtlid": req_tdtl_code,
@@ -321,9 +327,10 @@ def show_workorder_dialog(selected_row_dict,  # Passa un dizionario
                 "startdate": wo_startdate,
                 "enddate": wo_enddate,
                 "reqid": reqid,
-                "insdate": insdate,
+                "insdate": wo_insdate_default,
                 "sequence": SEQUENCE_NORMAL
             }
+            st.write(wo)
             wo_idrow, success = sqlite_db.save_workorder(wo, conn)
             if success:
                 #st.write(f"{woid} - {req_tdtl_code} - {wo_assignedto}- {st.session_state.df_user} - {st.session_state.df_woassignedto}")
